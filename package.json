@@ -1,0 +1,48 @@
+{
+  "name": "breakthebox",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "paraglide:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
+    "@inlang/paraglide-js": "^2.0.0",
+    "@lucia-auth/adapter-drizzle": "^1.1.0",
+    "arctic": "^2.1.1",
+    "drizzle-orm": "^0.41.0",
+    "lucia": "^3.2.2",
+    "lucide-svelte": "^0.577.0",
+    "postgres": "^3.4.5",
+    "sveltekit-superforms": "^2.23.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "^5.2.11",
+    "@sveltejs/kit": "^2.21.1",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tailwindcss/vite": "^4.1.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/svelte": "^5.2.7",
+    "drizzle-kit": "^0.30.4",
+    "jsdom": "^26.1.0",
+    "svelte": "^5.28.2",
+    "svelte-check": "^4.1.5",
+    "tailwindcss": "^4.1.3",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.2",
+    "vitest": "^3.1.2"
+  },
+  "type": "module"
+}

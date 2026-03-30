@@ -1,0 +1,49 @@
+# ═══════════════════════════════════════════════════════════
+# Docker Compose — Development Environment
+# ═══════════════════════════════════════════════════════════
+# Usage:
+#   docker compose up -d db        # Start only PostgreSQL
+#   docker compose up -d           # Start all services
+#   docker compose down            # Stop all services
+#   docker compose logs -f app     # Follow app logs
+
+services:
+  # ─── PostgreSQL Database ───
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME:-breakthebox_dev}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ─── Application (optional — for production-like testing) ───
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-breakthebox_dev}
+      - NODE_ENV=production
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - full  # Only starts with: docker compose --profile full up
+
+volumes:
+  pgdata:

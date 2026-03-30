@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "mosaikjobs-dev",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["scripts/start-mosaikjobs.sh"],
+      "port": 5173
+    },
+    {
+      "name": "db-studio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "db:studio"],
+      "port": 4983
+    },
+    {
+      "name": "mosaikjobs-docs",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "/Users/brigittehulliger/Dev/opus_46_team/mosaikjobs.ch/docs", "-p", "4242", "--no-clipboard"],
+      "port": 4242
+    }
+  ]
+}

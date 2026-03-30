@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Break the Box — Design System Reference v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════ */
+/* BREAK THE BOX — DESIGN SYSTEM v2                           */
+/* Copy-Paste Reference for Claude Code                        */
+/* Dual Mode (Dark + Light) | Steel + Copper                   */
+/* ═══════════════════════════════════════════════════════════ */
+
+/* ─── 1. CSS CUSTOM PROPERTIES ─── */
+:root {
+  /* Brand */
+  --btb-steel: #527a98;
+  --btb-steel-light: #6a94b2;
+  --btb-steel-subtle: rgba(82, 122, 152, 0.2);
+  --btb-steel-hover: #628ea8;
+  --btb-copper: #c4856a;
+  --btb-copper-light: #d4a08a;
+  --btb-copper-subtle: rgba(196, 133, 106, 0.15);
+
+  /* Dark Mode Surfaces */
+  --bg-page-dark: #0f1420;
+  --bg-surface-dark: rgba(255, 255, 255, 0.04);
+  --bg-surface-hover-dark: rgba(255, 255, 255, 0.06);
+  --bg-elevated-dark: #0f1729;
+  --bg-card-dark: rgba(255, 255, 255, 0.04);
+  --bg-overlay-dark: rgba(15, 23, 41, 0.92);
+  --border-dark: rgba(255, 255, 255, 0.08);
+  --border-dark-subtle: rgba(255, 255, 255, 0.06);
+
+  /* Dark Mode Text */
+  --text-primary-dark: #e8edf5;
+  --text-secondary-dark: #94a3b8;
+  --text-muted-dark: #64748b;
+  --text-heading-dark: #ffffff;
+
+  /* Light Mode Surfaces */
+  --bg-page-light: #f0f4f8;
+  --bg-surface-light: #ffffff;
+  --bg-section-light: #f8fafb;
+  --bg-elevated-light: #edf1f5;
+  --border-light: #e2e8f0;
+  --border-light-subtle: rgba(0, 0, 0, 0.06);
+
+  /* Light Mode Text */
+  --text-primary-light: #1a2332;
+  --text-secondary-light: #64748b;
+  --text-muted-light: #94a3b8;
+  --text-heading-light: #1a2332;
+
+  /* Category Colors */
+  --cat-blue: rgba(82, 122, 152, 0.2);
+  --cat-copper: rgba(196, 133, 106, 0.15);
+  --cat-violet: rgba(139, 92, 246, 0.15);
+  --cat-amber: rgba(245, 158, 11, 0.15);
+  --cat-emerald: rgba(16, 185, 129, 0.15);
+  --cat-rose: rgba(244, 63, 94, 0.15);
+
+  /* Icon Text Colors */
+  --icon-blue: #527a98;
+  --icon-copper: #c4856a;
+  --icon-violet: #a78bfa;
+  --icon-amber: #fbbf24;
+  --icon-emerald: #34d399;
+  --icon-rose: #fb7185;
+
+  /* Semantic */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #fb7185;
+  --color-info: #527a98;
+  --color-ai: #c4856a;
+
+  /* Shadows (Dark) */
+  --shadow-card-dark: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover-dark: 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  /* Shadows (Light) */
+  --shadow-card-light: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover-light: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  /* Shared */
+  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.2);
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-card: 16px;
+  --radius-card-lg: 20px;
+  --radius-button: 12px;
+  --radius-pill: 9999px;
+  --radius-icon-badge: 14px;
+  --radius-circle: 50%;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Z-Index */
+  --z-dropdown: 100;
+  --z-sidebar: 200;
+  --z-sticky: 400;
+  --z-overlay: 500;
+  --z-modal: 1000;
+  --z-toast: 2000;
+}
+
+/* ─── 2. RESET & BASE ─── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  background: var(--bg-page-light);
+  color: var(--text-primary-light);
+}
+
+/* ─── 3. REFERENCE PAGE LAYOUT ─── */
+.ref-page { max-width: 1200px; margin: 0 auto; padding: 48px 32px; }
+.ref-section {
+  margin-bottom: 64px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border-light);
+}
+.ref-section:last-child { border-bottom: none; }
+.ref-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-heading-light);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.ref-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary-light);
+  margin-bottom: 32px;
+}
+.ref-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted-light);
+  margin-bottom: 12px;
+}
+.ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.ref-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+
+/* ─── DUAL MODE DEMO CONTAINERS ─── */
+.demo-dark {
+  background: var(--bg-page-dark);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  color: var(--text-primary-dark);
+}
+.demo-light {
+  background: var(--bg-page-light);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  border: 1px solid var(--border-light);
+  color: var(--text-primary-light);
+}
+.demo-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="ref-page">
+
+<!-- ════════════════════════════════════════ -->
+<!-- HEADER                                  -->
+<!-- ════════════════════════════════════════ -->
+<div style="text-align: center; margin-bottom: 64px;">
+  <div style="font-size: 0.82rem; font-weight: 600; color: var(--btb-steel); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px;">Design System v2</div>
+  <h1 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text-heading-light);">Break the Box</h1>
+  <p style="font-size: 1rem; color: var(--text-secondary-light); margin-top: 8px;">Dual-Mode Reference — Steel + Copper — Nummernkreise</p>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 1. COLORS                               -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">1. Farben</h2>
+  <p class="ref-subtitle">Brand-Farben, Dual-Mode-Neutraltoene, Category Colors</p>
+
+  <p class="ref-label">Primaerfarben</p>
+  <div class="ref-row">
+    <div style="width: 160px; text-align: center;">
+      <div style="width: 100%; height: 72px; border-radius: 12px; background: var(--btb-steel);"></div>
+      <div style="font-weight: 700; font-size: 0.82rem; margin-top: 8px;">BTB Steel</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-secondary-light);">#527a98</div>
+    </div>
+    <div style="width: 160px; text-align: center;">
+      <div style="width: 100%; height: 72px; border-radius: 12px; background: var(--btb-steel-light);"></div>
+      <div style="font-weight: 700; font-size: 0.82rem; margin-top: 8px;">Steel Light</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-secondary-light);">#6a94b2</div>
+    </div>
+    <div style="width: 160px; text-align: center;">
+      <div style="width: 100%; height: 72px; border-radius: 12px; background: var(--btb-copper);"></div>
+      <div style="font-weight: 700; font-size: 0.82rem; margin-top: 8px;">BTB Copper</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-secondary-light);">#c4856a</div>
+    </div>
+    <div style="width: 160px; text-align: center;">
+      <div style="width: 100%; height: 72px; border-radius: 12px; background: var(--btb-copper-light);"></div>
+      <div style="font-weight: 700; font-size: 0.82rem; margin-top: 8px;">Copper Light</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-secondary-light);">#d4a08a</div>
+    </div>
+  </div>
+
+  <p class="ref-label" style="margin-top: 24px;">Dark Mode Surfaces</p>
+  <div class="ref-row">
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: var(--bg-page-dark); border: 1px solid var(--border-light);"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Page Dark</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#0f1420</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: var(--bg-elevated-dark); border: 1px solid var(--border-light);"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Elevated Dark</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#0f1729</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #e8edf5;"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Text on Dark</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#e8edf5</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #94a3b8;"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Secondary Dark</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#94a3b8</div>
+    </div>
+  </div>
+
+  <p class="ref-label" style="margin-top: 24px;">Light Mode Surfaces</p>
+  <div class="ref-row">
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: var(--bg-page-light); border: 1px solid var(--border-light);"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Page Light</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#f0f4f8</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: var(--bg-surface-light); border: 1px solid var(--border-light);"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Surface Light</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#ffffff</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: var(--bg-section-light); border: 1px solid var(--border-light);"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Section Alt</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#f8fafb</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: var(--border-light);"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Border Light</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#e2e8f0</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #1a2332;"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Text Primary</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#1a2332</div>
+    </div>
+    <div style="width: 140px; text-align: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #64748b;"></div>
+      <div style="font-size: 0.75rem; margin-top: 6px;">Text Secondary</div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text-muted-light);">#64748b</div>
+    </div>
+  </div>
+
+  <p class="ref-label" style="margin-top: 24px;">Category Colors (Icon Badges)</p>
+  <div class="ref-row">
+    <div style="width: 100px; text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-blue); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--icon-blue); font-size: 1.1rem;">📊</div>
+      <div style="font-size: 0.72rem; margin-top: 6px;">Blue</div>
+    </div>
+    <div style="width: 100px; text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-copper); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--icon-copper); font-size: 1.1rem;">🤖</div>
+      <div style="font-size: 0.72rem; margin-top: 6px;">Copper</div>
+    </div>
+    <div style="width: 100px; text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-violet); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--icon-violet); font-size: 1.1rem;">📄</div>
+      <div style="font-size: 0.72rem; margin-top: 6px;">Violet</div>
+    </div>
+    <div style="width: 100px; text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-amber); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--icon-amber); font-size: 1.1rem;">🤝</div>
+      <div style="font-size: 0.72rem; margin-top: 6px;">Amber</div>
+    </div>
+    <div style="width: 100px; text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-emerald); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--icon-emerald); font-size: 1.1rem;">✅</div>
+      <div style="font-size: 0.72rem; margin-top: 6px;">Emerald</div>
+    </div>
+    <div style="width: 100px; text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-rose); display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--icon-rose); font-size: 1.1rem;">🔒</div>
+      <div style="font-size: 0.72rem; margin-top: 6px;">Rose</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 2. TYPOGRAPHY                           -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">2. Typografie</h2>
+  <p class="ref-subtitle">Plus Jakarta Sans (UI) + JetBrains Mono (Code/Preise)</p>
+
+  <div class="demo-split">
+    <div class="demo-light">
+      <p class="ref-label">Light Mode</p>
+      <h1 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text-heading-light); margin-bottom: 8px;">Ihre <em style="text-decoration: underline; text-decoration-color: var(--btb-steel); text-decoration-thickness: 3px; text-underline-offset: 4px;">Strategie</em>.</h1>
+      <h2 style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-heading-light); margin-bottom: 8px;">Was Sie erwartet</h2>
+      <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--text-heading-light); margin-bottom: 8px;">KI-gestuetzte Analysen</h3>
+      <p style="font-size: 0.95rem; color: var(--text-secondary-light); margin-bottom: 8px;">Ueber 34 Analyse-Bausteine — von IT-Strategie ueber PESTEL bis Reifegradanalyse.</p>
+      <p style="font-family: 'JetBrains Mono'; font-size: 0.82rem; color: var(--text-secondary-light);">CHF 12'500 · ab 7 Analysen</p>
+    </div>
+    <div class="demo-dark">
+      <p class="ref-label" style="color: var(--text-muted-dark);">Dark Mode</p>
+      <h1 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text-heading-dark); margin-bottom: 8px;">Bereit fuer den <em style="text-decoration: underline; text-decoration-color: var(--btb-copper); text-decoration-thickness: 3px; text-underline-offset: 4px;">naechsten</em> Schritt?</h1>
+      <h2 style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-heading-dark); margin-bottom: 8px;">Transparente Preise</h2>
+      <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--text-primary-dark); margin-bottom: 8px;">Strategieentwicklung</h3>
+      <p style="font-size: 0.95rem; color: var(--text-secondary-dark); margin-bottom: 8px;">Von der Analyse zur Strategie. Komplette Situationsanalyse + fundierter Strategiebericht.</p>
+      <p style="font-family: 'JetBrains Mono'; font-size: 0.82rem; color: var(--text-muted-dark);">CHF 7'500 · Situationsanalyse</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 3. NUMBERED CIRCLES (BRAND SIGNATURE)   -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">3. Nummernkreise <span style="font-size: 0.72rem; background: var(--btb-copper); color: #fff; padding: 3px 10px; border-radius: 9999px; font-weight: 700; vertical-align: middle; margin-left: 8px;">BRAND SIGNATURE</span></h2>
+  <p class="ref-subtitle">Das Markenzeichen — Steel-gefuellte Kreise mit weisser Nummer fuer alle nummerierten Prozesse</p>
+
+  <p class="ref-label">Groessen-Varianten</p>
+  <div class="ref-row" style="align-items: center; gap: 24px; margin-bottom: 32px;">
+    <div style="text-align: center;">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto;">1</div>
+      <div style="font-size: 0.72rem; color: var(--text-muted-light); margin-top: 6px;">Compact 32px</div>
+    </div>
+    <div style="text-align: center;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto;">2</div>
+      <div style="font-size: 0.72rem; color: var(--text-muted-light); margin-top: 6px;">Standard 44px</div>
+    </div>
+    <div style="text-align: center;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto;">3</div>
+      <div style="font-size: 0.72rem; color: var(--text-muted-light); margin-top: 6px;">Large 56px</div>
+    </div>
+  </div>
+
+  <p class="ref-label">Horizontaler Prozess (Light Mode)</p>
+  <div class="demo-light" style="background: var(--bg-section-light);">
+    <h2 style="font-size: 1.5rem; font-weight: 800; text-align: center; color: var(--text-heading-light); margin-bottom: 32px;">So funktioniert es</h2>
+    <div style="display: flex; align-items: flex-start; justify-content: center; gap: 16px;">
+      <!-- Step 1 -->
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 200px; gap: 12px;">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">✉️</div>
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">1</div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-heading-light);">Einladung erhalten</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">Ihr Berater richtet das Projekt ein und laedt Sie ein.</div>
+        </div>
+      </div>
+      <div style="color: var(--text-muted-light); font-size: 1.2rem; margin-top: 36px;">→</div>
+      <!-- Step 2 -->
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 200px; gap: 12px;">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">📄</div>
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">2</div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-heading-light);">Kontext beisteuern</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">Beantworten Sie Fragen und teilen Sie Ihre Ausgangslage.</div>
+        </div>
+      </div>
+      <div style="color: var(--text-muted-light); font-size: 1.2rem; margin-top: 36px;">→</div>
+      <!-- Step 3 -->
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 200px; gap: 12px;">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">📊</div>
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">3</div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-heading-light);">Ergebnisse pruefen</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">KI-gestuetzte Analysen einsehen und Freigabe erteilen.</div>
+        </div>
+      </div>
+      <div style="color: var(--text-muted-light); font-size: 1.2rem; margin-top: 36px;">→</div>
+      <!-- Step 4 -->
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 200px; gap: 12px;">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">🚀</div>
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">4</div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-heading-light);">Umsetzung starten</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">Exportieren Sie Reports und setzen Sie die Strategie um.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="ref-label" style="margin-top: 24px;">Vertikale Nummernliste</p>
+  <div class="demo-light" style="max-width: 500px;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; align-items: flex-start; gap: 16px;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">1</div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-heading-light);">Umfeldanalyse (PESTEL, Markt, Wettbewerb)</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 2px;">Makrooekonomische Faktoren und Branchentrends identifizieren</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 16px;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">2</div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-heading-light);">Reifegradassessment &amp; Standortbestimmung</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 2px;">IT-Maturitaet entlang standardisierter Dimensionen bewerten</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 16px;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">3</div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-heading-light);">SWOT- und Capability-Gap-Analyse</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 2px;">Staerken, Schwaechen und Luecken systematisch aufdecken</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 4. BUTTONS                              -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">4. Buttons</h2>
+  <p class="ref-subtitle">Primary (Steel), Ghost (Border), Login, Pill-Tags, Empfohlen-Badge</p>
+
+  <div class="demo-split">
+    <div class="demo-light">
+      <p class="ref-label">Light Mode</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 12px; padding: 14px 32px; font-weight: 700; font-size: 0.92rem; font-family: inherit; cursor: pointer;">Anfragen →</button>
+        <button style="background: transparent; color: var(--text-secondary-light); border: 1px solid var(--border-light); border-radius: 12px; padding: 14px 32px; font-weight: 600; font-size: 0.92rem; font-family: inherit; cursor: pointer;">Kontakt aufnehmen →</button>
+        <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-weight: 600; font-size: 0.88rem; font-family: inherit; cursor: pointer;">Anmelden →</button>
+      </div>
+    </div>
+    <div class="demo-dark">
+      <p class="ref-label" style="color: var(--text-muted-dark);">Dark Mode</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 12px; padding: 14px 32px; font-weight: 700; font-size: 0.92rem; font-family: inherit; cursor: pointer;">Anfragen →</button>
+        <button style="background: transparent; color: var(--text-secondary-dark); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px 32px; font-weight: 600; font-size: 0.92rem; font-family: inherit; cursor: pointer;">Mehr erfahren</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="ref-label" style="margin-top: 24px;">Tags &amp; Badges</p>
+  <div class="ref-row" style="align-items: center;">
+    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid var(--border-light); border-radius: 9999px; font-size: 0.78rem; font-weight: 500; color: var(--text-secondary-light);">📊 IT-Strategie</span>
+    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid var(--border-light); border-radius: 9999px; font-size: 0.78rem; font-weight: 500; color: var(--text-secondary-light);">🔒 Security</span>
+    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid var(--border-light); border-radius: 9999px; font-size: 0.78rem; font-weight: 500; color: var(--text-secondary-light);">🤖 KI-Strategie</span>
+    <span style="background: var(--btb-copper); color: #fff; padding: 5px 18px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Empfohlen</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 5. ICON BADGES                          -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">5. Icon Badges</h2>
+  <p class="ref-subtitle">48px halbtransparente Badges mit 6 Kategorie-Farben</p>
+
+  <div class="ref-row" style="gap: 16px;">
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; width: 180px;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-blue); display: flex; align-items: center; justify-content: center; color: var(--icon-blue); font-size: 1.2rem; margin-bottom: 12px;">📊</div>
+      <div style="font-weight: 700; font-size: 0.95rem;">Dashboard</div>
+      <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">Alle Projekte auf einen Blick.</div>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; width: 180px;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-copper); display: flex; align-items: center; justify-content: center; color: var(--icon-copper); font-size: 1.2rem; margin-bottom: 12px;">🤖</div>
+      <div style="font-weight: 700; font-size: 0.95rem;">KI-Analysen</div>
+      <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">34+ Analyse-Bausteine.</div>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; width: 180px;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-violet); display: flex; align-items: center; justify-content: center; color: var(--icon-violet); font-size: 1.2rem; margin-bottom: 12px;">📄</div>
+      <div style="font-weight: 700; font-size: 0.95rem;">Reports</div>
+      <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">Professionelle PDF-Berichte.</div>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; width: 180px;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-emerald); display: flex; align-items: center; justify-content: center; color: var(--icon-emerald); font-size: 1.2rem; margin-bottom: 12px;">✅</div>
+      <div style="font-weight: 700; font-size: 0.95rem;">Review</div>
+      <div style="font-size: 0.82rem; color: var(--text-secondary-light); margin-top: 4px;">Kommentieren und freigeben.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 6. CARDS (DUAL MODE)                    -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">6. Cards</h2>
+  <p class="ref-subtitle">Feature Cards + Pricing Cards in beiden Modi</p>
+
+  <div class="demo-split">
+    <div class="demo-light" style="background: var(--bg-page-light);">
+      <p class="ref-label">Feature Card (Light)</p>
+      <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 32px; transition: all 0.25s ease;">
+        <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-blue); display: flex; align-items: center; justify-content: center; color: var(--icon-blue); font-size: 1.2rem; margin-bottom: 16px;">📊</div>
+        <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 8px; color: var(--text-heading-light);">Ihr persoenliches Dashboard</h3>
+        <p style="font-size: 0.88rem; color: var(--text-secondary-light);">Alle Projekte, Analysen und Fortschritte auf einen Blick.</p>
+      </div>
+    </div>
+    <div class="demo-dark">
+      <p class="ref-label" style="color: var(--text-muted-dark);">Feature Card (Dark)</p>
+      <div style="background: var(--bg-surface-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 32px;">
+        <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-copper); display: flex; align-items: center; justify-content: center; color: var(--icon-copper); font-size: 1.2rem; margin-bottom: 16px;">🤖</div>
+        <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 8px; color: var(--text-primary-dark);">KI-gestuetzte Analysen</h3>
+        <p style="font-size: 0.88rem; color: var(--text-secondary-dark);">34+ Analyse-Bausteine fuer fundierte strategische Entscheide.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="ref-label" style="margin-top: 24px;">Pricing Cards (Light Mode)</p>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+    <div style="background: var(--bg-surface-light); border: 1px solid var(--border-light); border-radius: 20px; padding: 32px;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-blue); display: flex; align-items: center; justify-content: center; color: var(--icon-blue); font-size: 1.2rem; margin-bottom: 16px;">🔍</div>
+      <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 4px;">Situationsanalyse</h3>
+      <p style="font-family: 'JetBrains Mono'; font-size: 0.82rem; color: var(--text-secondary-light); margin-bottom: 8px;">ab <strong style="font-size: 1.25rem; color: var(--text-heading-light);">CHF 7'500</strong></p>
+      <p style="font-size: 0.82rem; color: var(--btb-steel); font-weight: 600;">Verstehen &amp; Verorten</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 2px solid var(--btb-copper); border-radius: 20px; padding: 32px; position: relative; box-shadow: 0 8px 32px rgba(196, 133, 106, 0.12);">
+      <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--btb-copper); color: #fff; padding: 5px 18px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Empfohlen</span>
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-copper); display: flex; align-items: center; justify-content: center; color: var(--icon-copper); font-size: 1.2rem; margin-bottom: 16px;">🚀</div>
+      <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 4px;">Strategieentwicklung</h3>
+      <p style="font-family: 'JetBrains Mono'; font-size: 0.82rem; color: var(--text-secondary-light); margin-bottom: 8px;">ab <strong style="font-size: 1.25rem; color: var(--text-heading-light);">CHF 12'500</strong></p>
+      <p style="font-size: 0.82rem; color: var(--btb-copper); font-weight: 600;">Verstehen, Verorten, Visionieren &amp; Gestalten</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1px solid var(--border-light); border-radius: 20px; padding: 32px;">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: var(--cat-emerald); display: flex; align-items: center; justify-content: center; color: var(--icon-emerald); font-size: 1.2rem; margin-bottom: 16px;">🎯</div>
+      <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 4px;">Umsetzungsbegleitung</h3>
+      <p style="font-family: 'JetBrains Mono'; font-size: 0.82rem; color: var(--text-secondary-light); margin-bottom: 8px;"><strong style="font-size: 1.25rem; color: var(--text-heading-light);">Auf Anfrage</strong></p>
+      <p style="font-size: 0.82rem; color: var(--color-success); font-weight: 600;">Kompletter Transformationsprozess</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 7. NAVBAR (DUAL MODE)                   -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">7. Navigation</h2>
+  <p class="ref-subtitle">Glassmorphism Navbar (Light) + Dark Navbar</p>
+
+  <p class="ref-label">Light Mode Navbar</p>
+  <div style="background: rgba(248, 250, 251, 0.92); backdrop-filter: blur(12px); border: 1px solid var(--border-light-subtle); border-radius: 12px; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 1.2rem;">📦</span>
+      <span style="font-weight: 700; font-size: 1rem; color: var(--text-heading-light);">Box Essentials</span>
+    </div>
+    <div style="display: flex; gap: 24px; align-items: center;">
+      <a href="#" style="color: var(--text-secondary-light); font-size: 0.88rem; font-weight: 500; text-decoration: none;">Vorteile</a>
+      <a href="#" style="color: var(--text-secondary-light); font-size: 0.88rem; font-weight: 500; text-decoration: none;">Features</a>
+      <a href="#" style="color: var(--text-secondary-light); font-size: 0.88rem; font-weight: 500; text-decoration: none;">Preise</a>
+      <span style="font-size: 0.82rem; color: var(--text-muted-light);"><strong style="color: var(--text-primary-light);">DE</strong> | EN | FR</span>
+      <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-weight: 600; font-size: 0.88rem; font-family: inherit; cursor: pointer;">Anmelden →</button>
+    </div>
+  </div>
+
+  <p class="ref-label">Dark Mode Navbar</p>
+  <div style="background: var(--bg-elevated-dark); border: 1px solid var(--border-dark-subtle); border-radius: 12px; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 1.2rem;">📦</span>
+      <span style="font-weight: 700; font-size: 1rem; color: var(--text-heading-dark);">Box Essentials</span>
+    </div>
+    <div style="display: flex; gap: 24px; align-items: center;">
+      <a href="#" style="color: var(--text-secondary-dark); font-size: 0.88rem; font-weight: 500; text-decoration: none;">Vorteile</a>
+      <a href="#" style="color: var(--text-secondary-dark); font-size: 0.88rem; font-weight: 500; text-decoration: none;">Features</a>
+      <a href="#" style="color: var(--text-secondary-dark); font-size: 0.88rem; font-weight: 500; text-decoration: none;">Preise</a>
+      <span style="font-size: 0.82rem; color: var(--text-muted-dark);"><strong style="color: var(--text-heading-dark);">DE</strong> | EN | FR</span>
+      <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-weight: 600; font-size: 0.88rem; font-family: inherit; cursor: pointer;">Anmelden →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 8. SECTION DIVIDER                      -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">8. Section Divider</h2>
+  <p class="ref-subtitle">Wavy SVG Uebergaenge zwischen Sektionen</p>
+
+  <div style="overflow: hidden; border-radius: 12px;">
+    <div style="background: var(--bg-page-light); padding: 32px; text-align: center;">
+      <span style="color: var(--text-secondary-light); font-size: 0.88rem;">Light Section Content</span>
+    </div>
+    <div style="height: 60px; background: var(--bg-page-light); position: relative;">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block;">
+        <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,20 1440,40 L1440,60 L0,60 Z" fill="#0f1729" opacity="1"/>
+      </svg>
+    </div>
+    <div style="background: var(--bg-elevated-dark); padding: 32px; text-align: center;">
+      <span style="color: var(--text-secondary-dark); font-size: 0.88rem;">Dark Section Content (CTA / Footer)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 9. CTA SECTION (ALWAYS DARK)            -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">9. CTA-Sektion</h2>
+  <p class="ref-subtitle">Immer im Dark Mode — mit dekorativen Sketchy-Elementen</p>
+
+  <div class="demo-dark" style="text-align: center; padding: 64px 32px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 20px; left: 40px; opacity: 0.06; font-size: 4rem;">💡</div>
+    <div style="position: absolute; bottom: 30px; right: 60px; opacity: 0.06; font-size: 3rem;">⭐</div>
+    <div style="position: absolute; top: 50%; left: 10%; opacity: 0.06; font-size: 3.5rem;">💬</div>
+    <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-heading-dark); margin-bottom: 16px;">Bereit fuer den naechsten Schritt?</h2>
+    <p style="color: var(--text-secondary-dark); margin-bottom: 32px;">Lassen Sie uns gemeinsam herausfinden, wie Break the Box Ihre Organisation weiterbringen kann.</p>
+    <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 14px; padding: 16px 40px; font-weight: 700; font-size: 1rem; font-family: inherit; cursor: pointer;">✉️ info@breakthebox.ch</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 10. FOOTER (ALWAYS DARK)                -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">10. Footer</h2>
+  <p class="ref-subtitle">Immer Dark Mode — egal ob Seite Light oder Dark ist</p>
+
+  <div style="background: var(--bg-elevated-dark); border-radius: 16px; padding: 48px 32px 24px; color: rgba(255,255,255,0.7);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 32px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 1.1rem;">📦</span>
+          <span style="font-weight: 700; color: #fff;">Box Essentials</span>
+        </div>
+        <p style="font-size: 0.88rem; color: rgba(255,255,255,0.7); max-width: 280px;">Box Essentials begleitet Sie durch den gesamten Beratungsprozess — von der Analyse bis zum fertigen Strategiebericht.</p>
+      </div>
+      <div>
+        <div style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); margin-bottom: 16px;">Produkt</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Features</a>
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Vorteile</a>
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Preise</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); margin-bottom: 16px;">Break the Box</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Ueber uns</a>
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Kontakt</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); margin-bottom: 16px;">Rechtliches</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Datenschutz</a>
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Nutzungsbedingungen</a>
+          <a href="#" style="color: #fff; font-size: 0.88rem; text-decoration: none;">Impressum</a>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: rgba(255,255,255,0.4);">
+      <span>© 2026 Box Essentials. Alle Rechte vorbehalten.</span>
+      <span style="display: flex; align-items: center; gap: 6px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+        Made in Switzerland
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 11. FULL PAGE DEMO (LIGHT MODE)         -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">11. Vollstaendige Seite (Light Mode)</h2>
+  <p class="ref-subtitle">Hero + Benefits + Process Steps + CTA — wie auf essentials.breakthebox.ch</p>
+
+  <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-light);">
+    <!-- Hero -->
+    <div style="background: var(--bg-page-light); padding: 64px 48px; text-align: center;">
+      <h1 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text-heading-light); margin-bottom: 16px;">
+        Ihre <em style="text-decoration: underline; text-decoration-color: var(--btb-steel); text-decoration-thickness: 3px; text-underline-offset: 4px;">Strategie</em>. Unsere Plattform.
+      </h1>
+      <p style="font-size: 1rem; color: var(--text-secondary-light); max-width: 600px; margin: 0 auto 32px;">
+        Die KI-gestuetzte Beratungsplattform fuer fundierte IT-Strategien — von der Analyse bis zum fertigen Report.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 12px; padding: 14px 32px; font-weight: 700; font-size: 0.92rem; font-family: inherit;">Kostenlos testen →</button>
+        <button style="background: transparent; color: var(--text-secondary-light); border: 1px solid var(--border-light); border-radius: 12px; padding: 14px 32px; font-weight: 600; font-size: 0.92rem; font-family: inherit;">Mehr erfahren</button>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div style="background: var(--bg-section-light); padding: 48px;">
+      <h2 style="font-size: 1.5rem; font-weight: 800; text-align: center; color: var(--text-heading-light); margin-bottom: 32px;">Warum Break the Box?</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+        <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; text-align: center;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.6rem;">⏱️</div>
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">Schneller am Ziel</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light);">Von Monaten auf Wochen.</div>
+        </div>
+        <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; text-align: center;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.6rem;">💰</div>
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">Guenstiger</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light);">Hochwertige Beratung wird bezahlbar.</div>
+        </div>
+        <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; text-align: center;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.6rem;">🤖</div>
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">KI als Copilot</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light);">Fundierte Ergebnisse in kuerzester Zeit.</div>
+        </div>
+        <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 20px; padding: 24px; text-align: center;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.6rem;">📈</div>
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">Wiederholbar</div>
+          <div style="font-size: 0.82rem; color: var(--text-secondary-light);">Konsistente Qualitaet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Process Steps with Numbered Circles -->
+    <div style="background: var(--bg-page-light); padding: 64px 48px;">
+      <h2 style="font-size: 1.5rem; font-weight: 800; text-align: center; color: var(--text-heading-light); margin-bottom: 48px;">So funktioniert es</h2>
+      <div style="display: flex; align-items: flex-start; justify-content: center; gap: 24px;">
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 180px; gap: 10px;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">✉️</div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">1</div>
+          <strong style="font-size: 0.88rem;">Einladung erhalten</strong>
+        </div>
+        <div style="color: var(--text-muted-light); margin-top: 36px;">→</div>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 180px; gap: 10px;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">📄</div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">2</div>
+          <strong style="font-size: 0.88rem;">Kontext beisteuern</strong>
+        </div>
+        <div style="color: var(--text-muted-light); margin-top: 36px;">→</div>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 180px; gap: 10px;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">📊</div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">3</div>
+          <strong style="font-size: 0.88rem;">Ergebnisse pruefen</strong>
+        </div>
+        <div style="color: var(--text-muted-light); margin-top: 36px;">→</div>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 180px; gap: 10px;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-elevated-light); border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">🚀</div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--btb-steel); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">4</div>
+          <strong style="font-size: 0.88rem;">Umsetzung starten</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wavy Transition -->
+    <div style="height: 60px; background: var(--bg-page-light); position: relative;">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block;">
+        <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,20 1440,40 L1440,60 L0,60 Z" fill="#0f1729" opacity="1"/>
+      </svg>
+    </div>
+
+    <!-- CTA (always dark) -->
+    <div style="background: var(--bg-elevated-dark); padding: 64px 48px; text-align: center; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: 15px; left: 30px; opacity: 0.06; font-size: 3.5rem; color: #fff;">💡</div>
+      <div style="position: absolute; bottom: 20px; right: 40px; opacity: 0.06; font-size: 3rem; color: #fff;">⭐</div>
+      <h2 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 12px;">Bereit fuer den naechsten Schritt?</h2>
+      <p style="color: var(--text-secondary-dark); margin-bottom: 32px;">Lassen Sie uns gemeinsam herausfinden, wie Break the Box Ihre Organisation weiterbringen kann.</p>
+      <button style="background: var(--btb-steel); color: #fff; border: none; border-radius: 14px; padding: 16px 40px; font-weight: 700; font-size: 1rem; font-family: inherit;">✉️ info@breakthebox.ch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- 12. SIGNATURE PATTERNS                  -->
+<!-- ════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2 class="ref-title">12. Signature Patterns</h2>
+  <p class="ref-subtitle">Zusammenfassung aller visuellen Markenzeichen</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">🔵 Steel Accent</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">Primaerfarbe fuer alle Aktionen: Buttons, Links, Login, Nummernkreise</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">🟤 Copper Highlights</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">Sekundaerfarbe fuer AI/KI-Features, Empfohlen-Badge, Featured-Card</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">⭕ Nummernkreise</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">Brand-Signature: Steel-gefuellte Kreise (32/44/56px) mit weisser Nummer</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">✍️ Italic Underline</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">Keyword in Headings: kursiv + farbige Unterstreichung (3px, Steel/Copper)</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">🎨 Sketchy Illustrationen</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">Handgezeichnete Line-Art in runden Containern. Keine Stock Photos.</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">🌊 Wavy Dividers</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">Geschwungene SVG-Uebergaenge zwischen Light ↔ Dark Sektionen</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">🌗 Dual Mode</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">Light + Dark koexistieren. Footer + CTA immer Dark. Content sections Light.</p>
+    </div>
+    <div style="background: var(--bg-surface-light); border: 1.5px solid var(--border-light); border-radius: 16px; padding: 24px;">
+      <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">🇨🇭 Swiss Quality</div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary-light);">"Made in Switzerland" im Footer mit rotem Punkt. DE | EN | FR Switcher.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- .ref-page -->
+</body>
+</html>
