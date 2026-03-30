@@ -2,17 +2,16 @@
 
 ## Project Overview
 
-Break the Box ist eine webbasierte Applikation fuer [ZWECK].
+Break the Box ist eine webbasierte Applikation für [ZWECK].
 Gebaut mit SvelteKit, TypeScript und Tailwind CSS.
 
 ## Governance Reference
 
 - Verbindliche Projektprinzipien stehen in `.specify/memory/constitution.md`.
-- Bei Widerspruechen gelten die Regeln in der Constitution vor lokalen Gewohnheiten.
+- Bei Widersprüchen gelten die Regeln in der Constitution vor lokalen Gewohnheiten.
 
 ## Tech Stack
 
-<!-- ANPASSEN: Projektspezifische Details ergaenzen -->
 - **Framework:** SvelteKit 2 / Svelte 5 / Vite 7
 - **Language:** TypeScript (strict mode)
 - **Database:** PostgreSQL 16 with Drizzle ORM
@@ -105,7 +104,7 @@ docs/                        # Design system + project documentation
 
 ### Docker + PostgreSQL
 
-Die Entwicklungsumgebung nutzt Docker Compose fuer PostgreSQL:
+Die Entwicklungsumgebung nutzt Docker Compose für PostgreSQL:
 
 ```bash
 # Erster Start
@@ -116,16 +115,16 @@ npm run db:migrate           # Schema anlegen
 npm run dev                  # App starten
 ```
 
-- **PostgreSQL** laeuft in einem Docker-Container (Port 5432)
-- **Die App** laeuft lokal mit `npm run dev` (nicht im Container)
-- Fuer Production-Tests: `docker compose --profile full up -d`
+- **PostgreSQL** läuft in einem Docker-Container (Port 5432)
+- **Die App** läuft lokal mit `npm run dev` (nicht im Container)
+- Für Production-Tests: `docker compose --profile full up -d`
 - DB-Daten persistieren im Docker Volume `pgdata`
 
 ### Authentication (Lucia v3 + Auth0)
 
 - **Lucia v3** verwaltet Sessions mit Drizzle PostgreSQL Adapter
-- **Auth0** als primaerer OAuth Provider (via Arctic Library)
-- **Optional:** Google OAuth als zusaetzlicher Provider
+- **Auth0** als primärer OAuth Provider (via Arctic Library)
+- **Optional:** Google OAuth als zusätzlicher Provider
 - Session-Cookie: `secure` in Production, nicht in Dev
 - CSRF-Schutz: Origin-Check auf non-GET Requests in `hooks.server.ts`
 
@@ -141,12 +140,12 @@ npm run dev                  # App starten
 2. Auth0 authentifiziert → Callback an `/auth/callback/auth0`
 3. `oauth-callback.ts` erstellt/aktualisiert User + OAuth-Account
 4. Lucia erstellt Session → Session-Cookie gesetzt
-5. Alle `/(app)` Routen pruefen Session in `hooks.server.ts`
+5. Alle `/(app)` Routen prüfen Session in `hooks.server.ts`
 
 ### Internationalisierung (Paraglide JS 2.x)
 
-- **Paraglide JS 2.x** (`@inlang/paraglide-js`) fuer compile-time i18n
-- Sprachen: Deutsch (Basis), Englisch, Franzoesisch
+- **Paraglide JS 2.x** (`@inlang/paraglide-js`) für compile-time i18n
+- Sprachen: Deutsch (Basis), Englisch, Französisch
 - Message-Dateien: `messages/{de,en,fr}.json`
 - Kompilierte Ausgabe: `src/lib/paraglide/` (auto-generiert, NICHT editieren!)
 
@@ -180,24 +179,24 @@ npm run dev                  # App starten
 
 ### Database Migrations (KRITISCH!)
 
-Schema-Aenderungen MUESSEN ausschliesslich ueber den Drizzle-Migrations-Workflow erfolgen:
+Schema-Änderungen MÜSSEN ausschliesslich über den Drizzle-Migrations-Workflow erfolgen:
 
-1. **Schema aendern** in `src/lib/server/db/schema.ts`
+1. **Schema ändern** in `src/lib/server/db/schema.ts`
 2. **Migration generieren** mit `npm run db:generate`
 3. **Migration anwenden** mit `npm run db:migrate`
 
 **Verbotene Praktiken:**
 - **NIEMALS** SQL-Dateien manuell in `drizzle/` erstellen — ohne Journal-Eintrag werden sie ignoriert
 - **NIEMALS** `db:push` verwenden — umgeht Migration-Tracking
-- **NIEMALS** DDL direkt auf der DB ausfuehren ohne Drizzle-Workflow
+- **NIEMALS** DDL direkt auf der DB ausführen ohne Drizzle-Workflow
 
 ### AI Integration
 - AI-Dispatch mit Fallback-Kette: Claude API -> Mock-Daten
 - Alle AI-Outputs gegen Zod-Schemas validieren
-- Mock-Daten fuer jeden AI-Endpunkt bereitstellen (Offline-Entwicklung)
+- Mock-Daten für jeden AI-Endpunkt bereitstellen (Offline-Entwicklung)
 
 ### Module Boundaries
-- Components (`src/lib/components/`) duerfen NICHT von Server-Modulen importieren
+- Components (`src/lib/components/`) dürfen NICHT von Server-Modulen importieren
 - Shared Types leben in `src/lib/types/`
 - Server-only Code lebt in `src/lib/server/`
 
@@ -208,23 +207,39 @@ Schema-Aenderungen MUESSEN ausschliesslich ueber den Drizzle-Migrations-Workflow
 
 ## Schweizer Rechtschreibung
 
-**IMMER** Schweizer Rechtschreibung verwenden: kein ß, immer ss. Gilt fuer:
+**IMMER** Schweizer Rechtschreibung verwenden: kein ß, immer ss. Gilt für:
 - AI-Prompts und -Anweisungen
 - UI-Texte und i18n-Strings (`messages/*.json`)
 - Kommentare und Dokumentation auf Deutsch
 - Beispiele: "Massnahme" (nicht "Maßnahme"), "gross" (nicht "groß"), "weiss" (nicht "weiß")
 
+## Unicode-Sonderzeichen (KRITISCH!)
+
+**IMMER** korrekte Unicode-Zeichen verwenden — **NIEMALS** ASCII-Ersetzungen:
+- **ä, ö, ü** statt ae, oe, ue — Beispiel: "Über mich" (nicht "Ueber mich"), "Löschen" (nicht "Loeschen"), "Zurück" (nicht "Zurueck")
+- **Französische Akzente:** é, è, ê, ë, à, â, ç, î, ï, ô, û, ù, œ — Beispiel: "Stratégie" (nicht "Strategie"), "Paramètres" (nicht "Parametres")
+- Gilt für **alle** Dateien: `messages/*.json`, Svelte-Komponenten, Dokumentation, CLAUDE.md
+- Einzige Ausnahme: Schweizer ss statt ß (siehe oben)
+
+## Vollständige Übersetzung (KRITISCH!)
+
+**ALLE** benutzersichtbaren Texte MÜSSEN in allen drei Sprachen (de, en, fr) übersetzt sein:
+- Jeder neue Message-Key MUSS in `messages/de.json`, `messages/en.json` UND `messages/fr.json` hinzugefügt werden
+- **NIEMALS** einen Key nur in einer Sprache anlegen — immer alle drei gleichzeitig
+- **NIEMALS** Platzhalter-Texte oder Copy-Paste aus einer anderen Sprache als "Übersetzung" verwenden
+- Französische Übersetzungen müssen korrekte Akzente und Grammatik haben
+- Englische Übersetzungen müssen natürlich klingen, nicht wörtlich übersetzt
+
 ## Design System
 
-<!-- ANPASSEN: Verweis auf Design-System-Dokumentation -->
-**Vollstaendige Guidelines:** `docs/DESIGN_SYSTEM.md`
+**Vollständige Guidelines:** `docs/DESIGN_SYSTEM.md`
 
 ### Kritische Regeln
 
 #### Humanisierung (KRITISCH!)
 - **NIEMALS** technische Bezeichner im UI anzeigen
 - Keine camelCase, snake_case, Template-IDs, Enum-Werte, UUIDs in der UI
-- **IMMER** `m.message_key()` aus Paraglide fuer alle benutzersichtbaren Texte
+- **IMMER** `m.message_key()` aus Paraglide für alle benutzersichtbaren Texte
 
 #### DRY CSS Regeln
 - **IMMER** Design-Token-Variablen statt hardcoded Werte
@@ -232,7 +247,7 @@ Schema-Aenderungen MUESSEN ausschliesslich ueber den Drizzle-Migrations-Workflow
 - **NIEMALS** CSS-Patterns in mehr als 2 Dateien duplizieren
 
 #### Error Handling (KRITISCH!)
-- **NIEMALS** leere `catch`-Bloecke oder nur `console.error`
+- **NIEMALS** leere `catch`-Blöcke oder nur `console.error`
 - **JEDER** `catch`-Block bei User-Facing-Code MUSS sichtbares Feedback geben (Toast/Notification)
 
 #### Z-Index System
@@ -241,7 +256,7 @@ Schema-Aenderungen MUESSEN ausschliesslich ueber den Drizzle-Migrations-Workflow
 
 #### Empty States
 - **IMMER** shared `EmptyState`-Komponente verwenden
-- **NIEMALS** inline HTML mit custom classes fuer leere Zustaende
+- **NIEMALS** inline HTML mit custom classes für leere Zustände
 
 #### Button Hierarchy
 - Primary: filled/prominent

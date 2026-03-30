@@ -1,6 +1,6 @@
 # Break the Box
 
-Webbasierte Applikation fuer Break the Box — gebaut mit SvelteKit, TypeScript und Tailwind CSS.
+Webbasierte Applikation für Break the Box — gebaut mit SvelteKit, TypeScript und Tailwind CSS.
 
 ## Quick Start
 

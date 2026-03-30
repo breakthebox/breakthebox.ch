@@ -7,7 +7,7 @@
 import { pgTable, pgEnum, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 // ─── Enums ───
-// <!-- ANPASSEN: Rollen fuer dein Projekt -->
+// <!-- ANPASSEN: Rollen für dein Projekt -->
 export const userRoleEnum = pgEnum('user_role', ['admin', 'user']);
 
 // ─── Users ───
@@ -41,4 +41,4 @@ export const sessions = pgTable('sessions', {
 	expiresAt: timestamp('expires_at').notNull()
 });
 
-// <!-- ANPASSEN: Hier deine domain-spezifischen Tabellen hinzufuegen -->
+// <!-- ANPASSEN: Hier deine domain-spezifischen Tabellen hinzufügen -->

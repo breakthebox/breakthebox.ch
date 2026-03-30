@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Break the Box — Unified Design System v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Caveat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════ */
+/* BREAK THE BOX — UNIFIED DESIGN SYSTEM v3                   */
+/* Signal Palette (Steel + Teal) + BTB Brand Signatures        */
+/* Dual Mode | Nummernkreise | Keyword Underlines | Sketch     */
+/* ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Brand Colors ─── */
+  --btb-steel: #527A98;
+  --btb-steel-light: #6a94b2;
+  --btb-steel-subtle: rgba(82, 122, 152, 0.15);
+  --btb-steel-hover: #628ea8;
+  --btb-teal: #2B8A78;
+  --btb-teal-light: #DBF0EB;
+  --btb-teal-dark: #1A6557;
+  --btb-teal-subtle: rgba(43, 138, 120, 0.12);
+
+  /* ─── Light Mode ─── */
+  --bg-page: #F5F5F2;
+  --bg-surface: #ffffff;
+  --bg-section-alt: #f0f1ee;
+  --bg-elevated: #EAEAE5;
+  --border: #ddddd8;
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --text-primary: #262626;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-heading: #1a2332;
+
+  /* ─── Dark Mode (CTA, Footer, Feature-Sektionen) ─── */
+  --bg-page-dark: #0f1420;
+  --bg-elevated-dark: #0f1729;
+  --bg-surface-dark: rgba(255, 255, 255, 0.04);
+  --border-dark: rgba(255, 255, 255, 0.08);
+  --text-primary-dark: #e8edf5;
+  --text-secondary-dark: #94a3b8;
+  --text-muted-dark: #64748b;
+  --text-heading-dark: #ffffff;
+
+  /* ─── Navy (Metriken, Kontakt) ─── */
+  --navy: #1B344D;
+
+  /* ─── Category Colors ─── */
+  --cat-steel: rgba(82, 122, 152, 0.15);
+  --cat-teal: rgba(43, 138, 120, 0.12);
+  --cat-violet: rgba(139, 92, 246, 0.12);
+  --cat-amber: rgba(245, 158, 11, 0.12);
+  --cat-emerald: rgba(16, 185, 129, 0.12);
+  --cat-rose: rgba(244, 63, 94, 0.12);
+
+  /* ─── Semantic ─── */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #fb7185;
+  --color-info: #527A98;
+
+  /* ─── Shadows ─── */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.07);
+  --shadow-card-dark: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+  /* ─── Radius ─── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-card: 16px;
+  --radius-card-lg: 20px;
+  --radius-button: 10px;
+  --radius-pill: 9999px;
+  --radius-icon-badge: 14px;
+
+  /* ─── Spacing ─── */
+  --space-xs: 4px; --space-sm: 8px; --space-md: 16px;
+  --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px;
+  --space-3xl: 64px; --space-4xl: 96px;
+
+  /* ─── Transitions ─── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* ─── Base ─── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  line-height: 1.6;
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+/* ─── Layout ─── */
+.page { max-width: 1160px; margin: 0 auto; padding: 48px 32px; }
+.section { margin-bottom: 64px; padding-bottom: 48px; border-bottom: 1px solid var(--border); }
+.section:last-child { border-bottom: none; }
+.section-title {
+  font-size: 1.8rem; font-weight: 800; color: var(--text-heading);
+  margin-bottom: 6px; letter-spacing: -0.02em;
+}
+.section-sub { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 28px; }
+.label {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;
+}
+.row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* ─── Demo Containers ─── */
+.demo-light {
+  background: var(--bg-page); border-radius: var(--radius-card);
+  padding: 32px; border: 1px solid var(--border);
+}
+.demo-dark {
+  background: var(--bg-page-dark); border-radius: var(--radius-card);
+  padding: 32px; color: var(--text-primary-dark);
+}
+.demo-navy {
+  background: var(--navy); border-radius: var(--radius-card);
+  padding: 32px; color: #fff;
+}
+
+/* ─── Swatch ─── */
+.swatch { border-radius: 10px; overflow: hidden; }
+.swatch-color { height: 72px; display: flex; align-items: flex-end; padding: 10px; }
+.swatch-color span { font-family: 'JetBrains Mono'; font-size: 0.72rem; }
+.swatch-info { background: white; padding: 10px; }
+.swatch-name { font-weight: 700; font-size: 0.82rem; }
+.swatch-role { font-size: 0.72rem; color: var(--text-secondary); }
+
+@media (max-width: 768px) {
+  .page { padding: 24px 16px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+<!-- ═══════ HEADER ═══════ -->
+<div style="text-align:center; margin-bottom:64px;">
+  <div style="font-size:0.78rem; font-weight:600; color:var(--btb-teal); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:12px;">Unified Design System v3</div>
+  <h1 style="font-size:2.5rem; font-weight:800; letter-spacing:-0.03em; color:var(--text-heading);">Break the Box</h1>
+  <p style="font-size:0.95rem; color:var(--text-secondary); margin-top:8px;">Signal (Steel + Teal) · Nummernkreise · Keyword Underlines · Sketch · Dual Mode</p>
+</div>
+
+<!-- ═══════ 1. COLORS ═══════ -->
+<div class="section">
+  <h2 class="section-title">1. Farben</h2>
+  <p class="section-sub">Steel (#527A98) als Primärfarbe, Teal (#2B8A78) als Akzent — ersetzt Copper</p>
+
+  <p class="label">Brand-Farben</p>
+  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:24px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--btb-steel)"><span style="color:#fff">#527A98</span></div>
+      <div class="swatch-info"><div class="swatch-name">Steel</div><div class="swatch-role">Primär · Buttons, Nummernkreise</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--btb-steel-light)"><span style="color:#fff">#6a94b2</span></div>
+      <div class="swatch-info"><div class="swatch-name">Steel Light</div><div class="swatch-role">Hover, sekundäre Links</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--btb-teal)"><span style="color:#fff">#2B8A78</span></div>
+      <div class="swatch-info"><div class="swatch-name">Teal</div><div class="swatch-role">Akzent · Labels, CTA dark, Badges</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--btb-teal-light)"><span style="color:var(--btb-teal-dark)">#DBF0EB</span></div>
+      <div class="swatch-info"><div class="swatch-name">Teal Light</div><div class="swatch-role">Tags, Hintergrundakzente</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--btb-teal-dark)"><span style="color:#fff">#1A6557</span></div>
+      <div class="swatch-info"><div class="swatch-name">Teal Dark</div><div class="swatch-role">Text auf Teal Light</div></div>
+    </div>
+  </div>
+
+  <p class="label">Light-Mode-Flächen</p>
+  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:24px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--bg-page); border:1px solid var(--border)"><span style="color:var(--text-primary)">#F5F5F2</span></div>
+      <div class="swatch-info"><div class="swatch-name">Page BG</div><div class="swatch-role">Haupt-Hintergrund</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--bg-surface); border:1px solid var(--border)"><span style="color:var(--text-primary)">#FFFFFF</span></div>
+      <div class="swatch-info"><div class="swatch-name">Surface</div><div class="swatch-role">Karten, Modals</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--bg-elevated)"><span style="color:var(--text-primary)">#EAEAE5</span></div>
+      <div class="swatch-info"><div class="swatch-name">Elevated</div><div class="swatch-role">Icon-Container, Inputs</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--text-primary)"><span style="color:#fff">#262626</span></div>
+      <div class="swatch-info"><div class="swatch-name">Ink</div><div class="swatch-role">Primärtext</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--text-secondary)"><span style="color:#fff">#64748b</span></div>
+      <div class="swatch-info"><div class="swatch-name">Secondary</div><div class="swatch-role">Beschreibungen</div></div>
+    </div>
+  </div>
+
+  <p class="label">Dark-Mode-Flächen (CTA, Footer, Feature-Sektionen)</p>
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--navy)"><span style="color:#fff">#1B344D</span></div>
+      <div class="swatch-info"><div class="swatch-name">Navy</div><div class="swatch-role">Metriken, Kontakt</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--bg-page-dark); border:1px solid #333"><span style="color:#fff">#0f1420</span></div>
+      <div class="swatch-info"><div class="swatch-name">Deep Dark</div><div class="swatch-role">App-Footer, CTA</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--bg-elevated-dark); border:1px solid #333"><span style="color:#fff">#0f1729</span></div>
+      <div class="swatch-info"><div class="swatch-name">Elevated Dark</div><div class="swatch-role">Karten auf Dark</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:var(--text-primary-dark)"><span style="color:var(--bg-page-dark)">#e8edf5</span></div>
+      <div class="swatch-info"><div class="swatch-name">Text on Dark</div><div class="swatch-role">Primärtext dark</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 2. TYPOGRAPHY ═══════ -->
+<div class="section">
+  <h2 class="section-title">2. Typografie</h2>
+  <p class="section-sub">Plus Jakarta Sans (UI) + Caveat (Sketch/Handschrift) + JetBrains Mono (Code)</p>
+
+  <div class="grid-2">
+    <div class="demo-light" style="background:var(--bg-surface)">
+      <p class="label">Light Mode</p>
+      <h1 style="font-size:2.2rem; font-weight:800; letter-spacing:-0.03em; color:var(--text-heading); margin-bottom:8px;">Deine <em style="text-decoration:underline; text-decoration-color:var(--btb-steel); text-decoration-thickness:3px; text-underline-offset:4px; font-style:italic;">Strategie</em>.</h1>
+      <h2 style="font-size:1.4rem; font-weight:800; letter-spacing:-0.02em; color:var(--text-heading); margin-bottom:8px;">Vier <em style="text-decoration:underline; text-decoration-color:var(--btb-teal); text-decoration-thickness:3px; text-underline-offset:4px; font-style:italic;">Perspektiven</em></h2>
+      <div style="font-family:'Caveat',cursive; font-size:1.3rem; color:var(--btb-teal); margin-bottom:8px;">Was ich anbiete</div>
+      <div style="font-family:'Caveat',cursive; font-size:1rem; color:var(--btb-teal-dark); margin-bottom:8px;">→ mein Kerngeschäft seit über 10 Jahren</div>
+      <p style="font-size:0.92rem; color:var(--text-secondary); margin-bottom:8px;">Ich begleite Geschäftsleitungen von KMU bei strategischen IT-Fragen.</p>
+      <p style="font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--text-secondary);">CHF 12'500 · ab 7 Analysen</p>
+    </div>
+    <div class="demo-dark">
+      <p class="label" style="color:var(--text-muted-dark)">Dark Mode</p>
+      <h1 style="font-size:2.2rem; font-weight:800; letter-spacing:-0.03em; color:var(--text-heading-dark); margin-bottom:8px;">Bereit für den <em style="text-decoration:underline; text-decoration-color:var(--btb-teal); text-decoration-thickness:3px; text-underline-offset:4px; font-style:italic;">nächsten</em> Schritt?</h1>
+      <h2 style="font-size:1.4rem; font-weight:800; letter-spacing:-0.02em; color:var(--text-heading-dark); margin-bottom:8px;">Transparente Preise</h2>
+      <div style="font-family:'Caveat',cursive; font-size:1.3rem; color:var(--btb-teal-light); margin-bottom:8px;">Because there's more …</div>
+      <p style="font-size:0.92rem; color:var(--text-secondary-dark); margin-bottom:8px;">Von der Analyse zur Strategie. Fundierte Empfehlungen.</p>
+      <p style="font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--text-muted-dark);">SvelteKit 2 / TypeScript strict</p>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-card); padding:24px;">
+    <p class="label">Font-Stack Zusammenfassung</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+      <div>
+        <div style="font-weight:700; font-size:0.88rem; margin-bottom:6px;">Plus Jakarta Sans</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Headlines (800), Body (400–500), UI-Elemente. Primär-Font für alles Professionelle.</div>
+      </div>
+      <div>
+        <div style="font-family:'Caveat',cursive; font-weight:600; font-size:1.1rem; margin-bottom:6px;">Caveat</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Sketch-Labels, Section-Einführungen, persönliche Notizen. Der Charakter-Font.</div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono'; font-weight:500; font-size:0.88rem; margin-bottom:6px;">JetBrains Mono</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Code, Preise, technische Daten. Mono für Präzision.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 3. BRAND SIGNATURES ═══════ -->
+<div class="section">
+  <h2 class="section-title">3. Brand Signatures <span style="font-size:0.72rem; background:var(--btb-teal); color:#fff; padding:3px 12px; border-radius:9999px; font-weight:700; vertical-align:middle; margin-left:8px;">IDENTITÄT</span></h2>
+  <p class="section-sub">Die vier visuellen Markenzeichen, die Break the Box unverwechselbar machen</p>
+
+  <!-- 3A: NUMBERED CIRCLES -->
+  <p class="label">A — Nummernkreise (Brand Signature #1)</p>
+  <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:var(--radius-card-lg); padding:32px; margin-bottom:24px;">
+    <div style="display:flex; align-items:center; gap:36px; margin-bottom:24px;">
+      <!-- Compact -->
+      <div style="text-align:center;">
+        <div style="position:relative; width:48px; height:48px; margin:0 auto;">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="position:absolute;top:0;left:0;">
+            <ellipse cx="24" cy="24" rx="22" ry="21.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="4,3" transform="rotate(-3 24 24)"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:32px; height:32px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:0.88rem; font-weight:700; display:flex; align-items:center; justify-content:center;">1</div>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">Compact 32px</div>
+      </div>
+      <!-- Standard -->
+      <div style="text-align:center;">
+        <div style="position:relative; width:64px; height:64px; margin:0 auto;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="position:absolute;top:0;left:0;">
+            <ellipse cx="32" cy="32" rx="30" ry="29.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="5,3.5" transform="rotate(-2 32 32)"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center;">2</div>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">Standard 44px</div>
+      </div>
+      <!-- Large -->
+      <div style="text-align:center;">
+        <div style="position:relative; width:80px; height:80px; margin:0 auto;">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="position:absolute;top:0;left:0;">
+            <ellipse cx="40" cy="40" rx="38" ry="37" stroke="#A8C0D0" stroke-width="1.8" stroke-dasharray="6,4" transform="rotate(-2.5 40 40)"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:56px; height:56px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:1.4rem; font-weight:800; display:flex; align-items:center; justify-content:center;">3</div>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">Large 56px</div>
+      </div>
+      <!-- Teal -->
+      <div style="text-align:center;">
+        <div style="position:relative; width:64px; height:64px; margin:0 auto;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="position:absolute;top:0;left:0;">
+            <ellipse cx="32" cy="32" rx="30" ry="29.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="5,3.5" transform="rotate(2 32 32)"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--btb-teal); color:#fff; font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center;">✓</div>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">Teal-Variante</div>
+      </div>
+      <!-- Ohne Outline -->
+      <div style="text-align:center;">
+        <div style="position:relative; width:64px; height:64px; margin:0 auto; display:flex; align-items:center; justify-content:center;">
+          <div style="width:44px; height:44px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center;">5</div>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">Ohne Outline</div>
+      </div>
+    </div>
+    <p style="font-size:0.82rem; color:var(--text-secondary);">Steel-gefüllte Kreise mit weisser Nummer, umgeben von einem <strong>sketchy Outline-Ring</strong> — leicht unregelmässige, gestrichelte Ellipse in Steel Light. Die Outline verleiht den Nummern den handgezeichneten Charakter. Variante ohne Outline für kompakte Inline-Kontexte (Listen, Tabellen).</p>
+  </div>
+
+  <!-- 3B: ICON CONTAINERS + NUMBER -->
+  <p class="label">B — Icon-Container mit Nummernkreis (Brand Signature #2)</p>
+  <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:var(--radius-card-lg); padding:32px; margin-bottom:24px;">
+    <div style="display:flex; align-items:flex-start; justify-content:center; gap:20px;">
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; max-width:180px; gap:10px;">
+        <div style="width:72px; height:72px; border-radius:50%; background:var(--bg-elevated); border:2px solid var(--border); display:flex; align-items:center; justify-content:center;">
+          <svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round"><path d="M6 22 Q8 14,12 10 T20 6 T26 4"/><circle cx="12" cy="10" r="2.5" fill="var(--btb-teal)" opacity="0.6" stroke="none"/><circle cx="20" cy="6" r="2.5" fill="var(--btb-teal)" opacity="0.8" stroke="none"/></svg>
+        </div>
+        <div style="position:relative; width:64px; height:64px;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="position:absolute;top:0;left:0;"><ellipse cx="32" cy="32" rx="30" ry="29.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="5,3.5" transform="rotate(-2 32 32)"/></svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center;">1</div>
+        </div>
+        <div><strong style="font-size:0.88rem;">Verstehen</strong></div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Standortbestimmung und Analyse der Ausgangslage.</div>
+      </div>
+      <div style="color:var(--text-muted); font-size:1.2rem; margin-top:36px;">→</div>
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; max-width:180px; gap:10px;">
+        <div style="width:72px; height:72px; border-radius:50%; background:var(--bg-elevated); border:2px solid var(--border); display:flex; align-items:center; justify-content:center;">
+          <svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="20" height="20" rx="3"/><path d="M4 12 L24 12" stroke-dasharray="3,2"/><circle cx="12" cy="8" r="2" fill="var(--btb-teal)" opacity="0.6" stroke="none"/></svg>
+        </div>
+        <div style="position:relative; width:64px; height:64px;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="position:absolute;top:0;left:0;"><ellipse cx="32" cy="32" rx="30" ry="29.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="5,3.5" transform="rotate(2 32 32)"/></svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center;">2</div>
+        </div>
+        <div><strong style="font-size:0.88rem;">Verorten</strong></div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Reifegradanalyse und Benchmarking.</div>
+      </div>
+      <div style="color:var(--text-muted); font-size:1.2rem; margin-top:36px;">→</div>
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; max-width:180px; gap:10px;">
+        <div style="width:72px; height:72px; border-radius:50%; background:var(--bg-elevated); border:2px solid var(--border); display:flex; align-items:center; justify-content:center;">
+          <svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22 L14 4 L24 22Z"/><circle cx="14" cy="8" r="2.5" fill="var(--btb-teal)" opacity="0.8" stroke="none"/></svg>
+        </div>
+        <div style="position:relative; width:64px; height:64px;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="position:absolute;top:0;left:0;"><ellipse cx="32" cy="32" rx="30" ry="29.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="5,3.5" transform="rotate(-3 32 32)"/></svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center;">3</div>
+        </div>
+        <div><strong style="font-size:0.88rem;">Visionieren</strong></div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Strategieentwicklung und Roadmap.</div>
+      </div>
+      <div style="color:var(--text-muted); font-size:1.2rem; margin-top:36px;">→</div>
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; max-width:180px; gap:10px;">
+        <div style="width:72px; height:72px; border-radius:50%; background:var(--bg-elevated); border:2px solid var(--border); display:flex; align-items:center; justify-content:center;">
+          <svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round"><circle cx="14" cy="14" r="8"/><circle cx="14" cy="14" r="2.5" fill="var(--btb-teal)" opacity="0.8" stroke="none"/><path d="M14 2 L14 5M14 23 L14 26M2 14 L5 14M23 14 L26 14" opacity="0.5"/></svg>
+        </div>
+        <div style="position:relative; width:64px; height:64px;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style="position:absolute;top:0;left:0;"><ellipse cx="32" cy="32" rx="30" ry="29.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="5,3.5" transform="rotate(1.5 32 32)"/></svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:var(--btb-steel); color:#fff; font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center;">4</div>
+        </div>
+        <div><strong style="font-size:0.88rem;">Steuern</strong></div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Umsetzungsbegleitung und Controlling.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3C: KEYWORD UNDERLINES -->
+  <p class="label">C — Keyword Underlines (Brand Signature #3)</p>
+  <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:var(--radius-card-lg); padding:32px; margin-bottom:24px;">
+    <div class="grid-2">
+      <div>
+        <p class="label" style="margin-bottom:8px">Steel Underline (Primär)</p>
+        <h2 style="font-size:1.6rem; font-weight:800; letter-spacing:-0.02em; color:var(--text-heading);">Deine <em style="text-decoration:underline; text-decoration-color:var(--btb-steel); text-decoration-thickness:3px; text-underline-offset:4px; font-style:italic;">IT-Strategie</em> braucht Substanz.</h2>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-top:8px;">Steel Underline für das Hauptthema / die Kernaussage</p>
+      </div>
+      <div>
+        <p class="label" style="margin-bottom:8px">Teal Underline (Akzent)</p>
+        <h2 style="font-size:1.6rem; font-weight:800; letter-spacing:-0.02em; color:var(--text-heading);">Vier <em style="text-decoration:underline; text-decoration-color:var(--btb-teal); text-decoration-thickness:3px; text-underline-offset:4px; font-style:italic;">Perspektiven</em>. Eine Haltung.</h2>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-top:8px;">Teal Underline für sekundäre Hervorhebungen</p>
+      </div>
+    </div>
+    <div style="margin-top:20px; padding:16px 20px; background:var(--btb-teal-light); border-radius:10px;">
+      <p style="font-size:0.82rem; color:var(--btb-teal-dark);"><strong>Regel:</strong> Maximal 1 unterstrichenes Keyword pro Headline. Immer kursiv. Immer 3px Stärke. <code style="font-family:'JetBrains Mono'; font-size:0.75rem; background:rgba(0,0,0,0.06); padding:2px 6px; border-radius:4px;">text-underline-offset: 4px</code></p>
+    </div>
+  </div>
+
+  <!-- 3D: SKETCH LABELS -->
+  <p class="label">D — Caveat Sketch-Labels (Brand Signature #4)</p>
+  <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:var(--radius-card-lg); padding:32px;">
+    <div class="grid-2" style="align-items:start;">
+      <div>
+        <div style="font-family:'Caveat',cursive; font-size:1.4rem; color:var(--btb-teal); font-weight:500; margin-bottom:8px;">Was ich anbiete</div>
+        <div style="font-family:'Caveat',cursive; font-size:1.1rem; color:var(--btb-teal-dark); font-weight:500; margin-bottom:8px;">→ mein Kerngeschäft seit über 10 Jahren</div>
+        <div style="font-family:'Caveat',cursive; font-size:1.6rem; color:var(--btb-teal); font-weight:600; margin-bottom:8px;">Because there's more …</div>
+        <div style="font-family:'Caveat',cursive; font-size:1rem; color:var(--text-muted); font-weight:500;">← das bin ich</div>
+      </div>
+      <div style="padding:16px 20px; background:var(--bg-page); border-radius:10px;">
+        <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.7;">
+          <strong>Einsatz:</strong> Section-Labels, persönliche Notizen, Kommentare, der Claim. Nie für lange Texte. Max 1 Zeile. Farbe: Teal (auf hell) oder Teal Light (auf dunkel).
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 4. BUTTONS & TAGS ═══════ -->
+<div class="section">
+  <h2 class="section-title">4. Buttons &amp; Tags</h2>
+  <p class="section-sub">Steel-Primary, Teal-CTA (nur auf Dark), Pill-Tags mit Border</p>
+
+  <p class="label">Buttons</p>
+  <div class="row" style="align-items:center; gap:16px; margin-bottom:24px;">
+    <button style="background:var(--btb-steel); color:#fff; border:none; border-radius:var(--radius-button); padding:12px 28px; font-weight:600; font-size:0.88rem; font-family:inherit; cursor:pointer;">Strategiegespräch →</button>
+    <span style="font-size:0.72rem; color:var(--text-muted);">Primary</span>
+    <button style="background:transparent; color:var(--text-primary); border:1.5px solid var(--border); border-radius:var(--radius-button); padding:11px 28px; font-weight:500; font-size:0.88rem; font-family:inherit; cursor:pointer;">Angebot entdecken</button>
+    <span style="font-size:0.72rem; color:var(--text-muted);">Secondary</span>
+  </div>
+  <div class="demo-navy" style="padding:20px 28px;">
+    <div class="row" style="align-items:center; gap:16px;">
+      <button style="background:var(--btb-teal); color:#fff; border:none; border-radius:var(--radius-button); padding:12px 28px; font-weight:600; font-size:0.88rem; font-family:inherit; cursor:pointer;">Nachricht senden →</button>
+      <span style="font-size:0.72rem; color:rgba(255,255,255,0.4);">CTA auf Dark (Teal)</span>
+      <button style="background:var(--btb-steel); color:#fff; border:none; border-radius:var(--radius-button); padding:12px 28px; font-weight:600; font-size:0.88rem; font-family:inherit; cursor:pointer;">Anmelden →</button>
+      <span style="font-size:0.72rem; color:rgba(255,255,255,0.4);">Primary auf Dark</span>
+    </div>
+  </div>
+
+  <p class="label" style="margin-top:24px;">Tags &amp; Badges</p>
+  <div class="row" style="align-items:center;">
+    <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border:1px solid var(--border); border-radius:9999px; font-size:0.78rem; font-weight:500; color:var(--text-secondary);">IT-Strategie</span>
+    <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border:1px solid var(--border); border-radius:9999px; font-size:0.78rem; font-weight:500; color:var(--text-secondary);">Digitalisierung</span>
+    <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border:1px solid var(--border); border-radius:9999px; font-size:0.78rem; font-weight:500; color:var(--text-secondary);">Security</span>
+    <span style="display:inline-flex; padding:6px 14px; background:var(--btb-teal-light); border-radius:9999px; font-size:0.78rem; font-weight:600; color:var(--btb-teal-dark);">VR-Mandate</span>
+    <span style="background:var(--btb-teal); color:#fff; padding:5px 16px; border-radius:9999px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Empfohlen</span>
+  </div>
+</div>
+
+<!-- ═══════ 5. CARDS ═══════ -->
+<div class="section">
+  <h2 class="section-title">5. Cards</h2>
+  <p class="section-sub">Dual Mode — Feature Cards, Pricing Cards, Sketch Cards</p>
+
+  <div class="grid-2">
+    <div class="demo-light" style="background:var(--bg-page);">
+      <p class="label">Feature Card (Light)</p>
+      <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:20px; padding:28px;">
+        <div style="width:48px; height:48px; border-radius:14px; background:var(--cat-steel); display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
+          <svg width="20" height="20" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round"><path d="M4 16 Q6 10,9 8 T15 4 T19 3"/><circle cx="9" cy="8" r="2" fill="var(--btb-teal)" opacity="0.6" stroke="none"/></svg>
+        </div>
+        <h3 style="font-weight:700; font-size:1rem; margin-bottom:6px; color:var(--text-heading);">IT-Strategieberatung</h3>
+        <p style="font-size:0.82rem; color:var(--text-secondary);">Standortbestimmung, Roadmap und Umsetzungsbegleitung für KMU.</p>
+      </div>
+    </div>
+    <div class="demo-dark">
+      <p class="label" style="color:var(--text-muted-dark)">Feature Card (Dark)</p>
+      <div style="background:var(--bg-surface-dark); border:1px solid var(--border-dark); border-radius:16px; padding:28px;">
+        <div style="width:48px; height:48px; border-radius:14px; background:var(--cat-teal); display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
+          <svg width="20" height="20" fill="none" stroke="var(--btb-teal)" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><circle cx="10" cy="10" r="2" fill="var(--btb-teal)" opacity="0.8" stroke="none"/><path d="M10 2L10 5 M10 15L10 18 M2 10L5 10 M15 10L18 10" opacity="0.4"/></svg>
+        </div>
+        <h3 style="font-weight:700; font-size:1rem; margin-bottom:6px; color:var(--text-primary-dark);">Walk the Talk</h3>
+        <p style="font-size:0.82rem; color:var(--text-secondary-dark);">Eigene KI-Plattformen als Glaubwürdigkeitsbeweis.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px; background:var(--bg-surface); border:1.5px dashed var(--btb-teal-light); border-radius:20px; padding:28px; display:flex; align-items:center; gap:24px;">
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="22" stroke="var(--btb-teal)" stroke-width="1.5" stroke-dasharray="4,3"/><circle cx="28" cy="16" r="4" fill="var(--btb-teal)" opacity="0.7"/><circle cx="18" cy="36" r="3" fill="var(--btb-steel)" opacity="0.5"/><circle cx="40" cy="34" r="3" fill="var(--btb-steel)" opacity="0.5"/><path d="M28 20 L20 32" stroke="#A8C0D0" stroke-width="1"/><path d="M28 20 L38 31" stroke="#A8C0D0" stroke-width="1"/></svg>
+    <div>
+      <h4 style="font-weight:700; font-size:0.95rem;">Sketch Card (Dashed Border)</h4>
+      <div style="font-family:'Caveat',cursive; font-size:1rem; color:var(--btb-teal);">mein tägliches Arbeitsinstrument</div>
+      <p style="font-size:0.82rem; color:var(--text-secondary); margin-top:4px;">Für Elemente mit Sketch-Charakter — Miss Bizzy, persönliche Notizen, Proof-of-Concepts.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 6. WAVY DIVIDERS ═══════ -->
+<div class="section">
+  <h2 class="section-title">6. Section-Übergänge</h2>
+  <p class="section-sub">Wavy SVG-Divider + Sketch-Wellenlinien</p>
+
+  <div style="overflow:hidden; border-radius:12px; margin-bottom:16px;">
+    <div style="background:var(--bg-page); padding:28px; text-align:center;">
+      <span style="color:var(--text-secondary); font-size:0.85rem;">Light Section</span>
+    </div>
+    <div style="height:50px; background:var(--bg-page); position:relative;">
+      <svg viewBox="0 0 1440 50" preserveAspectRatio="none" style="width:100%; height:100%; display:block;">
+        <path d="M0,30 C360,60 720,0 1080,30 C1260,50 1380,15 1440,30 L1440,50 L0,50 Z" fill="var(--navy)" opacity="1"/>
+      </svg>
+    </div>
+    <div style="background:var(--navy); padding:28px; text-align:center;">
+      <span style="color:rgba(255,255,255,0.5); font-size:0.85rem;">Navy Section (Metriken / Kontakt)</span>
+    </div>
+  </div>
+
+  <p class="label">Sketch-Divider (zwischen gleichfarbigen Sektionen)</p>
+  <div style="width:100%; height:16px; margin:16px 0; background:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='16'%3E%3Cpath d='M0 8 Q75 3, 150 8 T300 7 T450 9 T600 7' fill='none' stroke='%23A8C0D0' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E&quot;) repeat-x center; background-size:600px 16px;"></div>
+</div>
+
+<!-- ═══════ 7. SIGNATURE OVERVIEW ═══════ -->
+<div class="section" style="border-bottom:none;">
+  <h2 class="section-title">7. Auf einen Blick</h2>
+  <p class="section-sub">Alle Signature-Elemente zusammengefasst — das ist Break the Box</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:16px; padding:20px;">
+      <div style="font-weight:700; font-size:0.88rem; margin-bottom:6px;">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="vertical-align:middle; margin-right:6px;"><ellipse cx="14" cy="14" rx="13" ry="12.5" stroke="#A8C0D0" stroke-width="1" stroke-dasharray="3,2" transform="rotate(-2 14 14)"/><circle cx="14" cy="14" r="9" fill="#527A98"/><text x="14" y="14" text-anchor="middle" dominant-baseline="central" fill="white" font-size="8" font-weight="700" font-family="Plus Jakarta Sans,sans-serif">1</text></svg>
+        Nummernkreise
+      </div>
+      <p style="font-size:0.78rem; color:var(--text-secondary);">Steel-Kreise (32/44/56px) mit weisser Nummer + sketchy Outline-Ring. Für Prozesse, Schritte, Listen.</p>
+    </div>
+    <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:16px; padding:20px;">
+      <div style="font-weight:700; font-size:0.88rem; margin-bottom:6px;">
+        <em style="text-decoration:underline; text-decoration-color:var(--btb-steel); text-decoration-thickness:2px; text-underline-offset:3px; font-style:italic;">Keyword</em> Underlines
+      </div>
+      <p style="font-size:0.78rem; color:var(--text-secondary);">Kursiv + farbige 3px-Unterstreichung. Steel (Primär) oder Teal (Akzent). Max 1 pro Heading.</p>
+    </div>
+    <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:16px; padding:20px;">
+      <div style="font-weight:700; font-size:0.88rem; margin-bottom:6px;">
+        <span style="font-family:'Caveat',cursive; color:var(--btb-teal); font-size:1rem;">Sketch</span>-Labels
+      </div>
+      <p style="font-size:0.78rem; color:var(--text-secondary);">Caveat-Handschrift in Teal für Section-Labels, Notizen und den Claim. Der Charakter-Font.</p>
+    </div>
+    <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:16px; padding:20px;">
+      <div style="font-weight:700; font-size:0.88rem; margin-bottom:6px;">
+        <svg width="28" height="10" viewBox="0 0 28 10" style="vertical-align:middle; margin-right:4px;"><path d="M0 5 Q3.5 1.5,7 5 T14 4 T21 5 T28 4" fill="none" stroke="var(--btb-steel-light)" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Sketch-Illustrationen
+      </div>
+      <p style="font-size:0.78rem; color:var(--text-secondary);">Handgezeichnete Line-Art in runden Containern (72px + 2px Border). Steel-Linien, Teal-Akzentpunkte.</p>
+    </div>
+    <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:16px; padding:20px;">
+      <div style="font-weight:700; font-size:0.88rem; margin-bottom:6px;">🌊 Wavy Dividers</div>
+      <p style="font-size:0.78rem; color:var(--text-secondary);">SVG-Übergänge zwischen Light↔Dark. Sketch-Wellenlinien zwischen gleichfarbigen Sektionen.</p>
+    </div>
+    <div style="background:var(--bg-surface); border:1.5px solid var(--border); border-radius:16px; padding:20px;">
+      <div style="font-weight:700; font-size:0.88rem; margin-bottom:6px;">🌗 Dual Mode</div>
+      <p style="font-size:0.78rem; color:var(--text-secondary);">Light (Content) + Dark (CTA, Footer, Features) koexistieren. Navy für Metriken/Kontakt.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ CSS VARS ═══════ -->
+<div style="background:var(--bg-elevated-dark); border-radius:var(--radius-card); padding:28px; margin-top:16px;">
+<pre style="font-family:'JetBrains Mono'; font-size:0.72rem; color:var(--text-primary-dark); line-height:1.8; overflow-x:auto;">/* Break the Box — Unified Design System v3 */
+:root {
+  --btb-steel: <span style="color:#6a94b2">#527A98</span>;      /* Primär */
+  --btb-steel-light: <span style="color:#6a94b2">#6a94b2</span>;
+  --btb-teal: <span style="color:#5CC4AD">#2B8A78</span>;       /* Akzent (ersetzt Copper) */
+  --btb-teal-light: <span style="color:#5CC4AD">#DBF0EB</span>;
+  --btb-teal-dark: <span style="color:#5CC4AD">#1A6557</span>;
+  --bg-page: #F5F5F2;          /* Neutral BG */
+  --bg-surface: #ffffff;        /* Karten */
+  --bg-elevated: #EAEAE5;      /* Icon-Container */
+  --navy: <span style="color:#6a94b2">#1B344D</span>;           /* Dunkle Sektionen */
+  --text-primary: #262626;      /* Ink */
+  --font-ui: 'Plus Jakarta Sans', sans-serif;
+  --font-sketch: 'Caveat', cursive;
+  --font-mono: 'JetBrains Mono', monospace;
+}</pre>
+</div>
+
+<div style="text-align:center; padding:40px 0; font-size:0.82rem; color:var(--text-muted);">
+  Break the Box GmbH · Unified Design System v3 · Signal (Steel + Teal) · März 2026
+</div>
+
+</div>
+</body>
+</html>
