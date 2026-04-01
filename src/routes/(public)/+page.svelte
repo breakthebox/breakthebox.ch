@@ -1876,7 +1876,7 @@
 		top: 60px;
 	}
 	.section-avatar-left {
-		left: -20px;
+		left: -100px;
 		top: 50%;
 		transform: translateY(-50%);
 	}
