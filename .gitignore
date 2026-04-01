@@ -30,5 +30,5 @@ drizzle/.drizzle/
 # Coverage
 coverage/
 
-# Uploads
-uploads/
+# Uploads (root-level only, not src/routes/api/uploads/)
+/uploads/
