@@ -358,7 +358,7 @@
 		<span class="sketch-label reveal">{m.section_walkthetalk_label()}</span>
 		<h2 class="section-title reveal">{m.section_walkthetalk_title()}</h2>
 		<p class="section-subtitle reveal">{m.section_walkthetalk_subtitle()}</p>
-		<div class="inno-grid reveal-stagger">
+		<div class="inno-grid reveal-stagger" class:inno-grid-2={walkthetalk.platforms.length === 2}>
 			{#each walkthetalk.platforms as platform, pi}
 				<div class="inno-card reveal" style="--stagger: {pi}">
 					<div class="inno-card-accent"></div>
@@ -1326,6 +1326,12 @@
 		grid-template-columns: repeat(3, 1fr);
 		gap: 20px;
 		margin-bottom: 24px;
+	}
+	.inno-grid-2 {
+		grid-template-columns: repeat(2, 1fr);
+		max-width: 720px;
+		margin-left: auto;
+		margin-right: auto;
 	}
 	.inno-card {
 		background: var(--navy);
