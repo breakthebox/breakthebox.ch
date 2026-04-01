@@ -237,7 +237,7 @@
 						<div class="pillar-back">
 							<span class="pillar-back-label">{m.pillar_examples_label()}</span>
 							<div class="pillar-examples">
-								{#each pickRandom(pillar.examples, 5) as example}
+								{#each pickRandom(pillar.examples, 3) as example}
 									{#if example.url}
 										<a href={example.url} class="pillar-example pillar-example-link" onclick={(e) => e.stopPropagation()}>
 											<span class="pillar-example-label">{example.label}</span>
