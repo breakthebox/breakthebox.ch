@@ -1,7 +1,24 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { localizeHref } from '$lib/paraglide/runtime';
+	import type { PillarsContent, AboutContent, WalkTheTalkContent, ReferencesContent, BlogContent } from '$lib/types/content';
+	import type { BlogPostRow } from '$lib/server/db/queries/blog';
+	import { renderMarkdown } from '$lib/utils/markdown';
 
-	let flipped = $state([false, false, false, false]);
+	let { data } = $props();
+
+	// Content from DB (with fallback to defaults in server load)
+	const pillars: PillarsContent = data.pillars;
+	const about: AboutContent = data.about;
+	const walkthetalk: WalkTheTalkContent = data.walkthetalk;
+	const references: ReferencesContent = data.references;
+	const blog: BlogContent = data.blog;
+	const latestPosts: BlogPostRow[] = data.latestPosts ?? [];
+	const hasRealPosts = latestPosts.length > 0;
+
+	let flipped = $state(pillars.pillars.map(() => false));
+	let navScrolled = $state(false);
+	let activeSection = $state('');
 
 	function toggleFlip(index: number) {
 		flipped[index] = !flipped[index];
@@ -13,6 +30,83 @@
 			toggleFlip(index);
 		}
 	}
+
+	// Scroll-aware nav: shadow + active section
+	$effect(() => {
+		function onScroll() {
+			navScrolled = window.scrollY > 20;
+
+			// Determine active section
+			const sectionIds = ['pillars', 'about', 'walkthetalk', 'references', 'blog', 'contact'];
+			let current = '';
+			for (const id of sectionIds) {
+				const el = document.getElementById(id);
+				if (el) {
+					const rect = el.getBoundingClientRect();
+					if (rect.top <= 120) current = id;
+				}
+			}
+			activeSection = current;
+		}
+		window.addEventListener('scroll', onScroll, { passive: true });
+		onScroll();
+		return () => window.removeEventListener('scroll', onScroll);
+	});
+
+	// Intersection Observer for reveal animations
+	$effect(() => {
+		const elements = document.querySelectorAll('.reveal');
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('is-visible');
+						observer.unobserve(entry.target);
+					}
+				}
+			},
+			{ threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+		);
+		elements.forEach((el) => observer.observe(el));
+		return () => observer.disconnect();
+	});
+
+	// Count-up animation for metric numbers
+	$effect(() => {
+		const metricsEl = document.querySelector('.metrics-inner');
+		if (!metricsEl) return;
+
+		let animated = false;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0]?.isIntersecting && !animated) {
+					animated = true;
+					const numbers = metricsEl.querySelectorAll('.metric-number');
+					numbers.forEach((el) => {
+						const text = el.textContent ?? '';
+						const suffix = text.replace(/[\d]/g, '');
+						const target = parseInt(text.replace(/\D/g, ''), 10);
+						if (isNaN(target)) return;
+						el.textContent = '0' + suffix;
+						const duration = 1200;
+						const start = performance.now();
+						function tick(now: number) {
+							const progress = Math.min((now - start) / duration, 1);
+							const eased = 1 - Math.pow(1 - progress, 3);
+							el.textContent = Math.round(target * eased) + suffix;
+							if (progress < 1) requestAnimationFrame(tick);
+						}
+						requestAnimationFrame(tick);
+					});
+					observer.disconnect();
+				}
+			},
+			{ threshold: 0.3 }
+		);
+		observer.observe(metricsEl);
+		return () => observer.disconnect();
+	});
+
 </script>
 
 <svelte:head>
@@ -21,29 +115,29 @@
 </svelte:head>
 
 <!-- ═══════ NAVIGATION ═══════ -->
-<nav class="nav">
+<nav class="nav" class:nav-scrolled={navScrolled}>
 	<div class="nav-inner">
 		<a href="/" class="nav-logo">
 			<img src="/box.svg" alt="" class="nav-logo-icon" width="32" height="32" />
 			<span class="nav-logo-text">Break the Box</span>
 		</a>
 		<div class="nav-links">
-			<a href="#pillars">{m.nav_services()}</a>
-			<a href="#about">{m.nav_about()}</a>
-			<a href="#walkthetalk">{m.nav_walkthetalk()}</a>
-			<a href="#references">{m.nav_references()}</a>
-			<a href="#contact">{m.nav_contact()}</a>
+			<a href="#pillars" class:nav-active={activeSection === 'pillars'}>{m.nav_services()}</a>
+			<a href="#about" class:nav-active={activeSection === 'about'}>{m.nav_about()}</a>
+			<a href="#walkthetalk" class:nav-active={activeSection === 'walkthetalk'}>{m.nav_walkthetalk()}</a>
+			<a href="#references" class:nav-active={activeSection === 'references'}>{m.nav_references()}</a>
+			<a href="#contact" class:nav-active={activeSection === 'contact'}>{m.nav_contact()}</a>
 		</div>
 	</div>
 </nav>
 
 <!-- ═══════ HERO ═══════ -->
 <section class="hero">
-	<div class="hero-inner">
+	<div class="hero-inner reveal">
 		<span class="hero-badge">{m.hero_badge()}</span>
 		<img src="/box.webp" alt="Break the Box" class="hero-box" />
 		<h1 class="hero-title">
-			{@html m.hero_name().split('.').filter(Boolean).map((word, i) => {
+			{@html m.hero_name().split('.').filter(Boolean).map((word: string, i: number) => {
 				const colors = ['var(--btb-steel)', 'var(--btb-teal)', 'var(--btb-steel)'];
 				return `<em class="keyword-underline" style="text-decoration-color: ${colors[i]}">${word.trim()}</em>`;
 			}).join('. ') + '.'}
@@ -69,24 +163,24 @@
 
 <!-- ═══════ METRICS BAR ═══════ -->
 <section class="metrics">
-	<div class="metrics-inner">
-		<div class="metric">
+	<div class="metrics-inner reveal-stagger">
+		<div class="metric reveal" style="--stagger: 0">
 			<span class="metric-number">10</span>
 			<span class="metric-label">{m.metrics_years()}</span>
 		</div>
-		<div class="metric">
+		<div class="metric reveal" style="--stagger: 1">
 			<span class="metric-number">50+</span>
 			<span class="metric-label">{m.metrics_clients()}</span>
 		</div>
-		<div class="metric">
+		<div class="metric reveal" style="--stagger: 2">
 			<span class="metric-number">3</span>
 			<span class="metric-label">{m.metrics_vr()}</span>
 		</div>
-		<div class="metric">
+		<div class="metric reveal" style="--stagger: 3">
 			<span class="metric-number">2</span>
 			<span class="metric-label">{m.metrics_universities()}</span>
 		</div>
-		<div class="metric">
+		<div class="metric reveal" style="--stagger: 4">
 			<span class="metric-number">80+</span>
 			<span class="metric-label">{m.metrics_projects()}</span>
 		</div>
@@ -96,254 +190,66 @@
 <!-- ═══════ FOUR PILLARS ═══════ -->
 <section id="pillars" class="section-light">
 	<div class="container">
-		<span class="sketch-label">{m.section_pillars_label()}</span>
-		<h2 class="section-title">
+		<span class="sketch-label reveal">{m.section_pillars_label()}</span>
+		<h2 class="section-title reveal">
 			{@html m.section_pillars_title().replace(
 				/Perspektiven|Perspectives|perspectives/,
 				'<em class="keyword-underline" style="text-decoration-color: var(--btb-teal)">$&</em>'
 			)}
 		</h2>
-		<p class="section-subtitle">{m.section_pillars_subtitle()}</p>
-		<div class="pillars-grid">
-			<!-- Pillar 1: Strategy -->
-			<div
-				class="pillar-flip"
-				class:is-flipped={flipped[0]}
-				onclick={() => toggleFlip(0)}
-				onkeydown={(e) => handleKeydown(e, 0)}
-				role="button"
-				tabindex="0"
-				aria-label="{m.pillar_strategy_title()} — {m.pillar_flip_hint()}"
-			>
-				<div class="pillar-flip-inner">
-					<div class="pillar-front">
-						<div class="pillar-icon">
-							<svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round">
-								<path d="M14 4L14 24M4 14L24 14"/>
-								<path d="M8 8L20 20M20 8L8 20" opacity="0.3"/>
-								<circle cx="14" cy="14" r="3" fill="var(--btb-teal)" opacity="0.6" stroke="none"/>
-							</svg>
+		<p class="section-subtitle reveal">{m.section_pillars_subtitle()}</p>
+		<div class="pillars-grid reveal-stagger">
+			{#each pillars.pillars as pillar, i}
+				<div
+					class="pillar-flip reveal"
+					style="--stagger: {i}"
+					class:is-flipped={flipped[i]}
+					onclick={() => toggleFlip(i)}
+					onkeydown={(e) => handleKeydown(e, i)}
+					role="button"
+					tabindex="0"
+					aria-label="{pillar.title} — {m.pillar_flip_hint()}"
+				>
+					<div class="pillar-flip-inner">
+						<div class="pillar-front">
+							{#if pillar.image}
+								<div class="pillar-card-image">
+									<img src={pillar.image} alt={pillar.title} />
+								</div>
+							{/if}
+							<h3>{pillar.title}</h3>
+							<span class="pillar-note">{pillar.note}</span>
+							<p class="pillar-desc-md">{@html renderMarkdown(pillar.desc)}</p>
+							<div class="pillar-tags">
+								{#each pillar.tags as tag}
+									<span class="pillar-tag">{tag}</span>
+								{/each}
+							</div>
+							<span class="pillar-flip-hint">{m.pillar_flip_hint()} &rarr;</span>
 						</div>
-						<div class="pillar-number">
-							<svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-								<ellipse cx="24" cy="24" rx="22" ry="21.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="4,3" transform="rotate(-3 24 24)"/>
-							</svg>
-							<span>1</span>
+						<div class="pillar-back">
+							<span class="pillar-back-label">{m.pillar_examples_label()}</span>
+							<div class="pillar-examples">
+								{#each pillar.examples as example}
+									{#if example.url}
+										<a href={example.url} class="pillar-example pillar-example-link" onclick={(e) => e.stopPropagation()}>
+											<span class="pillar-example-label">{example.label}</span>
+											<span class="pillar-example-desc">{example.desc}</span>
+											<svg class="pillar-example-arrow" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 2l4 4-4 4"/></svg>
+										</a>
+									{:else}
+										<div class="pillar-example">
+											<span class="pillar-example-label">{example.label}</span>
+											<span class="pillar-example-desc">{example.desc}</span>
+										</div>
+									{/if}
+								{/each}
+							</div>
+							<span class="pillar-flip-back">&larr; {m.pillar_flip_back()}</span>
 						</div>
-						<h3>{m.pillar_strategy_title()}</h3>
-						<span class="pillar-note">{m.pillar_strategy_note()}</span>
-						<p>{m.pillar_strategy_desc()}</p>
-						<div class="pillar-tags">
-							<span class="pillar-tag">{m.pillar_strategy_tag1()}</span>
-							<span class="pillar-tag">{m.pillar_strategy_tag2()}</span>
-							<span class="pillar-tag">{m.pillar_strategy_tag3()}</span>
-							<span class="pillar-tag">{m.pillar_strategy_tag4()}</span>
-							<span class="pillar-tag">{m.pillar_strategy_tag5()}</span>
-							<span class="pillar-tag">{m.pillar_strategy_tag6()}</span>
-						</div>
-						<span class="pillar-flip-hint">{m.pillar_flip_hint()} &rarr;</span>
-					</div>
-					<div class="pillar-back">
-						<span class="pillar-back-label">{m.pillar_examples_label()}</span>
-						<div class="pillar-examples">
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_strategy_ex1_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_strategy_ex1_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_strategy_ex2_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_strategy_ex2_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_strategy_ex3_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_strategy_ex3_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_strategy_ex4_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_strategy_ex4_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_strategy_ex5_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_strategy_ex5_desc()}</span>
-							</div>
-						</div>
-						<span class="pillar-flip-back">&larr; {m.pillar_flip_back()}</span>
 					</div>
 				</div>
-			</div>
-
-			<!-- Pillar 2: Governance -->
-			<div
-				class="pillar-flip"
-				class:is-flipped={flipped[1]}
-				onclick={() => toggleFlip(1)}
-				onkeydown={(e) => handleKeydown(e, 1)}
-				role="button"
-				tabindex="0"
-				aria-label="{m.pillar_governance_title()} — {m.pillar_flip_hint()}"
-			>
-				<div class="pillar-flip-inner">
-					<div class="pillar-front">
-						<div class="pillar-icon">
-							<svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round">
-								<path d="M14 4L4 12L14 10L24 12Z"/>
-								<path d="M6 14L6 22L22 22L22 14"/>
-								<circle cx="14" cy="18" r="2.5" fill="var(--btb-teal)" opacity="0.6" stroke="none"/>
-							</svg>
-						</div>
-						<div class="pillar-number">
-							<svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-								<ellipse cx="24" cy="24" rx="22" ry="21.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="4,3" transform="rotate(2 24 24)"/>
-							</svg>
-							<span>2</span>
-						</div>
-						<h3>{m.pillar_governance_title()}</h3>
-						<span class="pillar-note">{m.pillar_governance_note()}</span>
-						<p>{m.pillar_governance_desc()}</p>
-						<div class="pillar-tags">
-							<span class="pillar-tag">{m.pillar_governance_tag1()}</span>
-							<span class="pillar-tag">{m.pillar_governance_tag2()}</span>
-							<span class="pillar-tag">{m.pillar_governance_tag3()}</span>
-							<span class="pillar-tag">{m.pillar_governance_tag4()}</span>
-						</div>
-						<span class="pillar-flip-hint">{m.pillar_flip_hint()} &rarr;</span>
-					</div>
-					<div class="pillar-back">
-						<span class="pillar-back-label">{m.pillar_examples_label()}</span>
-						<div class="pillar-examples">
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_governance_ex1_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_governance_ex1_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_governance_ex2_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_governance_ex2_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_governance_ex3_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_governance_ex3_desc()}</span>
-							</div>
-						</div>
-						<span class="pillar-flip-back">&larr; {m.pillar_flip_back()}</span>
-					</div>
-				</div>
-			</div>
-
-			<!-- Pillar 3: Teaching -->
-			<div
-				class="pillar-flip"
-				class:is-flipped={flipped[2]}
-				onclick={() => toggleFlip(2)}
-				onkeydown={(e) => handleKeydown(e, 2)}
-				role="button"
-				tabindex="0"
-				aria-label="{m.pillar_teaching_title()} — {m.pillar_flip_hint()}"
-			>
-				<div class="pillar-flip-inner">
-					<div class="pillar-front">
-						<div class="pillar-icon">
-							<svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round">
-								<rect x="6" y="10" width="16" height="12" rx="2"/>
-								<path d="M6 14L22 14"/>
-								<circle cx="20" cy="6" r="3" fill="var(--btb-teal)" opacity="0.6" stroke="none"/>
-								<path d="M20 9L20 14" stroke-dasharray="2,2"/>
-							</svg>
-						</div>
-						<div class="pillar-number">
-							<svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-								<ellipse cx="24" cy="24" rx="22" ry="21.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="4,3" transform="rotate(-2 24 24)"/>
-							</svg>
-							<span>3</span>
-						</div>
-						<h3>{m.pillar_teaching_title()}</h3>
-						<span class="pillar-note">{m.pillar_teaching_note()}</span>
-						<p>{m.pillar_teaching_desc()}</p>
-						<div class="pillar-tags">
-							<span class="pillar-tag">{m.pillar_teaching_tag1()}</span>
-							<span class="pillar-tag">{m.pillar_teaching_tag2()}</span>
-							<span class="pillar-tag">{m.pillar_teaching_tag3()}</span>
-							<span class="pillar-tag">{m.pillar_teaching_tag4()}</span>
-							<span class="pillar-tag">{m.pillar_teaching_tag5()}</span>
-						</div>
-						<span class="pillar-flip-hint">{m.pillar_flip_hint()} &rarr;</span>
-					</div>
-					<div class="pillar-back">
-						<span class="pillar-back-label">{m.pillar_examples_label()}</span>
-						<div class="pillar-examples">
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_teaching_ex1_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_teaching_ex1_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_teaching_ex2_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_teaching_ex2_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_teaching_ex3_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_teaching_ex3_desc()}</span>
-							</div>
-						</div>
-						<span class="pillar-flip-back">&larr; {m.pillar_flip_back()}</span>
-					</div>
-				</div>
-			</div>
-
-			<!-- Pillar 4: Walk the Talk -->
-			<div
-				class="pillar-flip"
-				class:is-flipped={flipped[3]}
-				onclick={() => toggleFlip(3)}
-				onkeydown={(e) => handleKeydown(e, 3)}
-				role="button"
-				tabindex="0"
-				aria-label="{m.pillar_innovation_title()} — {m.pillar_flip_hint()}"
-			>
-				<div class="pillar-flip-inner">
-					<div class="pillar-front">
-						<div class="pillar-icon">
-							<svg width="28" height="28" fill="none" stroke="var(--btb-steel)" stroke-width="1.8" stroke-linecap="round">
-								<circle cx="14" cy="14" r="8"/>
-								<path d="M14 6L14 9M14 19L14 22M6 14L9 14M19 14L22 14" opacity="0.4"/>
-								<circle cx="14" cy="14" r="2.5" fill="var(--btb-teal)" opacity="0.8" stroke="none"/>
-							</svg>
-						</div>
-						<div class="pillar-number">
-							<svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-								<ellipse cx="24" cy="24" rx="22" ry="21.5" stroke="#A8C0D0" stroke-width="1.5" stroke-dasharray="4,3" transform="rotate(1.5 24 24)"/>
-							</svg>
-							<span>4</span>
-						</div>
-						<h3>{m.pillar_innovation_title()}</h3>
-						<span class="pillar-note">{m.pillar_innovation_note()}</span>
-						<p>{m.pillar_innovation_desc()}</p>
-						<div class="pillar-tags">
-							<span class="pillar-tag">{m.pillar_innovation_tag1()}</span>
-							<span class="pillar-tag">{m.pillar_innovation_tag2()}</span>
-							<span class="pillar-tag">{m.pillar_innovation_tag3()}</span>
-							<span class="pillar-tag">{m.pillar_innovation_tag4()}</span>
-						</div>
-						<span class="pillar-flip-hint">{m.pillar_flip_hint()} &rarr;</span>
-					</div>
-					<div class="pillar-back">
-						<span class="pillar-back-label">{m.pillar_examples_label()}</span>
-						<div class="pillar-examples">
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_innovation_ex1_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_innovation_ex1_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_innovation_ex2_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_innovation_ex2_desc()}</span>
-							</div>
-							<div class="pillar-example">
-								<span class="pillar-example-label">{m.pillar_innovation_ex3_label()}</span>
-								<span class="pillar-example-desc">{m.pillar_innovation_ex3_desc()}</span>
-							</div>
-						</div>
-						<span class="pillar-flip-back">&larr; {m.pillar_flip_back()}</span>
-					</div>
-				</div>
-			</div>
+			{/each}
 		</div>
 	</div>
 </section>
@@ -358,7 +264,7 @@
 <!-- ═══════ ABOUT ═══════ -->
 <section id="about" class="section-dark">
 	<div class="container about-grid">
-		<div class="about-content">
+		<div class="about-content reveal">
 			<span class="sketch-label sketch-label-dark">{m.section_about_label()}</span>
 			<h2 class="section-title section-title-dark">
 				{@html m.section_about_title().replace(
@@ -366,23 +272,23 @@
 					`<em class="keyword-underline" style="text-decoration-color: var(--btb-teal)">${m.section_about_highlight()}</em>`
 				)}
 			</h2>
-			<p class="about-text">{m.section_about_text()}</p>
-			<p class="about-text">{m.section_about_text2()}</p>
-			<p class="about-text">{m.section_about_text3()}</p>
+			{#each about.texts as text}
+				<p class="about-text">{text}</p>
+			{/each}
 			<div class="about-quals">
-				<span class="about-qual">{m.about_qual1()}</span>
-				<span class="about-qual">{m.about_qual2()}</span>
-				<span class="about-qual">{m.about_qual3()}</span>
+				{#each about.qualifications as qual}
+					<span class="about-qual">{qual}</span>
+				{/each}
 			</div>
 		</div>
-		<div class="about-sidebar">
+		<div class="about-sidebar reveal">
 			<div class="about-avatar">
 				<img src="/avatar_bhu.svg" alt="Brigitte Hulliger" class="avatar-img" />
 			</div>
 			<span class="about-sketch-note">{m.about_sketch_note()}</span>
 			<!-- CV Video -->
 			<div class="about-video">
-				<span class="about-video-label">{m.about_video_label()}</span>
+				<span class="about-video-label">{about.videoLabel}</span>
 				<div class="about-video-wrapper">
 					<iframe
 						src="https://www.youtube-nocookie.com/embed/uCzVUW3xY8I"
@@ -394,22 +300,12 @@
 				</div>
 			</div>
 			<div class="about-roles">
-				<div class="role-card">
-					<span class="role-tag role-tag-teal">{m.about_role1_title()}</span>
-					<span class="role-name">{m.about_role1_org()}</span>
-				</div>
-				<div class="role-card">
-					<span class="role-tag">{m.about_role2_title()}</span>
-					<span class="role-name">{m.about_role2_org()}</span>
-				</div>
-				<div class="role-card">
-					<span class="role-tag role-tag-teal">{m.about_role3_title()}</span>
-					<span class="role-name">{m.about_role3_org()}</span>
-				</div>
-				<div class="role-card">
-					<span class="role-tag">{m.about_role4_title()}</span>
-					<span class="role-name">{m.about_role4_org()}</span>
-				</div>
+				{#each about.roles as role, i}
+					<div class="role-card">
+						<span class="role-tag" class:role-tag-teal={i % 2 === 0}>{role.title}</span>
+						<span class="role-name">{role.org}</span>
+					</div>
+				{/each}
 			</div>
 		</div>
 	</div>
@@ -425,60 +321,46 @@
 <!-- ═══════ WALK THE TALK / INNOVATION ═══════ -->
 <section id="walkthetalk" class="section-light">
 	<div class="container">
-		<span class="sketch-label">{m.section_walkthetalk_label()}</span>
-		<h2 class="section-title">{m.section_walkthetalk_title()}</h2>
-		<p class="section-subtitle">{m.section_walkthetalk_subtitle()}</p>
-		<div class="inno-grid">
-			<div class="inno-card">
-				<div class="inno-card-accent"></div>
-				<h3 class="inno-card-name">{m.inno_ductivo_name()}</h3>
-				<span class="inno-card-sketch">{m.inno_ductivo_sketch()}</span>
-				<p class="inno-card-desc">{m.inno_ductivo_desc()}</p>
-				<div class="inno-card-tech">
-					<span>SvelteKit</span>
-					<span>Claude API</span>
-					<span>HERMES One</span>
+		<span class="sketch-label reveal">{m.section_walkthetalk_label()}</span>
+		<h2 class="section-title reveal">{m.section_walkthetalk_title()}</h2>
+		<p class="section-subtitle reveal">{m.section_walkthetalk_subtitle()}</p>
+		<div class="inno-grid reveal-stagger">
+			{#each walkthetalk.platforms as platform, pi}
+				<div class="inno-card reveal" style="--stagger: {pi}">
+					<div class="inno-card-accent"></div>
+					{#if platform.image}
+						<img src={platform.image} alt={platform.name} class="inno-card-image" />
+					{/if}
+					<h3 class="inno-card-name">{platform.name}</h3>
+					<span class="inno-card-sketch">{platform.sketch}</span>
+					<p class="inno-card-desc">{platform.desc}</p>
+					{#if platform.url}
+						<a href={platform.url} target="_blank" rel="noopener noreferrer" class="inno-card-link">
+							{m.walkthetalk_visit_platform()} →
+						</a>
+					{/if}
 				</div>
-			</div>
-			<div class="inno-card">
-				<div class="inno-card-accent"></div>
-				<h3 class="inno-card-name">{m.inno_entorakel_name()}</h3>
-				<span class="inno-card-sketch">{m.inno_entorakel_sketch()}</span>
-				<p class="inno-card-desc">{m.inno_entorakel_desc()}</p>
-				<div class="inno-card-tech">
-					<span>SvelteKit</span>
-					<span>Sonnet + Haiku</span>
-					<span>Brave Search</span>
-				</div>
-			</div>
-			<div class="inno-card">
-				<div class="inno-card-accent"></div>
-				<h3 class="inno-card-name">{m.inno_marketing_name()}</h3>
-				<span class="inno-card-sketch">{m.inno_marketing_sketch()}</span>
-				<p class="inno-card-desc">{m.inno_marketing_desc()}</p>
-				<div class="inno-card-tech">
-					<span>SvelteKit</span>
-					<span>Claude API</span>
-					<span>Auth0</span>
-				</div>
-			</div>
+			{/each}
+		</div>
+		<!-- Avatar accent -->
+		<div class="section-avatar section-avatar-right" aria-hidden="true">
+			<img src="/avatar2_bhu.svg" alt="" />
 		</div>
 		<!-- Miss Bizzy proof card -->
-		<div class="inno-proof">
-			<svg class="inno-proof-icon" viewBox="0 0 64 64" fill="none">
-				<circle cx="32" cy="32" r="24" stroke="var(--btb-teal)" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
-				<circle cx="32" cy="20" r="5" fill="var(--btb-teal)" opacity=".7"/>
-				<circle cx="20" cy="38" r="4" fill="var(--btb-steel)" opacity=".6"/>
-				<circle cx="44" cy="38" r="4" fill="var(--btb-steel)" opacity=".6"/>
-				<path d="M32 25L22 34" stroke="var(--border)" stroke-width="1" stroke-linecap="round"/>
-				<path d="M32 25L42 34" stroke="var(--border)" stroke-width="1" stroke-linecap="round"/>
-				<path d="M24 38L40 38" stroke="var(--border)" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"/>
-			</svg>
+		<div class="inno-proof reveal">
 			<div>
-				<h4>{m.inno_missbizzy_title()}</h4>
-				<span class="inno-proof-sketch">{m.inno_missbizzy_sketch()}</span>
-				<p>{m.inno_missbizzy_desc()}</p>
+				<h4>{walkthetalk.missbizzy.title}</h4>
+				<span class="inno-proof-sketch">{walkthetalk.missbizzy.sketch}</span>
+				<p>{walkthetalk.missbizzy.desc}</p>
+				{#if walkthetalk.missbizzy.url}
+					<a href={walkthetalk.missbizzy.url} target="_blank" rel="noopener noreferrer" class="inno-proof-link">
+						{m.walkthetalk_learn_more()} →
+					</a>
+				{/if}
 			</div>
+			{#if walkthetalk.missbizzy.image}
+				<img src={walkthetalk.missbizzy.image} alt={walkthetalk.missbizzy.title} class="inno-proof-image" />
+			{/if}
 		</div>
 	</div>
 </section>
@@ -493,27 +375,28 @@
 <!-- ═══════ REFERENCES ═══════ -->
 <section id="references" class="section-dark">
 	<div class="container">
-		<span class="sketch-label sketch-label-dark">{m.section_references_label()}</span>
-		<h2 class="section-title section-title-dark">{m.section_references_title()}</h2>
-		<div class="logos-grid">
-			<span class="logo-item">GVB</span>
-			<span class="logo-item">Nexplore</span>
-			<span class="logo-item">PostFinance</span>
-			<span class="logo-item">BLS</span>
-			<span class="logo-item">EWB</span>
-			<span class="logo-item">BFH</span>
-			<span class="logo-item">BEKB</span>
-			<span class="logo-item">Kanton Bern</span>
-			<span class="logo-item">SGAIM</span>
-			<span class="logo-item">Meier Tobler</span>
-			<span class="logo-item">Bracher & Partner</span>
-			<span class="logo-item">Michel Gruppe</span>
-			<span class="logo-item">ORTHO TEAM</span>
-			<span class="logo-item">BAFU</span>
-			<span class="logo-item">Identitas</span>
-			<span class="logo-item">Kellerhals Carrard</span>
-			<span class="logo-item">GASCHE</span>
-			<span class="logo-item">Milchgold Käse</span>
+		<span class="sketch-label sketch-label-dark reveal">{m.section_references_label()}</span>
+		<h2 class="section-title section-title-dark reveal">{m.section_references_title()}</h2>
+		<div class="logos-grid reveal">
+			{#each references.clients as client}
+				{#if client.websiteUrl}
+					<a href={client.websiteUrl} target="_blank" rel="noopener noreferrer" class="logo-item logo-item-link">
+						{#if client.logoUrl}
+							<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+						{:else}
+							{client.name}
+						{/if}
+					</a>
+				{:else}
+					<span class="logo-item">
+						{#if client.logoUrl}
+							<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+						{:else}
+							{client.name}
+						{/if}
+					</span>
+				{/if}
+			{/each}
 		</div>
 	</div>
 </section>
@@ -528,33 +411,43 @@
 <!-- ═══════ BLOG ═══════ -->
 <section id="blog" class="section-light">
 	<div class="container">
-		<span class="sketch-label">{m.section_blog_label()}</span>
-		<h2 class="section-title">{m.section_blog_title()}</h2>
-		<div class="blog-grid">
-			<div class="blog-card">
-				<div class="blog-card-img blog-card-img-1"></div>
-				<div class="blog-card-body">
-					<span class="blog-card-tag">{m.blog1_tag()}</span>
-					<h3 class="blog-card-title">{m.blog1_title()}</h3>
-					<p class="blog-card-excerpt">{m.blog1_excerpt()}</p>
-				</div>
-			</div>
-			<div class="blog-card">
-				<div class="blog-card-img blog-card-img-2"></div>
-				<div class="blog-card-body">
-					<span class="blog-card-tag">{m.blog2_tag()}</span>
-					<h3 class="blog-card-title">{m.blog2_title()}</h3>
-					<p class="blog-card-excerpt">{m.blog2_excerpt()}</p>
-				</div>
-			</div>
-			<div class="blog-card">
-				<div class="blog-card-img blog-card-img-3"></div>
-				<div class="blog-card-body">
-					<span class="blog-card-tag">{m.blog3_tag()}</span>
-					<h3 class="blog-card-title">{m.blog3_title()}</h3>
-					<p class="blog-card-excerpt">{m.blog3_excerpt()}</p>
-				</div>
-			</div>
+		<span class="sketch-label reveal">{m.section_blog_label()}</span>
+		<h2 class="section-title reveal">{m.section_blog_title()}</h2>
+		<div class="blog-grid reveal">
+			{#if hasRealPosts}
+				{#each latestPosts as post, i}
+					<a href={localizeHref(`/blog/${post.slug}`)} class="blog-card">
+						{#if post.headerImage}
+							<img src={post.headerImage} alt="" class="blog-card-img" />
+						{:else}
+							<div class="blog-card-img blog-card-img-{i + 1}"></div>
+						{/if}
+						<div class="blog-card-body">
+							{#if post.tags.length > 0}
+								<span class="blog-card-tag">{post.tags.join(' · ')}</span>
+							{/if}
+							<h3 class="blog-card-title">{post.title}</h3>
+							{#if post.excerpt}
+								<p class="blog-card-excerpt">{post.excerpt}</p>
+							{/if}
+						</div>
+					</a>
+				{/each}
+			{:else}
+				{#each blog.posts as post, i}
+					<div class="blog-card">
+						<div class="blog-card-img blog-card-img-{i + 1}"></div>
+						<div class="blog-card-body">
+							<span class="blog-card-tag">{post.tag}</span>
+							<h3 class="blog-card-title">{post.title}</h3>
+							<p class="blog-card-excerpt">{post.excerpt}</p>
+						</div>
+					</div>
+				{/each}
+			{/if}
+		</div>
+		<div class="blog-all-link">
+			<a href={localizeHref('/blog')}>{m.blog_all_posts()} &rarr;</a>
 		</div>
 	</div>
 </section>
@@ -569,11 +462,14 @@
 <!-- ═══════ CTA / CONTACT ═══════ -->
 <section id="contact" class="section-navy">
 	<div class="container cta-content">
-		<span class="sketch-label sketch-label-dark">{m.section_contact_label()}</span>
-		<h2 class="cta-title">{m.section_cta_title()}</h2>
-		<p class="cta-text">{m.section_cta_text()}</p>
+		<div class="section-avatar section-avatar-left" aria-hidden="true">
+			<img src="/avatar3_bhu.svg" alt="" />
+		</div>
+		<span class="sketch-label sketch-label-dark reveal">{m.section_contact_label()}</span>
+		<h2 class="cta-title reveal">{m.section_cta_title()}</h2>
+		<p class="cta-text reveal">{m.section_cta_text()}</p>
 		<span class="contact-sketch-note">{m.contact_sketch()} ☕</span>
-		<div class="contact-methods">
+		<div class="contact-methods reveal">
 			<div class="contact-method">
 				<span class="contact-method-label">{m.contact_email_label()}</span>
 				<a href="mailto:info@breakthebox.ch">info@breakthebox.ch</a>
@@ -605,6 +501,8 @@
 		</div>
 		<div class="footer-copy">
 			&copy; {new Date().getFullYear()} {m.footer_copyright()}
+			<span class="footer-admin-sep">·</span>
+			<a href="/auth/login" class="footer-admin-link">Admin</a>
 		</div>
 	</div>
 </footer>
@@ -619,7 +517,12 @@
 		z-index: var(--z-sticky);
 		background: rgba(245, 245, 242, 0.92);
 		backdrop-filter: blur(12px);
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid transparent;
+		transition: border-color 0.3s ease, box-shadow 0.3s ease;
+	}
+	.nav-scrolled {
+		border-bottom-color: var(--border);
+		box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
 	}
 	.nav-inner {
 		max-width: 1160px;
@@ -661,6 +564,10 @@
 	}
 	.nav-links a:hover {
 		color: var(--btb-steel);
+	}
+	.nav-links a.nav-active {
+		color: var(--btb-steel);
+		font-weight: 600;
 	}
 
 	/* ═══════ HERO ═══════ */
@@ -803,11 +710,16 @@
 		font-weight: 600;
 		font-size: 0.88rem;
 		text-decoration: none;
-		transition: background var(--t-fast);
+		transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
 		cursor: pointer;
 	}
 	.btn-primary:hover {
 		background: var(--btb-steel-hover);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(82, 122, 152, 0.25);
+	}
+	.btn-primary:active {
+		transform: translateY(0);
 	}
 	.btn-secondary {
 		display: inline-flex;
@@ -822,11 +734,15 @@
 		font-weight: 500;
 		font-size: 0.88rem;
 		text-decoration: none;
-		transition: border-color var(--t-fast);
+		transition: border-color var(--t-fast), transform var(--t-fast);
 		cursor: pointer;
 	}
 	.btn-secondary:hover {
 		border-color: var(--btb-steel);
+		transform: translateY(-1px);
+	}
+	.btn-secondary:active {
+		transform: translateY(0);
 	}
 	.btn-cta {
 		display: inline-flex;
@@ -841,18 +757,24 @@
 		font-weight: 600;
 		font-size: 0.95rem;
 		text-decoration: none;
-		transition: background var(--t-fast);
+		transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
 		cursor: pointer;
 		margin-top: 32px;
 	}
 	.btn-cta:hover {
 		background: var(--btb-teal-dark);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(43, 138, 120, 0.3);
+	}
+	.btn-cta:active {
+		transform: translateY(0);
 	}
 
 	/* ═══════ METRICS BAR ═══════ */
 	.metrics {
 		background: var(--navy);
 		padding: 40px 32px;
+		margin-top: -40px;
 	}
 	.metrics-inner {
 		max-width: 1160px;
@@ -963,51 +885,32 @@
 		padding: 32px;
 		display: flex;
 		flex-direction: column;
+		transition: box-shadow var(--t-normal), border-color var(--t-normal);
+	}
+	.pillar-flip:hover .pillar-front,
+	.pillar-flip:hover .pillar-back {
+		box-shadow: var(--shadow-card-hover);
+		border-color: var(--btb-steel-subtle);
 	}
 	.pillar-front {
 		z-index: 2;
 	}
+	.pillar-card-image {
+		width: 100%;
+		height: 140px;
+		border-radius: var(--radius-card) var(--radius-card) 0 0;
+		overflow: hidden;
+		margin: -28px -28px 16px -28px;
+		width: calc(100% + 56px);
+	}
+	.pillar-card-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
 	.pillar-back {
 		transform: rotateY(180deg);
 		z-index: 1;
-		justify-content: center;
-	}
-	.pillar-icon {
-		width: 56px;
-		height: 56px;
-		border-radius: 50%;
-		background: var(--bg-elevated);
-		border: 2px solid var(--border);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 16px;
-	}
-	.pillar-number {
-		position: relative;
-		width: 48px;
-		height: 48px;
-		margin-bottom: 16px;
-	}
-	.pillar-number svg {
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
-	.pillar-number span {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		background: var(--btb-steel);
-		color: #fff;
-		font-size: 0.88rem;
-		font-weight: 700;
-		display: flex;
-		align-items: center;
 		justify-content: center;
 	}
 	.pillar-note {
@@ -1095,6 +998,45 @@
 		color: var(--text-secondary);
 		line-height: 1.5;
 	}
+	.pillar-example-link {
+		text-decoration: none;
+		transition: background 0.15s;
+		border-radius: 6px;
+		position: relative;
+	}
+	.pillar-example-link:hover {
+		background: rgba(96, 125, 145, 0.08);
+	}
+	.pillar-example-link:hover .pillar-example-label {
+		color: var(--btb-steel);
+	}
+	.pillar-example-arrow {
+		position: absolute;
+		right: 4px;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--text-muted);
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+	.pillar-example-link:hover .pillar-example-arrow {
+		opacity: 1;
+		color: var(--btb-steel);
+	}
+	/* ─── Markdown in Descriptions ─── */
+	.pillar-desc-md :global(a) {
+		color: var(--btb-steel);
+		text-decoration: underline;
+		text-decoration-color: var(--btb-teal);
+		text-underline-offset: 2px;
+		transition: color 0.15s;
+	}
+	.pillar-desc-md :global(a:hover) {
+		color: var(--btb-teal);
+	}
+	.pillar-desc-md :global(strong) {
+		font-weight: 700;
+	}
 	.pillar-flip-back {
 		display: block;
 		font-family: var(--ff-sketch);
@@ -1166,6 +1108,11 @@
 		border: 3px solid var(--btb-teal);
 		box-shadow: 0 0 0 6px rgba(43, 138, 120, 0.15);
 		flex-shrink: 0;
+		transition: box-shadow 0.4s ease, transform 0.4s ease;
+	}
+	.about-avatar:hover {
+		box-shadow: 0 0 0 8px rgba(43, 138, 120, 0.2), 0 8px 24px rgba(0, 0, 0, 0.1);
+		transform: scale(1.03);
 	}
 	.avatar-img {
 		width: 100%;
@@ -1223,6 +1170,11 @@
 		background: var(--bg-surface-dark);
 		border: 1px solid var(--border-dark);
 		border-radius: var(--radius-md);
+		transition: border-color var(--t-normal), background var(--t-normal);
+	}
+	.role-card:hover {
+		border-color: rgba(255, 255, 255, 0.15);
+		background: rgba(255, 255, 255, 0.06);
 	}
 	.role-tag {
 		display: inline-flex;
@@ -1262,10 +1214,11 @@
 		padding: 32px 28px;
 		position: relative;
 		overflow: hidden;
-		transition: transform var(--t-normal);
+		transition: transform var(--t-normal), box-shadow var(--t-normal);
 	}
 	.inno-card:hover {
 		transform: translateY(-3px);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 	}
 	.inno-card-accent {
 		position: absolute;
@@ -1294,6 +1247,13 @@
 		margin-bottom: 14px;
 		font-weight: 500;
 	}
+	.inno-card-image {
+		width: 100%;
+		height: 160px;
+		object-fit: cover;
+		border-radius: var(--radius-card-sm, 8px);
+		margin-bottom: 16px;
+	}
 	.inno-card-desc {
 		font-size: 0.85rem;
 		line-height: 1.65;
@@ -1301,20 +1261,16 @@
 		margin-bottom: 20px;
 		font-weight: 300;
 	}
-	.inno-card-tech {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 5px;
-	}
-	.inno-card-tech span {
-		font-size: 0.68rem;
-		padding: 3px 8px;
-		border-radius: 3px;
-		background: rgba(255, 255, 255, 0.07);
-		color: rgba(255, 255, 255, 0.4);
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
+	.inno-card-link {
+		display: inline-block;
+		font-size: 0.85rem;
 		font-weight: 500;
+		color: var(--btb-teal-light);
+		text-decoration: none;
+		transition: color var(--t-normal);
+	}
+	.inno-card-link:hover {
+		color: #fff;
 	}
 	.inno-proof {
 		background: var(--bg-surface);
@@ -1324,11 +1280,6 @@
 		display: flex;
 		align-items: center;
 		gap: 28px;
-	}
-	.inno-proof-icon {
-		width: 64px;
-		height: 64px;
-		flex-shrink: 0;
 	}
 	.inno-proof h4 {
 		font-size: 1.1rem;
@@ -1350,6 +1301,25 @@
 		font-weight: 300;
 		line-height: 1.65;
 	}
+	.inno-proof-link {
+		display: inline-block;
+		margin-top: 10px;
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: var(--btb-teal);
+		text-decoration: none;
+		transition: color var(--t-normal);
+	}
+	.inno-proof-link:hover {
+		color: var(--btb-teal-light);
+	}
+	.inno-proof-image {
+		width: 100%;
+		max-width: 320px;
+		border-radius: var(--radius-card-sm, 8px);
+		object-fit: cover;
+		flex-shrink: 0;
+	}
 
 	/* ═══════ REFERENCES ═══════ */
 	.logos-grid {
@@ -1361,14 +1331,28 @@
 		gap: 28px 44px;
 	}
 	.logo-item {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		font-size: 0.9rem;
 		font-weight: 500;
 		color: var(--text-primary-dark);
 		opacity: 0.25;
 		transition: opacity var(--t-fast);
+		text-decoration: none;
 	}
 	.logo-item:hover {
 		opacity: 0.6;
+	}
+	.logo-item-link {
+		cursor: pointer;
+	}
+	.logo-item-img {
+		height: 104px;
+		width: auto;
+		max-width: 180px;
+		object-fit: contain;
+		filter: brightness(0) invert(1);
 	}
 
 	/* ═══════ BLOG ═══════ */
@@ -1384,6 +1368,8 @@
 		border: 1.5px solid var(--border);
 		transition: transform var(--t-normal), box-shadow var(--t-normal);
 		cursor: pointer;
+		text-decoration: none;
+		display: block;
 	}
 	.blog-card:hover {
 		transform: translateY(-3px);
@@ -1392,6 +1378,8 @@
 	.blog-card-img {
 		width: 100%;
 		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		display: block;
 	}
 	.blog-card-img-1 {
 		background: linear-gradient(135deg, rgba(43, 138, 120, 0.1), var(--bg-surface));
@@ -1425,6 +1413,20 @@
 		color: var(--text-secondary);
 		font-weight: 300;
 		line-height: 1.6;
+	}
+	.blog-all-link {
+		text-align: center;
+		margin-top: var(--space-xl);
+	}
+	.blog-all-link a {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--btb-steel);
+		text-decoration: none;
+		transition: color var(--t-fast);
+	}
+	.blog-all-link a:hover {
+		color: var(--btb-steel-hover);
 	}
 
 	/* ═══════ CTA / CONTACT ═══════ */
@@ -1529,6 +1531,19 @@
 		font-size: 0.78rem;
 		color: var(--text-muted-dark);
 	}
+	.footer-admin-sep {
+		margin: 0 4px;
+		opacity: 0.3;
+	}
+	.footer-admin-link {
+		color: var(--text-muted-dark);
+		text-decoration: none;
+		opacity: 0.4;
+		transition: opacity 0.2s;
+	}
+	.footer-admin-link:hover {
+		opacity: 0.8;
+	}
 
 	/* ═══════ RESPONSIVE ═══════ */
 	@media (max-width: 768px) {
@@ -1589,6 +1604,37 @@
 	@media (max-width: 1024px) and (min-width: 769px) {
 		.inno-grid {
 			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	/* ═══════ SECTION AVATARS (decorative) ═══════ */
+	.section-avatar {
+		position: absolute;
+		pointer-events: none;
+		opacity: 0.18;
+		z-index: 0;
+	}
+	.section-avatar img {
+		height: 220px;
+		width: auto;
+	}
+	.section-avatar-right {
+		right: -20px;
+		top: 60px;
+	}
+	.section-avatar-left {
+		left: -20px;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+	/* Sections need relative positioning for avatar placement */
+	#walkthetalk .container,
+	.cta-content {
+		position: relative;
+	}
+	@media (max-width: 768px) {
+		.section-avatar {
+			display: none;
 		}
 	}
 </style>

@@ -22,6 +22,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run paraglide:compile
       - run: npm run check
 
   # ─── Step 2: Run Tests ───
@@ -35,6 +36,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run paraglide:compile
       - run: npm run test:run
 
   # ─── Step 3: Build & Push Docker Image ───
