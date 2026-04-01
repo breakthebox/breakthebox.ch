@@ -168,12 +168,10 @@
 					<option value="published">{m.blog_status_published()}</option>
 					<option value="scheduled">{m.blog_status_scheduled()}</option>
 				</select>
-				{#if status === 'scheduled'}
-					<div class="field-sm">
-						<label for="publishDate">{m.blog_publish_date_label()}</label>
-						<input type="datetime-local" id="publishDate" name="publishDate" bind:value={publishDate} />
-					</div>
-				{/if}
+				<div class="field-sm">
+					<label for="publishDate">{m.blog_publish_date_label()}</label>
+					<input type="datetime-local" id="publishDate" name="publishDate" bind:value={publishDate} />
+				</div>
 			</div>
 
 			<!-- Header Image -->

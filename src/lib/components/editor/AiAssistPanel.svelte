@@ -20,6 +20,7 @@
 	let analyzingSeo = $state(false);
 	let seoResult = $state<SeoScoreResult | null>(null);
 	let aiError = $state('');
+	let generatedMeta = $state<string | null>(null);
 
 	function hasContent(): boolean {
 		return !!contentBlocks?.blocks?.length && !!title;
@@ -29,6 +30,7 @@
 		if (!hasContent()) return;
 		generatingMeta = true;
 		aiError = '';
+		generatedMeta = null;
 
 		try {
 			const res = await fetch('/api/ai/blog/meta-description', {
@@ -43,12 +45,23 @@
 			}
 
 			const data = await res.json();
-			metaDescription = data.metaDescription;
+			generatedMeta = data.metaDescription;
 		} catch (err) {
 			aiError = err instanceof Error ? err.message : 'Unbekannter Fehler';
 		} finally {
 			generatingMeta = false;
 		}
+	}
+
+	function acceptMeta() {
+		if (generatedMeta) {
+			metaDescription = generatedMeta;
+			generatedMeta = null;
+		}
+	}
+
+	function discardMeta() {
+		generatedMeta = null;
 	}
 
 	async function analyzeSeo() {
@@ -175,8 +188,26 @@
 				{m.blog_ai_generate_meta()}
 			{/if}
 		</button>
-		{#if metaDescription}
-			<p class="meta-preview">{metaDescription}</p>
+
+		{#if generatedMeta}
+			<div class="generated-preview">
+				<p class="meta-preview">{generatedMeta}</p>
+				<span class="char-count" class:over={generatedMeta.length > 160}>
+					{generatedMeta.length}/160
+				</span>
+				<div class="preview-actions">
+					<button type="button" class="accept-btn" onclick={acceptMeta}>
+						✓ {m.blog_ai_accept()}
+					</button>
+					<button type="button" class="discard-btn" onclick={discardMeta}>
+						✕ {m.blog_ai_discard()}
+					</button>
+				</div>
+			</div>
+		{/if}
+
+		{#if metaDescription && !generatedMeta}
+			<p class="meta-current">{metaDescription}</p>
 			<span class="char-count" class:over={metaDescription.length > 160}>
 				{metaDescription.length}/160
 			</span>
@@ -331,5 +362,59 @@
 	.char-count.over {
 		color: var(--color-error, #dc2626);
 		font-weight: 500;
+	}
+
+	.generated-preview {
+		margin-top: 0.5rem;
+		padding: 0.5rem;
+		background: var(--color-surface-hover, #f0fdf4);
+		border: 1px solid var(--color-success, #16a34a);
+		border-radius: 0.375rem;
+	}
+
+	.meta-current {
+		font-size: 0.75rem;
+		color: var(--color-text-muted, #64748b);
+		margin-top: 0.5rem;
+		line-height: 1.4;
+	}
+
+	.preview-actions {
+		display: flex;
+		gap: 0.375rem;
+		margin-top: 0.5rem;
+	}
+
+	.accept-btn {
+		flex: 1;
+		padding: 0.375rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		background: var(--color-success, #16a34a);
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		cursor: pointer;
+		transition: opacity 0.15s;
+	}
+
+	.accept-btn:hover {
+		opacity: 0.9;
+	}
+
+	.discard-btn {
+		padding: 0.375rem 0.5rem;
+		font-size: 0.75rem;
+		background: transparent;
+		color: var(--color-text-muted, #64748b);
+		border: 1px solid var(--color-border, #e2e8f0);
+		border-radius: 0.25rem;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.discard-btn:hover {
+		border-color: var(--color-error, #dc2626);
+		color: var(--color-error, #dc2626);
 	}
 </style>

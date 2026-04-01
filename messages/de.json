@@ -231,5 +231,7 @@
 	"blog_views": "Aufrufe",
 	"blog_views_label": "Seitenaufrufe",
 	"blog_change_image": "Ändern",
-	"blog_remove_image": "Entfernen"
+	"blog_remove_image": "Entfernen",
+	"blog_ai_accept": "Übernehmen",
+	"blog_ai_discard": "Verwerfen"
 }

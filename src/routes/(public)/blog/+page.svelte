@@ -25,7 +25,7 @@
 	<!-- Nav -->
 	<nav class="blog-nav">
 		<a href={localizeHref('/')} class="blog-nav-brand">
-			<img src="/btb-logo.svg" alt="" width="36" height="36" />
+			<img src="/box.svg" alt="Break the Box" width="32" height="32" />
 			<span>Break the Box</span>
 		</a>
 		<a href={localizeHref('/')} class="blog-nav-back">&larr; Zur Hauptseite</a>
