@@ -23,6 +23,18 @@
 		return shuffled.slice(0, max);
 	}
 
+	const pillarFlipHints: Record<string, () => string> = {
+		strategy: m.pillar_flip_hint_strategy,
+		governance: m.pillar_flip_hint_governance,
+		teaching: m.pillar_flip_hint_teaching,
+		innovation: m.pillar_flip_hint_innovation
+	};
+
+	function getPillarExamples(pillar: typeof pillars.pillars[0]) {
+		if (pillar.key === 'governance') return pillar.examples;
+		return pickRandom(pillar.examples, 3);
+	}
+
 	let flipped = $state(pillars.pillars.map(() => false));
 	let navScrolled = $state(false);
 	let activeSection = $state('');
@@ -232,12 +244,12 @@
 									<span class="pillar-tag">{tag}</span>
 								{/each}
 							</div>
-							<span class="pillar-flip-hint">{m.pillar_flip_hint()} &rarr;</span>
+							<span class="pillar-flip-hint">{(pillarFlipHints[pillar.key] ?? m.pillar_flip_hint)()} &rarr;</span>
 						</div>
 						<div class="pillar-back">
-							<span class="pillar-back-label">{m.pillar_examples_label()}</span>
+							<span class="pillar-back-label">{(pillarFlipHints[pillar.key] ?? m.pillar_flip_hint)()}</span>
 							<div class="pillar-examples">
-								{#each pickRandom(pillar.examples, 3) as example}
+								{#each getPillarExamples(pillar) as example}
 									{#if example.url}
 										<a href={example.url} class="pillar-example pillar-example-link" onclick={(e) => e.stopPropagation()}>
 											<span class="pillar-example-label">{example.label}</span>
