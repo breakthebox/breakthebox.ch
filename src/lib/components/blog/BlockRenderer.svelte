@@ -132,14 +132,21 @@
 		color: var(--color-text-muted, #64748b);
 	}
 
-	.prose :global(ul),
+	.prose :global(ul) {
+		margin: 1rem 0;
+		padding-left: 1.5rem;
+		list-style-type: disc;
+	}
+
 	.prose :global(ol) {
 		margin: 1rem 0;
 		padding-left: 1.5rem;
+		list-style-type: decimal;
 	}
 
 	.prose :global(li) {
 		margin: 0.25rem 0;
+		display: list-item;
 	}
 
 	.prose :global(pre) {
