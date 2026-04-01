@@ -14,7 +14,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN npm run paraglide:compile && npm run build
 
 # ─── Stage 3: Production ───
 FROM node:22-alpine AS production
