@@ -17,6 +17,11 @@
 	const latestPosts: BlogPostRow[] = data.latestPosts ?? [];
 	const hasRealPosts = latestPosts.length > 0;
 
+	// Split clients into two rows for marquee
+	const refHalf = Math.ceil(references.clients.length / 2);
+	const refRow1 = references.clients.slice(0, refHalf);
+	const refRow2 = references.clients.slice(refHalf);
+
 	function pickRandom<T>(arr: T[], max: number): T[] {
 		if (arr.length <= max) return arr;
 		const shuffled = [...arr].sort(() => Math.random() - 0.5);
@@ -406,25 +411,56 @@
 	<div class="container">
 		<span class="sketch-label sketch-label-dark reveal">{m.section_references_label()}</span>
 		<h2 class="section-title section-title-dark reveal">{m.section_references_title()}</h2>
-		<div class="logos-grid reveal">
-			{#each references.clients as client}
-				{#if client.websiteUrl}
-					<a href={client.websiteUrl} target="_blank" rel="noopener noreferrer" class="logo-item logo-item-link">
-						{#if client.logoUrl}
-							<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+	</div>
+	<div class="marquee-wrapper reveal">
+		<div class="marquee-track marquee-left">
+			{#each [0, 1] as _dup}
+				<div class="marquee-content" aria-hidden={_dup === 1}>
+					{#each refRow1 as client}
+						{#if client.websiteUrl}
+							<a href={client.websiteUrl} target="_blank" rel="noopener noreferrer" class="logo-item logo-item-link">
+								{#if client.logoUrl}
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+								{:else}
+									<span class="logo-item-text">{client.name}</span>
+								{/if}
+							</a>
 						{:else}
-							{client.name}
+							<span class="logo-item">
+								{#if client.logoUrl}
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+								{:else}
+									<span class="logo-item-text">{client.name}</span>
+								{/if}
+							</span>
 						{/if}
-					</a>
-				{:else}
-					<span class="logo-item">
-						{#if client.logoUrl}
-							<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+					{/each}
+				</div>
+			{/each}
+		</div>
+		<div class="marquee-track marquee-right">
+			{#each [0, 1] as _dup}
+				<div class="marquee-content" aria-hidden={_dup === 1}>
+					{#each refRow2 as client}
+						{#if client.websiteUrl}
+							<a href={client.websiteUrl} target="_blank" rel="noopener noreferrer" class="logo-item logo-item-link">
+								{#if client.logoUrl}
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+								{:else}
+									<span class="logo-item-text">{client.name}</span>
+								{/if}
+							</a>
 						{:else}
-							{client.name}
+							<span class="logo-item">
+								{#if client.logoUrl}
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+								{:else}
+									<span class="logo-item-text">{client.name}</span>
+								{/if}
+							</span>
 						{/if}
-					</span>
-				{/if}
+					{/each}
+				</div>
 			{/each}
 		</div>
 	</div>
@@ -1405,14 +1441,45 @@
 		flex-shrink: 0;
 	}
 
-	/* ═══════ REFERENCES ═══════ */
-	.logos-grid {
-		max-width: 960px;
-		margin: 0 auto;
+	/* ═══════ REFERENCES (Marquee) ═══════ */
+	.marquee-wrapper {
+		overflow: hidden;
+		width: 100%;
+		padding: 1rem 0;
+		mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+	}
+	.marquee-track {
 		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 28px 44px;
+		width: max-content;
+		margin-bottom: 1.5rem;
+	}
+	.marquee-track:last-child {
+		margin-bottom: 0;
+	}
+	.marquee-left {
+		animation: scroll-left 40s linear infinite;
+	}
+	.marquee-right {
+		animation: scroll-right 40s linear infinite;
+	}
+	.marquee-wrapper:hover .marquee-track {
+		animation-play-state: paused;
+	}
+	.marquee-content {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		gap: 3rem;
+		padding: 0 1.5rem;
+	}
+	@keyframes scroll-left {
+		from { transform: translateX(0); }
+		to { transform: translateX(-50%); }
+	}
+	@keyframes scroll-right {
+		from { transform: translateX(-50%); }
+		to { transform: translateX(0); }
 	}
 	.logo-item {
 		display: flex;
@@ -1421,22 +1488,28 @@
 		font-size: 0.9rem;
 		font-weight: 500;
 		color: var(--text-primary-dark);
-		opacity: 0.25;
+		opacity: 0.3;
 		transition: opacity var(--t-fast);
 		text-decoration: none;
+		flex-shrink: 0;
 	}
 	.logo-item:hover {
-		opacity: 0.6;
+		opacity: 0.7;
 	}
 	.logo-item-link {
 		cursor: pointer;
 	}
 	.logo-item-img {
-		height: 104px;
+		height: 56px;
 		width: auto;
-		max-width: 180px;
+		max-width: 140px;
 		object-fit: contain;
 		filter: brightness(0) invert(1);
+	}
+	.logo-item-text {
+		white-space: nowrap;
+		font-size: 0.85rem;
+		letter-spacing: 0.02em;
 	}
 
 	/* ═══════ BLOG ═══════ */
@@ -1737,6 +1810,13 @@
 		}
 		.blog-grid {
 			grid-template-columns: 1fr;
+		}
+		.marquee-content {
+			gap: 2rem;
+		}
+		.logo-item-img {
+			height: 40px;
+			max-width: 100px;
 		}
 		.contact-methods {
 			flex-direction: column;
