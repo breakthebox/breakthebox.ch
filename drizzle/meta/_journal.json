@@ -8,6 +8,20 @@
       "when": 1774887221954,
       "tag": "0000_perfect_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774903612470,
+      "tag": "0001_steep_ronan",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774992839294,
+      "tag": "0002_large_nebula",
+      "breakpoints": true
     }
   ]
 }

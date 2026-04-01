@@ -34,7 +34,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${DB_USER:-breakthebox}:${DB_PASSWORD}@db:5432/${DB_NAME:-breakthebox}
       - NODE_ENV=production
-      - ORIGIN=${PUBLIC_APP_URL:-https://breakthebox.ch}
+      - ORIGIN=${PUBLIC_APP_URL:-https://web.breakthebox.ch}
     env_file:
       - .env.production
     depends_on:

@@ -12,7 +12,7 @@
 set -euo pipefail
 
 APP_DIR=~/breakthebox.ch
-DOMAIN="breakthebox.ch"
+DOMAIN="web.breakthebox.ch"
 EMAIL="admin@breakthebox.ch"  # For Let's Encrypt notifications
 
 echo "=== Break the Box — Server Setup ==="
@@ -103,7 +103,7 @@ MAINNGINX
         --agree-tos \
         --no-eff-email \
         -d "$DOMAIN" \
-        -d "www.$DOMAIN"
+        -d "www.breakthebox.ch"
 
     docker compose -f docker-compose.prod.yml down
 

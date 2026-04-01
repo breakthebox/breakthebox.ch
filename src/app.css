@@ -2,12 +2,12 @@
 
 /* ═══════════════════════════════════════════════════════════
    Break the Box — Design System v3 Tokens
-   Signal (Steel + Teal) · Plus Jakarta Sans · Caveat · Dual Mode
+   Signal (Steel + Teal) · Plus Jakarta Sans · Shadows Into Light · Dual Mode
 ═══════════════════════════════════════════════════════════ */
 :root {
 	/* Typography — Font Families */
 	--ff-ui: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
-	--ff-sketch: 'Caveat', cursive;
+	--ff-sketch: 'Shadows Into Light', cursive;
 	--ff-mono: 'JetBrains Mono', monospace;
 
 	/* Brand — Steel (Primary) */
@@ -92,6 +92,11 @@
 	--t-normal: 250ms ease;
 }
 
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: 80px;
+}
+
 body {
 	background: var(--bg-page);
 	color: var(--text-primary);
@@ -99,9 +104,32 @@ body {
 	line-height: 1.6;
 }
 
+/* ═══════ Scroll-Triggered Entrance Animations ═══════ */
+.reveal {
+	opacity: 0;
+	transform: translateY(24px);
+	transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+	            transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+/* Staggered children */
+.reveal-stagger > .reveal {
+	transition-delay: calc(var(--stagger, 0) * 100ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	* {
 		animation: none !important;
 		transition: none !important;
+	}
+	html {
+		scroll-behavior: auto;
+	}
+	.reveal {
+		opacity: 1;
+		transform: none;
 	}
 }

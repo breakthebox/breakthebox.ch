@@ -24,7 +24,7 @@ export function requireAuth(event: RequestEvent) {
 export function requireRole(event: RequestEvent, allowedRoles: string[]) {
 	const { user } = requireAuth(event);
 	if (!allowedRoles.includes(user.role)) {
-		throw redirect(302, '/dashboard');
+		throw redirect(302, '/');
 	}
 	return { user, session: event.locals.session! };
 }
