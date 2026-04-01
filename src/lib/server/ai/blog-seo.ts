@@ -18,8 +18,11 @@ function blocksToPlainText(blocks: BlogContentBlocks): string {
 				case 'quote':
 					return stripHtml(data.text as string ?? '');
 				case 'list': {
-					const items = data.items as string[];
-					return items.map((i) => `- ${stripHtml(i)}`).join('\n');
+					const items = data.items as (string | { content?: string })[];
+					return items.map((i) => {
+						const text = typeof i === 'string' ? i : (i?.content ?? '');
+						return `- ${stripHtml(text)}`;
+					}).join('\n');
 				}
 				case 'code':
 					return data.code as string ?? '';
