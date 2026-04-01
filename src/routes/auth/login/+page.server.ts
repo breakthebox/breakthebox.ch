@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { generateState } from 'arctic';
+import { dev } from '$app/environment';
 import { auth0 } from '$lib/server/auth/providers';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -20,7 +21,7 @@ export const actions: Actions = {
 		cookies.set('oauth_state', state, {
 			path: '/',
 			httpOnly: true,
-			secure: false, // dev: false, prod: true
+			secure: !dev,
 			maxAge: 60 * 10, // 10 minutes
 			sameSite: 'lax'
 		});
