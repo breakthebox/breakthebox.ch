@@ -17,6 +17,12 @@
 	const latestPosts: BlogPostRow[] = data.latestPosts ?? [];
 	const hasRealPosts = latestPosts.length > 0;
 
+	function pickRandom<T>(arr: T[], max: number): T[] {
+		if (arr.length <= max) return arr;
+		const shuffled = [...arr].sort(() => Math.random() - 0.5);
+		return shuffled.slice(0, max);
+	}
+
 	let flipped = $state(pillars.pillars.map(() => false));
 	let navScrolled = $state(false);
 	let activeSection = $state('');
@@ -231,7 +237,7 @@
 						<div class="pillar-back">
 							<span class="pillar-back-label">{m.pillar_examples_label()}</span>
 							<div class="pillar-examples">
-								{#each pillar.examples as example}
+								{#each pickRandom(pillar.examples, 5) as example}
 									{#if example.url}
 										<a href={example.url} class="pillar-example pillar-example-link" onclick={(e) => e.stopPropagation()}>
 											<span class="pillar-example-label">{example.label}</span>
