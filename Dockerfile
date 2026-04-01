@@ -27,6 +27,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./
 
+# Copy migration files + migration script
+COPY --from=build /app/drizzle ./drizzle
+COPY --from=build /app/scripts ./scripts
+
 # Create uploads directory
 RUN mkdir -p /app/uploads && chown -R node:node /app
 USER node
