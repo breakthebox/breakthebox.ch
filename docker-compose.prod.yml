@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════
-# Docker Compose — Production Deployment
+# Docker Compose — Production Deployment (Traefik)
 # ═══════════════════════════════════════════════════════════
 # Usage:
 #   docker compose -f docker-compose.prod.yml up -d
@@ -10,64 +10,50 @@ services:
   # ─── PostgreSQL Database ───
   db:
     image: postgres:16-alpine
-    restart: always
-    expose:
-      - "5432"
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-breakthebox}
       POSTGRES_USER: ${DB_USER:-breakthebox}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-breakthebox}"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
 
   # ─── SvelteKit Application ───
   app:
     image: ghcr.io/breakthebox/breakthebox.ch:${APP_VERSION:-latest}
-    restart: always
-    expose:
-      - "3000"
+    restart: unless-stopped
     environment:
       - DATABASE_URL=postgresql://${DB_USER:-breakthebox}:${DB_PASSWORD}@db:5432/${DB_NAME:-breakthebox}
       - NODE_ENV=production
       - ORIGIN=${PUBLIC_APP_URL:-https://web.breakthebox.ch}
     env_file:
-      - .env.production
+      - .env
     depends_on:
       db:
         condition: service_healthy
-
-  # ─── Nginx Reverse Proxy ───
-  nginx:
-    image: nginx:alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - certbot-etc:/etc/letsencrypt:ro
-      - certbot-var:/var/lib/letsencrypt
-      - webroot:/var/www/certbot
-    depends_on:
-      - app
-
-  # ─── Certbot (SSL Certificates) ───
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - webroot:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - internal
+      - n8n_internal
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.breakthebox.rule=Host(`web.breakthebox.ch`) || Host(`www.breakthebox.ch`)'
+      - 'traefik.http.routers.breakthebox.entrypoints=websecure'
+      - 'traefik.http.routers.breakthebox.tls=true'
+      - 'traefik.http.routers.breakthebox.tls.certresolver=myresolver'
+      - 'traefik.http.services.breakthebox.loadbalancer.server.port=3000'
+      - 'traefik.docker.network=n8n_internal'
 
 volumes:
   pgdata:
-  certbot-etc:
-  certbot-var:
-  webroot:
+
+networks:
+  internal:
+  n8n_internal:
+    external: true
