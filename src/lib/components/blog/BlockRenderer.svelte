@@ -39,17 +39,17 @@
 				{/if}
 			</blockquote>
 		{:else if block.type === 'list'}
-			{@const data = block.data as { style: string; items: (string | { content?: string })[] }}
+			{@const data = block.data as { style: string; items: string[] }}
 			{#if data.style === 'ordered'}
 				<ol>
 					{#each data.items as item}
-						<li>{@html typeof item === 'string' ? item : (item?.content ?? '')}</li>
+						<li>{@html item}</li>
 					{/each}
 				</ol>
 			{:else}
 				<ul>
 					{#each data.items as item}
-						<li>{@html typeof item === 'string' ? item : (item?.content ?? '')}</li>
+						<li>{@html item}</li>
 					{/each}
 				</ul>
 			{/if}

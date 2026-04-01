@@ -72,11 +72,8 @@ export const actions: Actions = {
 						case 'quote':
 							return ((data.text as string) ?? '').replace(/<[^>]*>/g, '');
 						case 'list': {
-							const items = data.items as (string | { content?: string })[];
-							return items?.map((i) => {
-								const text = typeof i === 'string' ? i : (i?.content ?? '');
-								return text.replace(/<[^>]*>/g, '');
-							}).join('\n') ?? '';
+							const items = data.items as string[];
+							return items?.map((i) => i.replace(/<[^>]*>/g, '')).join('\n') ?? '';
 						}
 						case 'code':
 							return (data.code as string) ?? '';

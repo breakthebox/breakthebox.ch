@@ -24,7 +24,7 @@
     "@editorjs/header": "^2.8.8",
     "@editorjs/image": "^2.10.3",
     "@editorjs/inline-code": "^1.5.2",
-    "@editorjs/list": "^2.0.9",
+    "@editorjs/list": "^1.10.0",
     "@editorjs/quote": "^2.7.6",
     "@google/genai": "^1.47.0",
     "@inlang/paraglide-js": "^2.0.0",
