@@ -4,6 +4,7 @@
 	import type { PillarsContent, AboutContent, WalkTheTalkContent, ReferencesContent, BlogContent } from '$lib/types/content';
 	import type { BlogPostRow } from '$lib/server/db/queries/blog';
 	import { renderMarkdown } from '$lib/utils/markdown';
+	import { Coffee } from 'lucide-svelte';
 
 	let { data } = $props();
 
@@ -478,7 +479,7 @@
 		<span class="sketch-label sketch-label-dark reveal">{m.section_contact_label()}</span>
 		<h2 class="cta-title reveal">{m.section_cta_title()}</h2>
 		<p class="cta-text reveal">{m.section_cta_text()}</p>
-		<span class="contact-sketch-note">{m.contact_sketch()} ☕</span>
+		<span class="contact-sketch-note">{m.contact_sketch()} <Coffee size={20} strokeWidth={2} class="contact-coffee-icon" /></span>
 		<div class="contact-methods reveal">
 			<div class="contact-method">
 				<span class="contact-method-label">{m.contact_email_label()}</span>
@@ -487,10 +488,6 @@
 			<div class="contact-method">
 				<span class="contact-method-label">{m.contact_phone_label()}</span>
 				<a href="tel:+41763092088">+41 76 309 20 88</a>
-			</div>
-			<div class="contact-method">
-				<span class="contact-method-label">{m.contact_linkedin_label()}</span>
-				<a href="https://www.linkedin.com/in/bhulliger/" target="_blank">linkedin.com/in/bhulliger</a>
 			</div>
 		</div>
 		<a href="mailto:info@breakthebox.ch" class="btn-cta">{m.cta_contact()} &rarr;</a>
@@ -1519,11 +1516,19 @@
 		line-height: 1.6;
 	}
 	.contact-sketch-note {
-		display: block;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
 		font-family: var(--ff-sketch);
 		font-size: 1.2rem;
 		color: var(--btb-teal-light);
 		margin-bottom: 32px;
+	}
+	.contact-sketch-note :global(.contact-coffee-icon) {
+		display: inline-block;
+		vertical-align: middle;
+		opacity: 0.85;
 	}
 	.contact-methods {
 		display: flex;
