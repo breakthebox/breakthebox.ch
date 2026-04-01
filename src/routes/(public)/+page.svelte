@@ -495,9 +495,9 @@
 			<span class="footer-tagline">{m.footer_tagline()}</span>
 		</div>
 		<div class="footer-links">
-			<a href="#">{m.footer_impressum()}</a>
-			<a href="#">{m.footer_datenschutz()}</a>
-			<a href="#">{m.footer_agb()}</a>
+			<a href={localizeHref('/impressum')}>{m.footer_impressum()}</a>
+			<a href={localizeHref('/datenschutz')}>{m.footer_datenschutz()}</a>
+			<a href={localizeHref('/agb')}>{m.footer_agb()}</a>
 		</div>
 		<div class="footer-copy">
 			&copy; {new Date().getFullYear()} {m.footer_copyright()}
