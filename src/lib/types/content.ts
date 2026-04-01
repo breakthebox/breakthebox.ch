@@ -84,6 +84,96 @@ export interface BlogContent {
 	posts: BlogPost[];
 }
 
+// ─── Block Editor Types ───
+export type EditorBlockType =
+	| 'paragraph'
+	| 'header'
+	| 'image'
+	| 'quote'
+	| 'list'
+	| 'code'
+	| 'delimiter'
+	| 'linkButton';
+
+export interface ParagraphBlockData {
+	text: string;
+}
+
+export interface HeaderBlockData {
+	text: string;
+	level: 2 | 3 | 4;
+}
+
+export interface ImageBlockData {
+	file: { url: string };
+	caption?: string;
+	withBorder?: boolean;
+	stretched?: boolean;
+	withBackground?: boolean;
+}
+
+export interface QuoteBlockData {
+	text: string;
+	caption?: string;
+	alignment?: 'left' | 'center';
+}
+
+export interface ListBlockData {
+	style: 'ordered' | 'unordered';
+	items: string[];
+}
+
+export interface CodeBlockData {
+	code: string;
+}
+
+export interface DelimiterBlockData {
+	// no data
+}
+
+export interface LinkButtonBlockData {
+	text: string;
+	url: string;
+	style?: 'link' | 'button';
+}
+
+export interface EditorBlock {
+	id: string;
+	type: EditorBlockType;
+	data:
+		| ParagraphBlockData
+		| HeaderBlockData
+		| ImageBlockData
+		| QuoteBlockData
+		| ListBlockData
+		| CodeBlockData
+		| DelimiterBlockData
+		| LinkButtonBlockData;
+}
+
+export interface BlogContentBlocks {
+	time: number;
+	blocks: EditorBlock[];
+	version: string;
+}
+
+// ─── AI Response Types ───
+export interface SeoSuggestion {
+	type: 'title' | 'content' | 'meta' | 'structure' | 'keywords';
+	message: string;
+	priority: 'high' | 'medium' | 'low';
+}
+
+export interface SeoScoreResult {
+	score: number;
+	suggestions: SeoSuggestion[];
+}
+
+export interface SeoOptimizationResult {
+	optimizedText: string;
+	changes: string[];
+}
+
 // ─── Section Union ───
 export type SectionKey = 'pillars' | 'about' | 'walkthetalk' | 'references' | 'blog';
 

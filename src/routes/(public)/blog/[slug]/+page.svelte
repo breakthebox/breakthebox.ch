@@ -1,10 +1,14 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import { browser } from '$app/environment';
+	import BlockRenderer from '$lib/components/blog/BlockRenderer.svelte';
+	import type { BlogContentBlocks } from '$lib/types/content';
 
 	let { data } = $props();
 	let post = $derived(data.post);
 	let renderedContent = $derived(data.renderedContent);
+	let contentBlocks = $derived(data.post.contentBlocks as BlogContentBlocks | null);
 
 	function formatDate(date: Date | string | null): string {
 		if (!date) return '';
@@ -14,6 +18,16 @@
 			year: 'numeric'
 		});
 	}
+
+	// Track page view
+	$effect(() => {
+		if (!browser || !post?.id) return;
+		fetch('/api/blog/track-view', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ postId: post.id })
+		}).catch(() => {});
+	});
 </script>
 
 <svelte:head>
@@ -59,8 +73,14 @@
 		</div>
 
 		<!-- Content -->
-		<div class="post-content prose">
-			{@html renderedContent}
+		<div class="post-content">
+			{#if contentBlocks?.blocks?.length}
+				<BlockRenderer content={contentBlocks} />
+			{:else}
+				<div class="prose">
+					{@html renderedContent}
+				</div>
+			{/if}
 		</div>
 
 		<!-- Back -->

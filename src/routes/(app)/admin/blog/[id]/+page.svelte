@@ -1,13 +1,18 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { renderMarkdownBlock } from '$lib/utils/markdown';
+	import { localizeHref } from '$lib/paraglide/runtime';
 	import { generateSlug } from '$lib/utils/slug';
+	import BlockEditor from '$lib/components/editor/BlockEditor.svelte';
+	import AiAssistPanel from '$lib/components/editor/AiAssistPanel.svelte';
+	import type { BlogContentBlocks } from '$lib/types/content';
 
 	let { data } = $props();
 
 	let title = $state(data.post?.title ?? '');
 	let slug = $state(data.post?.slug ?? '');
-	let content = $state(data.post?.content ?? '');
+	let contentBlocks = $state<BlogContentBlocks | null>(
+		(data.post?.contentBlocks as BlogContentBlocks | null) ?? null
+	);
 	let excerpt = $state(data.post?.excerpt ?? '');
 	let headerImage = $state(data.post?.headerImage ?? '');
 	let tagsString = $state(data.post?.tags?.join(', ') ?? '');
@@ -20,11 +25,13 @@
 	let metaTitle = $state(data.post?.metaTitle ?? '');
 	let metaDescription = $state(data.post?.metaDescription ?? '');
 	let ogImage = $state(data.post?.ogImage ?? '');
-	let showPreview = $state(false);
+	let seoScore = $state<number | null>(data.post?.seoScore ?? null);
 	let seoOpen = $state(false);
+	let aiOpen = $state(true);
 	let saving = $state(false);
 
 	let uploading = $state<Record<string, boolean>>({});
+	let slugManuallyEdited = $state(false);
 
 	// Auto-generate slug from title
 	function onTitleChange() {
@@ -33,7 +40,6 @@
 		}
 	}
 
-	let slugManuallyEdited = $state(false);
 	function onSlugInput() {
 		slugManuallyEdited = true;
 	}
@@ -53,292 +59,217 @@
 		}
 	}
 
-	function handleFileChange(event: Event, key: string, onSuccess: (url: string) => void) {
-		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
-		if (file) uploadFile(key, file, onSuccess);
-	}
-
-	function handleSubmit() {
-		saving = true;
-	}
-
-	function submitAndPublish() {
-		status = 'published';
-		if (!publishDate) {
-			publishDate = new Date().toISOString().slice(0, 16);
+	function handleHeaderDrop(e: DragEvent) {
+		e.preventDefault();
+		const file = e.dataTransfer?.files[0];
+		if (file?.type.startsWith('image/')) {
+			uploadFile('header', file, (url) => (headerImage = url));
 		}
 	}
 
-	$effect(() => {
-		onTitleChange();
-	});
+	function handleHeaderInput(e: Event) {
+		const input = e.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (file) {
+			uploadFile('header', file, (url) => (headerImage = url));
+		}
+	}
+
+	function handleSubmit(e: SubmitEvent) {
+		saving = true;
+	}
+
+	let viewCount = $derived(data.viewCount ?? 0);
 </script>
 
-<svelte:head>
-	<title>{data.isNew ? m.blog_new_post() : m.blog_edit_post()} — Admin — Break the Box</title>
-</svelte:head>
+<div class="editor-page">
+	<form method="POST" action="?/save" class="editor-layout" onsubmit={handleSubmit}>
+		<!-- Hidden fields for content blocks -->
+		<input type="hidden" name="contentBlocks" value={contentBlocks ? JSON.stringify(contentBlocks) : ''} />
+		<input type="hidden" name="content" value="" />
+		<input type="hidden" name="seoScore" value={seoScore ?? ''} />
 
-<div class="editor">
-	<a href="/admin/blog" class="back-link">
-		<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-			<path d="M11 4L6 9l5 5" />
-		</svg>
-		{m.blog_back_to_list()}
-	</a>
-
-	<form method="POST" action="?/save" onsubmit={handleSubmit}>
-		<input type="hidden" name="headerImage" value={headerImage} />
-		<input type="hidden" name="ogImage" value={ogImage} />
-
-		<div class="editor-layout">
-			<!-- ═══════ Main Column ═══════ -->
-			<div class="editor-main">
-				<div class="field">
-					<label for="title">{m.blog_title_label()}</label>
-					<input
-						id="title"
-						name="title"
-						type="text"
-						class="input input-title"
-						bind:value={title}
-						placeholder="Titel des Blogposts"
-						required
-					/>
-				</div>
-
-				<div class="field">
-					<label for="slug">{m.blog_slug_label()}</label>
-					<div class="slug-row">
-						<span class="slug-prefix">/blog/</span>
-						<input
-							id="slug"
-							name="slug"
-							type="text"
-							class="input slug-input"
-							bind:value={slug}
-							oninput={onSlugInput}
-							placeholder="url-slug"
-						/>
-					</div>
-				</div>
-
-				<!-- Editor / Preview Toggle -->
-				<div class="field">
-					<div class="editor-tabs">
-						<button
-							type="button"
-							class="tab-btn"
-							class:active={!showPreview}
-							onclick={() => showPreview = false}
-						>{m.blog_editor()}</button>
-						<button
-							type="button"
-							class="tab-btn"
-							class:active={showPreview}
-							onclick={() => showPreview = true}
-						>{m.blog_preview()}</button>
-					</div>
-
-					{#if showPreview}
-						<div class="preview-pane prose">
-							{#if content}
-								{@html renderMarkdownBlock(content)}
-							{:else}
-								<p class="preview-empty">Noch kein Inhalt vorhanden.</p>
-							{/if}
-						</div>
-					{:else}
-						<textarea
-							name="content"
-							class="textarea content-editor"
-							bind:value={content}
-							placeholder="Schreibe deinen Blogpost in Markdown...
-
-# Überschrift
-
-Text mit **fett** und *kursiv*.
-
-> Zitat
-
-- Aufzählung
-- Punkt 2
-
-![Bild](url)"
-							rows="24"
-						></textarea>
-					{/if}
-				</div>
+		<!-- Main Column -->
+		<div class="editor-main">
+			<div class="editor-header">
+				<h1>{data.isNew ? m.blog_new_post() : m.blog_edit_post()}</h1>
+				{#if !data.isNew && viewCount > 0}
+					<span class="view-count" title={m.blog_views_label()}>
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+						{viewCount} {m.blog_views()}
+					</span>
+				{/if}
 			</div>
 
-			<!-- ═══════ Sidebar ═══════ -->
-			<div class="editor-sidebar">
-				<!-- Status -->
-				<div class="sidebar-section">
-					<div class="field">
-						<label for="status">{m.blog_status_label()}</label>
-						<select id="status" name="status" class="input" bind:value={status}>
-							<option value="draft">{m.blog_status_draft()}</option>
-							<option value="published">{m.blog_status_published()}</option>
-							<option value="scheduled">{m.blog_status_scheduled()}</option>
-						</select>
-					</div>
+			<!-- Title -->
+			<div class="field">
+				<label for="title">{m.blog_title_label()}</label>
+				<input
+					type="text"
+					id="title"
+					name="title"
+					bind:value={title}
+					oninput={onTitleChange}
+					placeholder="Titel des Blogposts"
+					required
+				/>
+			</div>
 
-					{#if status === 'published' || status === 'scheduled'}
-						<div class="field">
-							<label for="publishDate">{m.blog_publish_date_label()}</label>
-							<input
-								id="publishDate"
-								name="publishDate"
-								type="datetime-local"
-								class="input"
-								bind:value={publishDate}
-							/>
-						</div>
-					{/if}
-				</div>
+			<!-- Slug -->
+			<div class="field">
+				<label for="slug">{m.blog_slug_label()}</label>
+				<input
+					type="text"
+					id="slug"
+					name="slug"
+					bind:value={slug}
+					oninput={onSlugInput}
+					placeholder="url-slug"
+				/>
+			</div>
 
-				<!-- Header Image -->
-				<div class="sidebar-section">
-					<div class="field">
-						<label>{m.blog_header_image_label()}</label>
-						<div class="upload-area">
-							{#if headerImage}
-								<div class="image-preview">
-									<img src={headerImage} alt="Header" />
-									<button
-										type="button"
-										class="btn-remove-img"
-										onclick={() => { headerImage = ''; }}
-									>&times;</button>
-								</div>
-							{/if}
-							<label class="btn-upload" class:uploading={uploading['header']}>
-								<input
-									type="file"
-									accept="image/jpeg,image/png,image/webp,image/svg+xml,image/gif"
-									onchange={(e) => handleFileChange(e, 'header', (url) => { headerImage = url; })}
-									hidden
-								/>
-								{#if uploading['header']}
-									Hochladen…
-								{:else}
-									{headerImage ? 'Ersetzen' : 'Bild hochladen'}
-								{/if}
-							</label>
-						</div>
-					</div>
-				</div>
-
-				<!-- Excerpt -->
-				<div class="sidebar-section">
-					<div class="field">
-						<label for="excerpt">{m.blog_excerpt_label()}</label>
-						<textarea
-							id="excerpt"
-							name="excerpt"
-							class="textarea"
-							bind:value={excerpt}
-							placeholder="Kurze Zusammenfassung für Vorschaukarten"
-							rows="3"
-						></textarea>
-					</div>
-				</div>
-
-				<!-- Tags -->
-				<div class="sidebar-section">
-					<div class="field">
-						<label for="tags">{m.blog_tags_label()}</label>
-						<input
-							id="tags"
-							name="tags"
-							type="text"
-							class="input"
-							bind:value={tagsString}
-							placeholder="KI, Strategie, Governance"
-						/>
-						<span class="field-hint">{m.blog_tags_hint()}</span>
-					</div>
-				</div>
-
-				<!-- SEO -->
-				<details class="sidebar-section seo-details" bind:open={seoOpen}>
-					<summary class="seo-summary">{m.blog_seo_section()}</summary>
-					<div class="seo-fields">
-						<div class="field">
-							<label for="metaTitle">{m.blog_meta_title_label()}</label>
-							<input
-								id="metaTitle"
-								name="metaTitle"
-								type="text"
-								class="input"
-								bind:value={metaTitle}
-								placeholder={title || 'Titel des Blogposts'}
-							/>
-							<span class="field-hint">{m.blog_meta_title_hint()}</span>
-						</div>
-						<div class="field">
-							<label for="metaDescription">{m.blog_meta_description_label()}</label>
-							<textarea
-								id="metaDescription"
-								name="metaDescription"
-								class="textarea"
-								bind:value={metaDescription}
-								placeholder={excerpt || 'Kurzbeschreibung für Suchmaschinen'}
-								rows="2"
-							></textarea>
-							<span class="field-hint">{m.blog_meta_description_hint()}</span>
-						</div>
-						<div class="field">
-							<label>{m.blog_og_image_label()}</label>
-							<div class="upload-area">
-								{#if ogImage}
-									<div class="image-preview image-preview-sm">
-										<img src={ogImage} alt="OG" />
-										<button
-											type="button"
-											class="btn-remove-img"
-											onclick={() => { ogImage = ''; }}
-										>&times;</button>
-									</div>
-								{/if}
-								<label class="btn-upload" class:uploading={uploading['og']}>
-									<input
-										type="file"
-										accept="image/jpeg,image/png,image/webp"
-										onchange={(e) => handleFileChange(e, 'og', (url) => { ogImage = url; })}
-										hidden
-									/>
-									{#if uploading['og']}
-										Hochladen…
-									{:else}
-										{ogImage ? 'Ersetzen' : 'Bild hochladen'}
-									{/if}
-								</label>
-							</div>
-							<span class="field-hint">{m.blog_og_image_hint()}</span>
-						</div>
-					</div>
-				</details>
+			<!-- Block Editor -->
+			<div class="field">
+				<label>{m.blog_content_label()}</label>
+				<BlockEditor bind:content={contentBlocks} />
 			</div>
 		</div>
 
-		<!-- ═══════ Actions ═══════ -->
-		<div class="editor-actions">
-			<a href="/admin/blog" class="btn-cancel">Abbrechen</a>
-			<div class="actions-right">
-				<button type="submit" class="btn-save" disabled={saving}>
-					{saving ? 'Speichern…' : m.blog_save()}
+		<!-- Sidebar -->
+		<div class="editor-sidebar">
+			<!-- Actions -->
+			<div class="sidebar-section actions-section">
+				<button type="submit" class="btn-primary" disabled={saving}>
+					{#if saving}
+						<span class="spinner"></span>
+					{/if}
+					{m.blog_save()}
 				</button>
 				{#if status === 'draft'}
 					<button
 						type="submit"
-						class="btn-publish"
+						class="btn-secondary"
 						disabled={saving}
-						onclick={submitAndPublish}
+						onclick={() => (status = 'published')}
 					>
 						{m.blog_save_publish()}
 					</button>
+				{/if}
+				<a href={localizeHref('/admin/blog')} class="btn-ghost">
+					{m.blog_back_to_list()}
+				</a>
+			</div>
+
+			<!-- Status -->
+			<div class="sidebar-section">
+				<label for="status">{m.blog_status_label()}</label>
+				<select id="status" name="status" bind:value={status}>
+					<option value="draft">{m.blog_status_draft()}</option>
+					<option value="published">{m.blog_status_published()}</option>
+					<option value="scheduled">{m.blog_status_scheduled()}</option>
+				</select>
+				{#if status === 'scheduled'}
+					<div class="field-sm">
+						<label for="publishDate">{m.blog_publish_date_label()}</label>
+						<input type="datetime-local" id="publishDate" name="publishDate" bind:value={publishDate} />
+					</div>
+				{/if}
+			</div>
+
+			<!-- Header Image -->
+			<div class="sidebar-section">
+				<label>{m.blog_header_image_label()}</label>
+				{#if headerImage}
+					<div class="image-preview">
+						<img src={headerImage} alt="Header" />
+						<div class="image-actions">
+							<label class="btn-sm">
+								{m.blog_change_image?.() ?? 'Ändern'}
+								<input type="file" accept="image/*" hidden onchange={handleHeaderInput} />
+							</label>
+							<button type="button" class="btn-sm btn-danger" onclick={() => (headerImage = '')}>
+								{m.blog_remove_image?.() ?? 'Entfernen'}
+							</button>
+						</div>
+					</div>
+				{:else}
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div
+						class="dropzone"
+						ondrop={handleHeaderDrop}
+						ondragover={(e) => e.preventDefault()}
+					>
+						{#if uploading['header']}
+							<span class="spinner"></span>
+							<span>Wird hochgeladen...</span>
+						{:else}
+							<label class="dropzone-label">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+								<span>Bild hochladen oder hierhin ziehen</span>
+								<input type="file" accept="image/*" hidden onchange={handleHeaderInput} />
+							</label>
+						{/if}
+					</div>
+				{/if}
+				<input type="hidden" name="headerImage" value={headerImage} />
+			</div>
+
+			<!-- Excerpt -->
+			<div class="sidebar-section">
+				<label for="excerpt">{m.blog_excerpt_label()}</label>
+				<textarea id="excerpt" name="excerpt" bind:value={excerpt} rows="3" placeholder="Kurzer Teaser-Text..."></textarea>
+			</div>
+
+			<!-- Tags -->
+			<div class="sidebar-section">
+				<label for="tags">{m.blog_tags_label()}</label>
+				<input type="text" id="tags" name="tags" bind:value={tagsString} placeholder="KI, Strategie, Governance" />
+				<span class="hint">{m.blog_tags_hint()}</span>
+			</div>
+
+			<!-- AI Assist -->
+			<div class="sidebar-section">
+				<button type="button" class="section-toggle" onclick={() => (aiOpen = !aiOpen)}>
+					<span>{m.blog_ai_section()}</span>
+					<span class="toggle-icon" class:open={aiOpen}>▸</span>
+				</button>
+				{#if aiOpen}
+					<div class="section-content">
+						<AiAssistPanel
+							{title}
+							{contentBlocks}
+							{metaTitle}
+							bind:metaDescription
+							bind:seoScore
+						/>
+					</div>
+				{/if}
+			</div>
+
+			<!-- SEO Details -->
+			<div class="sidebar-section">
+				<button type="button" class="section-toggle" onclick={() => (seoOpen = !seoOpen)}>
+					<span>{m.blog_seo_section()}</span>
+					<span class="toggle-icon" class:open={seoOpen}>▸</span>
+				</button>
+				{#if seoOpen}
+					<div class="section-content">
+						<div class="field-sm">
+							<label for="metaTitle">{m.blog_meta_title_label()}</label>
+							<input type="text" id="metaTitle" name="metaTitle" bind:value={metaTitle} />
+							<span class="hint">{m.blog_meta_title_hint()}</span>
+						</div>
+						<div class="field-sm">
+							<label for="metaDescription">{m.blog_meta_description_label()}</label>
+							<textarea id="metaDescription" name="metaDescription" bind:value={metaDescription} rows="3"></textarea>
+							<span class="hint">{m.blog_meta_description_hint()}</span>
+						</div>
+						<div class="field-sm">
+							<label for="ogImage">{m.blog_og_image_label()}</label>
+							<input type="text" id="ogImage" name="ogImage" bind:value={ogImage} />
+							<span class="hint">{m.blog_og_image_hint()}</span>
+						</div>
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -346,363 +277,306 @@ Text mit **fett** und *kursiv*.
 </div>
 
 <style>
-	/* ═══════ Layout ═══════ */
-	.editor {
-		max-width: 1100px;
+	.editor-page {
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 1.5rem;
 	}
-	.back-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 0.82rem;
-		font-weight: 500;
-		color: var(--text-secondary);
-		text-decoration: none;
-		margin-bottom: var(--space-lg);
-		transition: color var(--t-fast);
-	}
-	.back-link:hover { color: var(--btb-steel); }
 
 	.editor-layout {
 		display: grid;
 		grid-template-columns: 1fr 320px;
-		gap: var(--space-xl);
-		margin-bottom: var(--space-xl);
+		gap: 1.5rem;
+		align-items: start;
 	}
 
-	/* ═══════ Main Column ═══════ */
-	.editor-main {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-md);
-	}
-
-	/* ═══════ Fields ═══════ */
-	.field {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-xs);
-	}
-	.field label {
-		font-size: 0.78rem;
-		font-weight: 600;
-		color: var(--text-secondary);
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-	}
-	.input,
-	.textarea {
-		padding: 10px 14px;
-		border: 1.5px solid var(--border);
-		border-radius: var(--radius-sm);
-		font-size: 0.88rem;
-		font-family: var(--ff-ui);
-		color: var(--text-primary);
-		background: var(--bg-surface);
-		transition: border-color var(--t-fast), box-shadow var(--t-fast);
-	}
-	.input:focus,
-	.textarea:focus {
-		outline: none;
-		border-color: var(--btb-steel);
-		box-shadow: 0 0 0 3px var(--btb-steel-subtle);
-	}
-	select.input {
-		cursor: pointer;
-	}
-	.textarea {
-		resize: vertical;
-		min-height: 80px;
-		line-height: 1.6;
-	}
-	.input-title {
-		font-size: 1.3rem;
-		font-weight: 700;
-		padding: 14px;
-	}
-	.field-hint {
-		font-size: 0.72rem;
-		color: var(--text-muted);
-	}
-
-	/* ═══════ Slug ═══════ */
-	.slug-row {
-		display: flex;
-		align-items: center;
-	}
-	.slug-prefix {
-		padding: 10px 12px;
-		font-size: 0.85rem;
-		color: var(--text-muted);
-		background: var(--bg-elevated);
-		border: 1.5px solid var(--border);
-		border-right: none;
-		border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-	}
-	.slug-input {
-		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-		flex: 1;
-	}
-
-	/* ═══════ Editor Tabs ═══════ */
-	.editor-tabs {
-		display: flex;
-		gap: 0;
-		border-bottom: 2px solid var(--border);
-	}
-	.tab-btn {
-		padding: 8px 20px;
-		font-size: 0.82rem;
-		font-weight: 600;
-		font-family: var(--ff-ui);
-		color: var(--text-muted);
-		background: none;
-		border: none;
-		cursor: pointer;
-		border-bottom: 2px solid transparent;
-		margin-bottom: -2px;
-		transition: color var(--t-fast), border-color var(--t-fast);
-	}
-	.tab-btn.active {
-		color: var(--btb-steel);
-		border-bottom-color: var(--btb-steel);
-	}
-	.tab-btn:hover:not(.active) {
-		color: var(--text-primary);
-	}
-
-	/* ═══════ Content Editor ═══════ */
-	.content-editor {
-		font-family: 'SF Mono', 'Fira Code', monospace;
-		font-size: 0.85rem;
-		line-height: 1.7;
-		min-height: 500px;
-		border-top: none;
-		border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-	}
-
-	/* ═══════ Preview ═══════ */
-	.preview-pane {
-		padding: 24px;
-		min-height: 500px;
-		border: 1.5px solid var(--border);
-		border-top: none;
-		border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-		background: var(--bg-surface);
-		overflow-y: auto;
-	}
-	.preview-empty {
-		color: var(--text-muted);
-		font-style: italic;
-	}
-
-	/* Prose styling for rendered markdown */
-	.prose :global(h1) { font-size: 1.5rem; font-weight: 700; margin: 1.5em 0 0.5em; }
-	.prose :global(h2) { font-size: 1.25rem; font-weight: 600; margin: 1.3em 0 0.4em; }
-	.prose :global(h3) { font-size: 1.1rem; font-weight: 600; margin: 1.2em 0 0.3em; }
-	.prose :global(p) { margin: 0.8em 0; line-height: 1.7; }
-	.prose :global(ul), .prose :global(ol) { margin: 0.8em 0; padding-left: 1.5em; }
-	.prose :global(li) { margin: 0.3em 0; line-height: 1.6; }
-	.prose :global(blockquote) {
-		border-left: 3px solid var(--btb-teal);
-		padding: 8px 16px;
-		margin: 1em 0;
-		color: var(--text-secondary);
-		background: var(--bg-elevated);
-		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-	}
-	.prose :global(code) {
-		font-family: 'SF Mono', 'Fira Code', monospace;
-		font-size: 0.85em;
-		background: var(--bg-elevated);
-		padding: 2px 6px;
-		border-radius: 3px;
-	}
-	.prose :global(pre) {
-		background: var(--bg-elevated);
-		padding: 16px;
-		border-radius: var(--radius-sm);
-		overflow-x: auto;
-		margin: 1em 0;
-	}
-	.prose :global(pre code) {
-		background: none;
-		padding: 0;
-	}
-	.prose :global(img) {
-		max-width: 100%;
-		border-radius: var(--radius-sm);
-		margin: 1em 0;
-	}
-	.prose :global(a) {
-		color: var(--btb-teal);
-		text-decoration: underline;
-	}
-	.prose :global(hr) {
-		border: none;
-		border-top: 1px solid var(--border);
-		margin: 2em 0;
-	}
-
-	/* ═══════ Sidebar ═══════ */
-	.editor-sidebar {
-		display: flex;
-		flex-direction: column;
-		gap: 0;
-	}
-	.sidebar-section {
-		padding: var(--space-md) 0;
-		border-bottom: 1px solid var(--border);
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-sm);
-	}
-	.sidebar-section:first-child {
-		padding-top: 0;
-	}
-
-	/* ═══════ SEO Details ═══════ */
-	.seo-details {
-		border-bottom: none;
-	}
-	.seo-summary {
-		font-size: 0.78rem;
-		font-weight: 600;
-		color: var(--text-secondary);
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		cursor: pointer;
-		padding: 4px 0;
-	}
-	.seo-summary:hover {
-		color: var(--btb-steel);
-	}
-	.seo-fields {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-sm);
-		padding-top: var(--space-sm);
-	}
-
-	/* ═══════ Upload ═══════ */
-	.upload-area {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-	.image-preview {
-		position: relative;
-		border: 1.5px solid var(--border);
-		border-radius: var(--radius-sm);
-		overflow: hidden;
-	}
-	.image-preview img {
-		display: block;
-		width: 100%;
-		height: auto;
-		max-height: 180px;
-		object-fit: cover;
-	}
-	.image-preview-sm img {
-		max-height: 100px;
-	}
-	.btn-remove-img {
-		position: absolute;
-		top: 6px;
-		right: 6px;
-		width: 24px;
-		height: 24px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 50%;
-		background: rgba(0, 0, 0, 0.6);
-		border: none;
-		color: #fff;
-		font-size: 1rem;
-		cursor: pointer;
-		line-height: 1;
-	}
-	.btn-remove-img:hover { background: var(--color-error); }
-	.btn-upload {
-		display: inline-flex;
-		align-items: center;
-		padding: 8px 14px;
-		background: var(--bg-page);
-		color: var(--text-secondary);
-		border: 1.5px dashed var(--border);
-		border-radius: var(--radius-sm);
-		font-size: 0.78rem;
-		font-weight: 600;
-		font-family: var(--ff-ui);
-		cursor: pointer;
-		transition: all var(--t-fast);
-	}
-	.btn-upload:hover {
-		border-color: var(--btb-steel);
-		color: var(--btb-steel);
-	}
-	.btn-upload.uploading {
-		opacity: 0.6;
-		pointer-events: none;
-	}
-
-	/* ═══════ Actions ═══════ */
-	.editor-actions {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-top: var(--space-lg);
-		border-top: 1px solid var(--border);
-	}
-	.actions-right {
-		display: flex;
-		gap: var(--space-sm);
-	}
-	.btn-cancel {
-		font-size: 0.85rem;
-		color: var(--text-secondary);
-		text-decoration: none;
-		padding: 10px 16px;
-		transition: color var(--t-fast);
-	}
-	.btn-cancel:hover { color: var(--text-primary); }
-	.btn-save {
-		padding: 10px 24px;
-		background: var(--btb-steel);
-		color: #fff;
-		border: none;
-		border-radius: var(--radius-button);
-		font-size: 0.88rem;
-		font-weight: 600;
-		font-family: var(--ff-ui);
-		cursor: pointer;
-		transition: background var(--t-fast);
-	}
-	.btn-save:hover:not(:disabled) { background: var(--btb-steel-hover); }
-	.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
-	.btn-publish {
-		padding: 10px 24px;
-		background: #059669;
-		color: #fff;
-		border: none;
-		border-radius: var(--radius-button);
-		font-size: 0.88rem;
-		font-weight: 600;
-		font-family: var(--ff-ui);
-		cursor: pointer;
-		transition: background var(--t-fast);
-	}
-	.btn-publish:hover:not(:disabled) { background: #047857; }
-	.btn-publish:disabled { opacity: 0.6; cursor: not-allowed; }
-
-	/* ═══════ Responsive ═══════ */
-	@media (max-width: 768px) {
+	@media (max-width: 1024px) {
 		.editor-layout {
 			grid-template-columns: 1fr;
 		}
-		.editor-sidebar {
-			order: -1;
-		}
+	}
+
+	.editor-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 1.5rem;
+	}
+
+	.editor-header h1 {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--color-heading, #0f172a);
+	}
+
+	.view-count {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.875rem;
+		color: var(--color-text-muted, #64748b);
+	}
+
+	.editor-main {
+		min-width: 0;
+	}
+
+	.field {
+		margin-bottom: 1rem;
+	}
+
+	.field label {
+		display: block;
+		font-size: 0.8125rem;
+		font-weight: 500;
+		color: var(--color-text, #334155);
+		margin-bottom: 0.375rem;
+	}
+
+	.field input[type='text'],
+	.field textarea {
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--color-border, #e2e8f0);
+		border-radius: 0.375rem;
+		font-size: 0.9375rem;
+		background: var(--color-surface, #fff);
+		transition: border-color 0.15s;
+	}
+
+	.field input:focus,
+	.field textarea:focus {
+		outline: none;
+		border-color: var(--color-primary, #0f766e);
+		box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.1);
+	}
+
+	/* Sidebar */
+	.editor-sidebar {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		position: sticky;
+		top: 1rem;
+	}
+
+	.sidebar-section {
+		border: 1px solid var(--color-border, #e2e8f0);
+		border-radius: 0.5rem;
+		padding: 0.75rem;
+		background: var(--color-surface, #fff);
+	}
+
+	.sidebar-section label {
+		display: block;
+		font-size: 0.8125rem;
+		font-weight: 500;
+		color: var(--color-text, #334155);
+		margin-bottom: 0.375rem;
+	}
+
+	.sidebar-section input[type='text'],
+	.sidebar-section textarea,
+	.sidebar-section select {
+		width: 100%;
+		padding: 0.375rem 0.5rem;
+		border: 1px solid var(--color-border, #e2e8f0);
+		border-radius: 0.375rem;
+		font-size: 0.8125rem;
+		background: var(--color-surface, #fff);
+	}
+
+	.sidebar-section input:focus,
+	.sidebar-section textarea:focus,
+	.sidebar-section select:focus {
+		outline: none;
+		border-color: var(--color-primary, #0f766e);
+	}
+
+	.hint {
+		font-size: 0.6875rem;
+		color: var(--color-text-muted, #94a3b8);
+		margin-top: 0.25rem;
+		display: block;
+	}
+
+	.field-sm {
+		margin-top: 0.5rem;
+	}
+
+	.field-sm label {
+		font-size: 0.75rem;
+	}
+
+	/* Section toggles */
+	.section-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		background: none;
+		border: none;
+		padding: 0;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		cursor: pointer;
+		color: var(--color-heading, #0f172a);
+	}
+
+	.toggle-icon {
+		transition: transform 0.2s;
+	}
+
+	.toggle-icon.open {
+		transform: rotate(90deg);
+	}
+
+	.section-content {
+		margin-top: 0.75rem;
+	}
+
+	/* Buttons */
+	.actions-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.btn-primary {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.375rem;
+		width: 100%;
+		padding: 0.625rem;
+		background: var(--color-primary, #0f766e);
+		color: white;
+		border: none;
+		border-radius: 0.375rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: opacity 0.15s;
+	}
+
+	.btn-primary:hover:not(:disabled) {
+		opacity: 0.9;
+	}
+
+	.btn-primary:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.btn-secondary {
+		width: 100%;
+		padding: 0.5rem;
+		background: transparent;
+		color: var(--color-primary, #0f766e);
+		border: 1px solid var(--color-primary, #0f766e);
+		border-radius: 0.375rem;
+		font-size: 0.8125rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.btn-secondary:hover:not(:disabled) {
+		background: var(--color-primary, #0f766e);
+		color: white;
+	}
+
+	.btn-ghost {
+		display: block;
+		text-align: center;
+		padding: 0.375rem;
+		font-size: 0.8125rem;
+		color: var(--color-text-muted, #64748b);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+
+	.btn-ghost:hover {
+		color: var(--color-text, #334155);
+	}
+
+	/* Image upload */
+	.image-preview {
+		border-radius: 0.375rem;
+		overflow: hidden;
+	}
+
+	.image-preview img {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border-radius: 0.375rem;
+	}
+
+	.image-actions {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 0.5rem;
+	}
+
+	.btn-sm {
+		font-size: 0.75rem;
+		padding: 0.25rem 0.5rem;
+		border: 1px solid var(--color-border, #e2e8f0);
+		border-radius: 0.25rem;
+		background: transparent;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+
+	.btn-sm:hover {
+		background: var(--color-surface-hover, #f8fafc);
+	}
+
+	.btn-danger {
+		color: var(--color-error, #dc2626);
+		border-color: var(--color-error, #dc2626);
+	}
+
+	.btn-danger:hover {
+		background: var(--color-error, #dc2626);
+		color: white;
+	}
+
+	.dropzone {
+		border: 2px dashed var(--color-border, #e2e8f0);
+		border-radius: 0.5rem;
+		padding: 1rem;
+		text-align: center;
+		cursor: pointer;
+		transition: border-color 0.15s;
+	}
+
+	.dropzone:hover {
+		border-color: var(--color-primary, #0f766e);
+	}
+
+	.dropzone-label {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.375rem;
+		cursor: pointer;
+		color: var(--color-text-muted, #64748b);
+		font-size: 0.8125rem;
+	}
+
+	.spinner {
+		width: 1rem;
+		height: 1rem;
+		border: 2px solid currentColor;
+		border-top-color: transparent;
+		border-radius: 50%;
+		animation: spin 0.6s linear infinite;
+		display: inline-block;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
 	}
 </style>

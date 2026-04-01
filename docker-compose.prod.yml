@@ -47,6 +47,8 @@ services:
       - 'traefik.http.routers.breakthebox.entrypoints=websecure'
       - 'traefik.http.routers.breakthebox.tls=true'
       - 'traefik.http.routers.breakthebox.tls.certresolver=myresolver'
+      - 'traefik.http.routers.breakthebox.tls.domains[0].main=web.breakthebox.ch'
+      - 'traefik.http.routers.breakthebox.tls.domains[0].sans=www.breakthebox.ch'
       - 'traefik.http.services.breakthebox.loadbalancer.server.port=3000'
       - 'traefik.docker.network=n8n_internal'
 

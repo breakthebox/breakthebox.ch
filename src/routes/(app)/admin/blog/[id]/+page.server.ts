@@ -3,14 +3,16 @@ import {
 	getBlogPostById,
 	createBlogPost,
 	updateBlogPost,
-	isSlugUnique
+	isSlugUnique,
+	getBlogPostViewCount
 } from '$lib/server/db/queries/blog';
 import { generateSlug } from '$lib/utils/slug';
 import { fail, redirect } from '@sveltejs/kit';
+import type { BlogContentBlocks } from '$lib/types/content';
 
 export const load: PageServerLoad = async ({ params }) => {
 	if (params.id === 'new') {
-		return { post: null, isNew: true };
+		return { post: null, isNew: true, viewCount: 0 };
 	}
 
 	const post = await getBlogPostById(params.id);
@@ -18,7 +20,9 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw redirect(303, '/admin/blog');
 	}
 
-	return { post, isNew: false };
+	const viewCount = await getBlogPostViewCount(params.id);
+
+	return { post, isNew: false, viewCount };
 };
 
 export const actions: Actions = {
@@ -30,6 +34,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const title = (formData.get('title') as string)?.trim();
 		const content = (formData.get('content') as string) ?? '';
+		const contentBlocksRaw = formData.get('contentBlocks') as string;
 		const excerpt = (formData.get('excerpt') as string)?.trim() || null;
 		const headerImage = (formData.get('headerImage') as string)?.trim() || null;
 		const tagsRaw = (formData.get('tags') as string)?.trim() ?? '';
@@ -38,10 +43,46 @@ export const actions: Actions = {
 		const metaTitle = (formData.get('metaTitle') as string)?.trim() || null;
 		const metaDescription = (formData.get('metaDescription') as string)?.trim() || null;
 		const ogImage = (formData.get('ogImage') as string)?.trim() || null;
+		const seoScoreRaw = formData.get('seoScore') as string;
 		let slug = (formData.get('slug') as string)?.trim() || '';
 
 		if (!title) {
 			return fail(400, { error: 'Titel ist erforderlich.' });
+		}
+
+		// Parse content blocks
+		let contentBlocks: BlogContentBlocks | null = null;
+		if (contentBlocksRaw) {
+			try {
+				contentBlocks = JSON.parse(contentBlocksRaw) as BlogContentBlocks;
+			} catch {
+				// Ignore parse errors, keep null
+			}
+		}
+
+		// Generate plain text content from blocks for search/fallback
+		let plainContent = content;
+		if (contentBlocks?.blocks?.length) {
+			plainContent = contentBlocks.blocks
+				.map((block) => {
+					const data = block.data as Record<string, unknown>;
+					switch (block.type) {
+						case 'paragraph':
+						case 'header':
+						case 'quote':
+							return ((data.text as string) ?? '').replace(/<[^>]*>/g, '');
+						case 'list': {
+							const items = data.items as string[];
+							return items?.map((i) => i.replace(/<[^>]*>/g, '')).join('\n') ?? '';
+						}
+						case 'code':
+							return (data.code as string) ?? '';
+						default:
+							return '';
+					}
+				})
+				.filter(Boolean)
+				.join('\n\n');
 		}
 
 		// Auto-generate slug from title if empty
@@ -64,7 +105,6 @@ export const actions: Actions = {
 		// Check slug uniqueness
 		const unique = await isSlugUnique(slug, excludeId);
 		if (!unique) {
-			// Append timestamp to make unique
 			slug = `${slug}-${Date.now().toString(36)}`;
 		}
 
@@ -76,15 +116,17 @@ export const actions: Actions = {
 		// Parse publish date
 		const publishDate = publishDateStr ? new Date(publishDateStr) : null;
 
-		// Validate scheduled status needs a publish date
 		if (status === 'scheduled' && !publishDate) {
 			return fail(400, { error: 'Geplante Posts brauchen ein Veröffentlichungsdatum.' });
 		}
 
+		const seoScore = seoScoreRaw ? parseInt(seoScoreRaw, 10) : null;
+
 		const postData = {
 			title,
 			slug,
-			content,
+			content: plainContent,
+			contentBlocks,
 			excerpt,
 			headerImage,
 			tags,
@@ -93,6 +135,7 @@ export const actions: Actions = {
 			metaTitle,
 			metaDescription,
 			ogImage,
+			seoScore: seoScore && !isNaN(seoScore) ? seoScore : null,
 			authorId: locals.user.id
 		};
 

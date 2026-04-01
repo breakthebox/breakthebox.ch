@@ -1,10 +1,12 @@
 import type { PageServerLoad, Actions } from './$types';
-import { getAllBlogPosts, deleteBlogPost, updateBlogPost } from '$lib/server/db/queries/blog';
+import { getAllBlogPosts, deleteBlogPost, updateBlogPost, getBlogPostViewCounts } from '$lib/server/db/queries/blog';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
 	const posts = await getAllBlogPosts();
-	return { posts };
+	const postIds = posts.map((p) => p.id);
+	const viewCounts = await getBlogPostViewCounts(postIds);
+	return { posts, viewCounts };
 };
 
 export const actions: Actions = {

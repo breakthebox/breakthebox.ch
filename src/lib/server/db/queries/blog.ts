@@ -2,9 +2,9 @@
 // Blog Queries — CRUD for blog_posts table
 // ═══════════════════════════════════════════════════════════
 
-import { eq, and, lte, or, desc, ne, sql } from 'drizzle-orm';
+import { eq, and, lte, or, desc, ne, sql, count } from 'drizzle-orm';
 import { db } from '../index';
-import { blogPosts } from '../schema';
+import { blogPosts, blogPostViews } from '../schema';
 
 export type BlogPostRow = typeof blogPosts.$inferSelect;
 export type BlogPostInsert = typeof blogPosts.$inferInsert;
@@ -138,4 +138,44 @@ export async function isSlugUnique(slug: string, excludeId?: string): Promise<bo
 		.limit(1);
 
 	return rows.length === 0;
+}
+
+/**
+ * Get total view count for a single post.
+ */
+export async function getBlogPostViewCount(postId: string): Promise<number> {
+	const rows = await db
+		.select({ total: count() })
+		.from(blogPostViews)
+		.where(eq(blogPostViews.postId, postId));
+
+	return rows[0]?.total ?? 0;
+}
+
+/**
+ * Get view counts for multiple posts (batch).
+ * Returns a map of postId -> viewCount.
+ */
+export async function getBlogPostViewCounts(
+	postIds: string[]
+): Promise<Record<string, number>> {
+	if (postIds.length === 0) return {};
+
+	const rows = await db
+		.select({
+			postId: blogPostViews.postId,
+			total: count()
+		})
+		.from(blogPostViews)
+		.where(sql`${blogPostViews.postId} IN ${postIds}`)
+		.groupBy(blogPostViews.postId);
+
+	const result: Record<string, number> = {};
+	for (const id of postIds) {
+		result[id] = 0;
+	}
+	for (const row of rows) {
+		result[row.postId] = row.total;
+	}
+	return result;
 }

@@ -60,6 +60,7 @@ export const blogPosts = pgTable('blog_posts', {
 	title: text('title').notNull(),
 	slug: text('slug').notNull().unique(),
 	content: text('content').notNull().default(''),
+	contentBlocks: jsonb('content_blocks'),
 	excerpt: text('excerpt'),
 	headerImage: text('header_image'),
 	tags: text('tags').array().notNull().default([]),
@@ -68,9 +69,20 @@ export const blogPosts = pgTable('blog_posts', {
 	metaTitle: text('meta_title'),
 	metaDescription: text('meta_description'),
 	ogImage: text('og_image'),
+	seoScore: integer('seo_score'),
 	authorId: uuid('author_id').references(() => users.id),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+// ─── Blog Post Views ───
+export const blogPostViews = pgTable('blog_post_views', {
+	id: uuid('id').defaultRandom().primaryKey(),
+	postId: uuid('post_id')
+		.references(() => blogPosts.id, { onDelete: 'cascade' })
+		.notNull(),
+	sessionHash: text('session_hash').notNull(),
+	viewedAt: timestamp('viewed_at').defaultNow().notNull()
 });
 
 // ─── Reference Logos ───
