@@ -35,6 +35,8 @@ services:
       - ORIGIN=${PUBLIC_APP_URL:-https://web.breakthebox.ch}
     env_file:
       - .env
+    volumes:
+      - uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -53,6 +55,7 @@ services:
 
 volumes:
   pgdata:
+  uploads:
 
 networks:
   internal:
