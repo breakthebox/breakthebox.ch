@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import { generateState } from 'arctic';
 import { dev } from '$app/environment';
-import { auth0 } from '$lib/server/auth/providers';
+import { getAuth0 } from '$lib/server/auth/providers';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -16,7 +16,7 @@ export const actions: Actions = {
 	default: async ({ cookies }) => {
 		const state = generateState();
 
-		const url = auth0.createAuthorizationURL(state, ['openid', 'profile', 'email']);
+		const url = getAuth0().createAuthorizationURL(state, ['openid', 'profile', 'email']);
 
 		cookies.set('oauth_state', state, {
 			path: '/',

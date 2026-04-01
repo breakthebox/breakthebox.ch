@@ -6,7 +6,7 @@
 
 import { redirect, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { auth0 } from '$lib/server/auth/providers';
+import { getAuth0 } from '$lib/server/auth/providers';
 import { handleOAuthCallback } from '$lib/server/auth/oauth-callback';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 	try {
 		// Exchange code for tokens
-		const tokens = await auth0.validateAuthorizationCode(code);
+		const tokens = await getAuth0().validateAuthorizationCode(code);
 		const accessToken = tokens.accessToken();
 
 		// Fetch user info from Auth0

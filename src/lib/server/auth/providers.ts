@@ -7,14 +7,20 @@
 import { Auth0 } from 'arctic';
 import { env } from '$env/dynamic/private';
 
-const baseUrl = env.PUBLIC_APP_URL ?? 'http://localhost:5173';
+let _auth0: Auth0 | null = null;
 
-export const auth0 = new Auth0(
-	env.AUTH0_DOMAIN ?? '',
-	env.AUTH0_CLIENT_ID ?? '',
-	env.AUTH0_CLIENT_SECRET ?? '',
-	`${baseUrl}/auth/callback/auth0`
-);
+export function getAuth0(): Auth0 {
+	if (!_auth0) {
+		const baseUrl = env.PUBLIC_APP_URL ?? 'http://localhost:5173';
+		_auth0 = new Auth0(
+			env.AUTH0_DOMAIN ?? '',
+			env.AUTH0_CLIENT_ID ?? '',
+			env.AUTH0_CLIENT_SECRET ?? '',
+			`${baseUrl}/auth/callback/auth0`
+		);
+	}
+	return _auth0;
+}
 
 // ─── Optional: Google OAuth ───
 // import { Google } from 'arctic';
