@@ -500,31 +500,52 @@
 <!-- ═══════ FOOTER ═══════ -->
 <footer class="footer">
 	<div class="footer-inner">
-		<div class="footer-brand">
-			<img src="/logo.svg" alt="Break the Box GmbH" class="footer-logo-img" />
+		<!-- Spalte 1: Brand + Tagline -->
+		<div class="footer-col footer-col-brand">
+			<div class="footer-brand">
+				<img src="/box.svg" alt="Break the Box" width="28" height="28" class="footer-cube" />
+				<span class="footer-name">Break the Box</span>
+			</div>
 			<span class="footer-tagline">{m.footer_tagline()}</span>
+			<div class="footer-social">
+				<a href="https://www.linkedin.com/company/break-the-box-gmbh" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="footer-social-link">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+				</a>
+				<a href="https://www.instagram.com/breakthebox_ch/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="footer-social-link">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+				</a>
+				<a href="https://www.youtube.com/channel/UC1b1A2dUD8zVEtwah1de2zQ" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="footer-social-link">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+				</a>
+			</div>
 		</div>
-		<div class="footer-social">
-			<a href="https://www.linkedin.com/company/break-the-box-gmbh" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="footer-social-link">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-			</a>
-			<a href="https://www.instagram.com/breakthebox_ch/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="footer-social-link">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-			</a>
-			<a href="https://www.youtube.com/channel/UC1b1A2dUD8zVEtwah1de2zQ" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="footer-social-link">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-			</a>
+
+		<!-- Spalte 2: Adresse -->
+		<div class="footer-col footer-col-address">
+			<span class="footer-col-title">Kontakt</span>
+			<address class="footer-address">
+				Break the Box GmbH<br />
+				Mülibüüne 4<br />
+				3422 Kirchberg
+			</address>
+			<a href="mailto:info@breakthebox.ch" class="footer-contact-link">info@breakthebox.ch</a>
 		</div>
-		<div class="footer-links">
-			<a href={localizeHref('/impressum')}>{m.footer_impressum()}</a>
-			<a href={localizeHref('/datenschutz')}>{m.footer_datenschutz()}</a>
-			<a href={localizeHref('/agb')}>{m.footer_agb()}</a>
+
+		<!-- Spalte 3: Rechtliches -->
+		<div class="footer-col footer-col-legal">
+			<span class="footer-col-title">Rechtliches</span>
+			<nav class="footer-legal-nav">
+				<a href={localizeHref('/impressum')}>{m.footer_impressum()}</a>
+				<a href={localizeHref('/datenschutz')}>{m.footer_datenschutz()}</a>
+				<a href={localizeHref('/agb')}>{m.footer_agb()}</a>
+			</nav>
 		</div>
-		<div class="footer-copy">
-			&copy; {new Date().getFullYear()} {m.footer_copyright()}
-			<span class="footer-admin-sep">·</span>
-			<a href="/auth/login" class="footer-admin-link">Admin</a>
-		</div>
+	</div>
+
+	<!-- Bottom bar -->
+	<div class="footer-bottom">
+		<span>&copy; {new Date().getFullYear()} Break the Box GmbH</span>
+		<a href="/auth/login" class="footer-admin-link">Admin</a>
 	</div>
 </footer>
 
@@ -1537,65 +1558,55 @@
 	/* ═══════ FOOTER ═══════ */
 	.footer {
 		background: var(--bg-page-dark);
-		padding: 40px 32px;
+		padding: 48px 32px 0;
 		border-top: 1px solid var(--border-dark);
 	}
 	.footer-inner {
 		max-width: 1160px;
 		margin: 0 auto;
+		display: grid;
+		grid-template-columns: 1.4fr 1fr 1fr;
+		gap: 48px;
+		padding-bottom: 40px;
+	}
+	.footer-col {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		flex-direction: column;
+		gap: 8px;
+	}
+	.footer-col-title {
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--text-muted-dark);
+		margin-bottom: 4px;
 	}
 	.footer-brand {
 		display: flex;
-		flex-direction: column;
-		gap: 4px;
+		align-items: center;
+		gap: 10px;
 	}
-	.footer-logo-img {
-		height: 36px;
-		width: auto;
+	.footer-cube {
 		filter: invert(1) brightness(0.85);
+	}
+	.footer-name {
+		font-size: 1.15rem;
+		font-weight: 800;
+		color: var(--text-primary-dark);
+		letter-spacing: -0.01em;
 	}
 	.footer-tagline {
 		font-family: var(--ff-sketch);
-		font-size: 1rem;
+		font-size: 0.95rem;
 		color: var(--btb-teal);
-	}
-	.footer-links {
-		display: flex;
-		gap: 20px;
-	}
-	.footer-links a {
-		font-size: 0.78rem;
-		color: var(--text-muted-dark);
-		text-decoration: none;
-		transition: color var(--t-fast);
-	}
-	.footer-links a:hover {
-		color: var(--text-secondary-dark);
-	}
-	.footer-copy {
-		font-size: 0.78rem;
-		color: var(--text-muted-dark);
-	}
-	.footer-admin-sep {
-		margin: 0 4px;
-		opacity: 0.3;
-	}
-	.footer-admin-link {
-		color: var(--text-muted-dark);
-		text-decoration: none;
-		opacity: 0.4;
-		transition: opacity 0.2s;
-	}
-	.footer-admin-link:hover {
-		opacity: 0.8;
+		margin-top: 2px;
 	}
 	.footer-social {
 		display: flex;
-		gap: 16px;
+		gap: 14px;
 		align-items: center;
+		margin-top: 8px;
 	}
 	.footer-social-link {
 		color: var(--text-muted-dark);
@@ -1606,6 +1617,55 @@
 	.footer-social-link:hover {
 		color: var(--btb-teal-light);
 		transform: translateY(-2px);
+	}
+	.footer-address {
+		font-style: normal;
+		font-size: 0.85rem;
+		line-height: 1.7;
+		color: var(--text-secondary-dark);
+	}
+	.footer-contact-link {
+		font-size: 0.85rem;
+		color: var(--text-secondary-dark);
+		text-decoration: none;
+		transition: color var(--t-fast);
+	}
+	.footer-contact-link:hover {
+		color: var(--btb-teal-light);
+	}
+	.footer-legal-nav {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+	.footer-legal-nav a {
+		font-size: 0.85rem;
+		color: var(--text-secondary-dark);
+		text-decoration: none;
+		transition: color var(--t-fast);
+	}
+	.footer-legal-nav a:hover {
+		color: var(--text-primary-dark);
+	}
+	.footer-bottom {
+		max-width: 1160px;
+		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20px 0;
+		border-top: 1px solid var(--border-dark);
+		font-size: 0.75rem;
+		color: var(--text-muted-dark);
+	}
+	.footer-admin-link {
+		color: var(--text-muted-dark);
+		text-decoration: none;
+		opacity: 0.4;
+		transition: opacity 0.2s;
+	}
+	.footer-admin-link:hover {
+		opacity: 0.8;
 	}
 
 	/* ═══════ RESPONSIVE ═══════ */
@@ -1665,9 +1725,24 @@
 			align-items: center;
 		}
 		.footer-inner {
-			flex-direction: column;
-			gap: 16px;
+			grid-template-columns: 1fr;
+			gap: 32px;
 			text-align: center;
+		}
+		.footer-brand {
+			justify-content: center;
+		}
+		.footer-social {
+			justify-content: center;
+		}
+		.footer-legal-nav {
+			flex-direction: row;
+			justify-content: center;
+			gap: 16px;
+		}
+		.footer-bottom {
+			justify-content: center;
+			gap: 16px;
 		}
 	}
 	@media (max-width: 1024px) and (min-width: 769px) {
