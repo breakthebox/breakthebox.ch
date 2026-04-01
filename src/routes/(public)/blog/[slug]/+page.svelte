@@ -19,6 +19,14 @@
 		});
 	}
 
+	function goBack() {
+		if (browser && window.history.length > 1) {
+			window.history.back();
+		} else {
+			window.location.href = localizeHref('/blog');
+		}
+	}
+
 	// Track page view
 	$effect(() => {
 		if (!browser || !post?.id) return;
@@ -48,7 +56,7 @@
 			<img src="/box.svg" alt="Break the Box" width="32" height="32" />
 			<span>Break the Box</span>
 		</a>
-		<a href={localizeHref('/blog')} class="post-nav-back">&larr; {m.blog_all_posts()}</a>
+		<button type="button" onclick={goBack} class="post-nav-back">&larr; {m.blog_all_posts()}</button>
 	</nav>
 
 	<article class="post-article">
@@ -85,9 +93,9 @@
 
 		<!-- Back -->
 		<div class="post-footer">
-			<a href={localizeHref('/blog')} class="post-back-link">
+			<button type="button" onclick={goBack} class="post-back-link">
 				&larr; {m.blog_all_posts()}
-			</a>
+			</button>
 		</div>
 	</article>
 </div>
@@ -122,6 +130,11 @@
 		color: var(--text-secondary);
 		text-decoration: none;
 		transition: color var(--t-fast);
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		font-family: inherit;
 	}
 	.post-nav-back:hover { color: var(--btb-steel); }
 
@@ -223,6 +236,11 @@
 		color: var(--btb-steel);
 		text-decoration: none;
 		transition: color var(--t-fast);
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		font-family: inherit;
 	}
 	.post-back-link:hover { color: var(--btb-steel-hover); }
 
