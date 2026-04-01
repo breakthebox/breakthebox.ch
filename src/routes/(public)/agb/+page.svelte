@@ -23,79 +23,135 @@
 		<section>
 			<h2>1. Geltungsbereich</h2>
 			<p>
-				Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für sämtliche Geschäftsbeziehungen zwischen der Break the Box GmbH (nachfolgend «Anbieterin») und ihren Kundinnen und Kunden (nachfolgend «Auftraggebende»). Abweichende Bedingungen bedürfen der schriftlichen Zustimmung der Anbieterin.
+				Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für den gesamten Geschäftsbereich der Break the Box GmbH (nachfolgend «Firma»). Die Firma bietet Beratungsdienstleistungen in den Bereichen IT-Strategie, Digitalisierung, IT-Governance, KI-Beratung sowie Lehre und Workshops an. Durch strategische Begleitung, Wissensvermittlung sowie Erstellung, Validierung und Umsetzung von Konzepten und Lösungen im Bereich IT unterstützt die Firma ihre Kunden bei der digitalen Transformation ihrer Unternehmung.
 			</p>
 		</section>
 
 		<section>
-			<h2>2. Leistungen</h2>
+			<h2>2. Vertragsabschluss</h2>
 			<p>
-				Die Anbieterin erbringt Beratungsleistungen in den Bereichen IT-Strategie, Digitalisierung, IT-Governance, KI-Beratung sowie Lehre und Workshops. Der genaue Leistungsumfang wird im jeweiligen Angebot oder Vertrag festgelegt.
+				Der Vertragsabschluss kommt durch die Akzeptanz der Offerte der Firma betreffend den Bezug von Produkten und / oder Dienstleistungen durch den Kunden zustande. Der Vertrag kommt auf jeden Fall zustande, wenn der Kunde die von der Firma angebotenen Dienstleistungen in Anspruch nimmt.
 			</p>
 		</section>
 
 		<section>
-			<h2>3. Angebote und Vertragsschluss</h2>
+			<h2>3. Preise</h2>
 			<p>
-				Angebote der Anbieterin sind freibleibend und unverbindlich, sofern sie nicht ausdrücklich als verbindlich gekennzeichnet sind. Ein Vertrag kommt zustande durch schriftliche Auftragsbestätigung oder durch Beginn der Leistungserbringung.
+				Vorbehaltlich anderslautender Offerten verstehen sich alle Preise in Schweizer Franken (CHF). Alle Preise verstehen sich exklusive einer allfällig erhobenen Mehrwertsteuer (MwSt). Die Preise verstehen sich exklusive weiterer allfällig geschuldeter Steuern. Die Firma behält sich vor, die Preise jederzeit zu ändern. Es gelten die zum Zeitpunkt des Vertragsabschlusses gültigen Preise gemäss Preisliste der Firma.
 			</p>
 		</section>
 
 		<section>
-			<h2>4. Honorare und Zahlungsbedingungen</h2>
+			<h2>4. Bezahlung</h2>
 			<p>
-				Die Honorare richten sich nach dem vereinbarten Angebot. Sofern nicht anders vereinbart, gelten folgende Bedingungen:
-			</p>
-			<ul>
-				<li>Rechnungen sind innert 30 Tagen netto zahlbar.</li>
-				<li>Bei Verzug wird ein Verzugszins von 5% p.a. berechnet.</li>
-				<li>Reise- und Auslagenkosten werden separat in Rechnung gestellt, sofern vorgängig vereinbart.</li>
-				<li>Alle Preise verstehen sich exkl. MwSt., sofern nicht anders angegeben.</li>
-			</ul>
-		</section>
-
-		<section>
-			<h2>5. Mitwirkungspflichten</h2>
-			<p>
-				Die Auftraggebenden stellen der Anbieterin rechtzeitig alle für die Leistungserbringung erforderlichen Unterlagen, Informationen und Zugänge zur Verfügung. Verzögerungen durch fehlende Mitwirkung gehen nicht zu Lasten der Anbieterin.
+				Die Firma bietet dem Kunden folgende Zahlungsmöglichkeiten: Rechnung, Vorauskasse und Anzahlung. Der Kunde ist verpflichtet den in Rechnung gestellten Betrag innert 30 (dreissig) Tagen ab Rechnungsdatum zu bezahlen. Wird die Rechnung nicht binnen vorgenannter Zahlungsfrist beglichen, wird der Kunde abgemahnt. Begleicht der Kunde die Rechnung nicht binnen der angesetzten Mahnfrist fällt er automatisch in Verzug. Ab dem Zeitpunkt des Verzuges schuldet der Kunde der Firma Verzugszinsen in der Höhe von 5% (fünf Prozent). Die Verrechnung des in Rechnung gestellten Betrages mit einer allfälligen Forderung des Kunden gegen die Firma ist nicht zulässig. Bei einer hohen Bestellungssumme kann die Firma vom Kunden eine Anzahlung verlangen. Der Firma steht das Recht zu, bei Zahlungsverzug die Lieferung oder Dienstleistungserbringung zu verweigern.
 			</p>
 		</section>
 
 		<section>
-			<h2>6. Geistiges Eigentum</h2>
+			<h2>5. Pflichten der Firma</h2>
+			<h3>5.1 Lieferung / Liefertermine</h3>
 			<p>
-				Sämtliche Arbeitsergebnisse, die im Rahmen eines Auftrags erstellt werden, gehen nach vollständiger Bezahlung in das Eigentum der Auftraggebenden über — mit Ausnahme von Methoden, Frameworks und Werkzeugen, die zum allgemeinen Know-how der Anbieterin gehören.
+				Die Lieferung erfolgt nach individueller Absprache zwischen dem Kunden und der Firma. Vorbehaltlich anderslautender Vereinbarung gilt der Sitz der Firma als Erfüllungsort. Die Firma erfüllt durch die Übergabe oder Zurverfügungstellung des bestellten Produkts an den Kunden.
 			</p>
+			<h3>5.2 Dienstleistungserbringung</h3>
 			<p>
-				Die Anbieterin behält sich das Recht vor, die Zusammenarbeit in anonymisierter Form als Referenz zu verwenden, sofern keine anderslautende Vereinbarung besteht.
+				Vorbehaltlich anderslautender Vereinbarung erfüllt die Firma ihre Verpflichtung durch Erbringung der vereinbarten Dienstleistungen. Wird kein Ort der Erfüllung bestimmt, gilt der Sitz der Firma als Erfüllungsort.
 			</p>
-		</section>
-
-		<section>
-			<h2>7. Vertraulichkeit</h2>
+			<h3>5.3 Hilfspersonen</h3>
 			<p>
-				Beide Parteien verpflichten sich, vertrauliche Informationen der jeweils anderen Partei nicht an Dritte weiterzugeben und ausschliesslich für die Zwecke des Auftrags zu verwenden. Diese Pflicht besteht auch nach Beendigung des Vertragsverhältnisses fort.
-			</p>
-		</section>
-
-		<section>
-			<h2>8. Haftung</h2>
-			<p>
-				Die Anbieterin haftet für direkte Schäden, die durch grobe Fahrlässigkeit oder Vorsatz verursacht werden. Die Haftung für indirekte Schäden, entgangenen Gewinn und Folgeschäden ist ausgeschlossen. Die Haftung ist in jedem Fall auf die Höhe des jeweiligen Auftragshonorars beschränkt.
+				Die Parteien haben das ausdrückliche Recht, zur Erledigung ihrer vertragsgemässen Pflichten Hilfspersonen beizuziehen. Sie haben sicherzustellen, dass der Beizug der Hilfsperson unter Einhaltung aller zwingenden gesetzlichen Bestimmungen und allfälliger Gesamtarbeitsverträge erfolgt.
 			</p>
 		</section>
 
 		<section>
-			<h2>9. Kündigung</h2>
+			<h2>6. Pflichten des Kunden</h2>
 			<p>
-				Beide Parteien können laufende Aufträge unter Einhaltung einer Frist von 30 Tagen schriftlich kündigen. Bereits erbrachte Leistungen werden in Rechnung gestellt. Bei wichtigem Grund ist eine fristlose Kündigung möglich.
+				Der Kunde hat sämtliche Vorkehrungen, die zur Erbringung der Dienstleistungen durch die Firma erforderlich sind, am vereinbarten Ort zur vereinbarten Zeit und im vereinbarten Mass umgehend vorzunehmen. Dazu gehört die Zurverfügungstellung nötiger und geeigneter Informationen und Unterlagen für die Firma. Sämtliche Leistungen der Firma dürfen vom Kunden nur in Verbindung mit Datennetzwerken und Ausrüstungen (Komponenten) genutzt werden, welche von der Firma vorab genehmigt wurden. Nicht genehmigte Komponenten werden vom Netzwerk der Firma abgekoppelt und zum Zeitpunkt der Ersetzung wieder aktiviert. Nachrichten und andere Arten der Kontaktaufnahme resp. allfällige Zwischen- und Endergebnisse können von der Firma sowohl per Telefon, per Post oder über geeignete elektronische Kanäle übermittelt werden. Mögliche Kommunikationskanäle und Kontaktangaben der Firma werden auf deren Webseite aufgeführt. Der Kunde hat daher die Pflicht der Firma die nötigen Kontaktdaten mitzuteilen. Der Kunde ist verantwortlich für die Beschaffung, die Aktualisierung und den Unterhalt seiner Daten. Er ist verpflichtet sämtliche Vorkehrungen zu treffen, um allfällige Gesetzesverstösse oder Vertragsverletzungen zu unterlassen. Wird dem Kunden Hardware zur Verfügung gestellt, bleibt diese im Eigentum der Firma und muss bei Vertragsende im selben Zustand retourniert werden.
 			</p>
 		</section>
 
 		<section>
-			<h2>10. Anwendbares Recht und Gerichtsstand</h2>
+			<h2>7. Abnahme</h2>
 			<p>
-				Es gilt ausschliesslich schweizerisches Recht. Gerichtsstand ist Bern, Schweiz.
+				Macht die Art des Produktes oder der Dienstleistung eine Abnahme erforderlich, so erfolgt diese gemäss separater Abnahmevereinbarung. Wurde keine solche Vereinbarung getroffen, gilt das entsprechende Produkt oder die Dienstleistung 30 Tage nach der Übergabe an den Kunden als abgenommen.
+			</p>
+		</section>
+
+		<section>
+			<h2>8. Gewährleistung</h2>
+			<p>
+				Wird vertraglich nichts anderes vereinbart, so wird jegliche Gewährleistung der Firma ausgeschlossen.
+			</p>
+		</section>
+
+		<section>
+			<h2>9. Haftung</h2>
+			<p>
+				Die Haftung für jegliche indirekte Schäden und Mangelfolgeschäden wird vollumfänglich ausgeschlossen. Die Haftung für direkte Schäden wird auf die Vertragssumme beschränkt. Diese Haftungsbeschränkung gilt nicht für direkte Schäden, welche durch Grobfahrlässigkeit oder Absicht verursacht werden. Der Kunde ist verpflichtet, der Firma allfällige Schäden umgehend zu melden. Jegliche Haftung für Hilfspersonen wird vollumfänglich ausgeschlossen.
+			</p>
+		</section>
+
+		<section>
+			<h2>10. Immaterialgüterrechte</h2>
+			<p>
+				Sämtliche Rechte an den erarbeiteten Produkten, Dienstleistungen und allfälligen Marken stehen der Firma zu oder sie ist zu deren Benutzung vom Inhaber berechtigt. Weder diese AGB noch dazugehörige Individualvereinbarungen haben die Übertragung etwelcher Immaterialgüterrechte zum Inhalt, es sei denn, dies werde in den Individualvereinbarungen explizit erwähnt. Jegliche Weiterverwendung, Veröffentlichung und das Zugänglichmachen von Informationen, Bildern, Texten oder Sonstigem, welches der Kunde von der Firma erhält, ist untersagt, es sei denn, es werde von der Firma explizit genehmigt. Verwendet der Kunde in der Zusammenarbeit mit der Firma Inhalte, Texte oder Bildmaterial, an welchen Dritte ein Schutzrecht haben, hat der Kunde sicherzustellen, dass keine Schutzrechte Dritter verletzt werden.
+			</p>
+		</section>
+
+		<section>
+			<h2>11. Datenschutz</h2>
+			<p>
+				Die Firma darf die im Rahmen des Vertragsabschlusses aufgenommenen Daten zur Erfüllung ihrer vertraglichen Verpflichtungen verarbeiten und verwenden. Die Firma ergreift die Massnahmen, welche zur Sicherung der Daten gemäss den gesetzlichen Vorschriften erforderlich sind. Der Kunde erklärt sich mit der Speicherung und vertragsgemässen Verwertung seiner Daten durch die Firma vollumfänglich einverstanden und ist sich bewusst, dass die Firma auf Anordnung von Gerichten oder Behörden verpflichtet und berechtigt ist, diesen oder Dritten Informationen des Kunden bekannt zu geben. Die Firma darf die Daten zu Marketingzwecken verwenden, sofern ihr der Kunde dies nicht ausdrücklich untersagt. Die zur Leistungserfüllung notwendigen Daten dürfen auch an beauftragte Dienstleistungspartner weitergegeben werden.
+			</p>
+		</section>
+
+		<section>
+			<h2>12. Änderungen</h2>
+			<p>
+				Diese Allgemeinen Geschäftsbedingungen können von der Firma jederzeit geändert werden. Die neue Version tritt 30 (dreissig) Tage nach der Aufschaltung auf der Website durch die Firma in Kraft. Für die Kunden gilt grundsätzlich die Version der AGB, welche zum Zeitpunkt des Vertragsabschlusses in Kraft ist, es sei denn, der Kunde habe einer neueren Version der AGB zugestimmt.
+			</p>
+		</section>
+
+		<section>
+			<h2>13. Priorität</h2>
+			<p>
+				Diese AGB gehen sämtlichen älteren Bestimmungen und Verträgen vor. Lediglich Bestimmungen aus Individualverträgen, welche die Bestimmungen dieser AGB noch spezifizieren, gehen diesen AGB vor.
+			</p>
+		</section>
+
+		<section>
+			<h2>14. Salvatorische Klausel</h2>
+			<p>
+				Sollte eine Bestimmung dieses Vertrages oder eine Beilage dieses Vertrages ungültig sein oder werden, so wird dadurch die Wirksamkeit des Vertrages im Übrigen nicht berührt. Die Vertragsparteien werden die unwirksame Bestimmung durch eine wirksame Bestimmung zu ersetzen, die dem gewollten wirtschaftlichen Zweck der ungültigen Bestimmung möglichst nahe kommt. Dasselbe gilt auch für allfällige Vertragslücken.
+			</p>
+		</section>
+
+		<section>
+			<h2>15. Vertraulichkeit</h2>
+			<p>
+				Beide Parteien sowie deren Hilfspersonen verpflichten sich, sämtliche Informationen, welche ihnen im Zusammenhang mit den vereinbarten Leistungen unterbreitet wurden oder sie sich angeeignet haben, vertraulich zu behandeln. Diese Pflicht bleibt auch nach der Beendigung des Vertrages bestehen.
+			</p>
+		</section>
+
+		<section>
+			<h2>16. Höhere Gewalt (vis major)</h2>
+			<p>
+				Wird die fristgerechte Erfüllung durch die Firma, deren Lieferanten oder beigezogenen Dritten infolge höherer Gewalt wie beispielsweise Naturkatastrophen, Erdbeben, Vulkanausbrüche, Lawinen, Unwetter, Gewitter, Stürme, Kriege, Unruhen, Bürgerkriege, Revolutionen und Aufstände, Terrorismus, Sabotage, Streiks, Atomunfälle resp. Reaktorschäden unmöglich, so ist die Firma während der Dauer der höheren Gewalt sowie einer angemessenen Anlaufzeit nach deren Ende von der Erfüllung der betroffenen Pflichten befreit. Dauert die höhere Gewalt länger als 30 (dreissig) Tage, kann die Firma vom Vertrag zurücktreten. Die Firma hat dem Kunden ein bereits geleistetes Entgelt vollumfänglich zurückzuerstatten. Jegliche weiteren Ansprüche, insbesondere Schadenersatzansprüche infolge vis major, sind ausgeschlossen.
+			</p>
+		</section>
+
+		<section>
+			<h2>17. Agenten und Vertriebspartner</h2>
+			<p>
+				Der Kunde nimmt zur Kenntnis, dass allfällige Vertriebspartner oder Agenten selbstständig und damit unabhängig von der Firma arbeiten und jegliche potentiellen Ansprüche diesen gegenüber direkt geltend zu machen sind. Die Firma haftet in keiner Weise für Vertragsverletzungen allfälliger Agenten und Vertriebspartnern.
+			</p>
+		</section>
+
+		<section>
+			<h2>18. Anwendbares Recht / Gerichtsstand</h2>
+			<p>
+				Diese AGB unterstehen schweizerischem Recht. Soweit keine zwingenden gesetzlichen Bestimmungen vorgehen, ist das Gericht am Sitz der Firma zuständig. Der Firma steht es frei, am Sitz des Beklagten eine Klage anzuheben. Das Übereinkommen der Vereinten Nationen über Verträge über den internationalen Produktekauf (SR 0.221.221.1) wird explizit ausgeschlossen.
 			</p>
 		</section>
 	</article>
@@ -159,6 +215,13 @@
 		font-weight: 700;
 		color: var(--text-heading);
 		margin: 2rem 0 0.75rem;
+	}
+
+	.legal-content h3 {
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: var(--text-heading);
+		margin: 1.5rem 0 0.5rem;
 	}
 
 	.legal-content p {

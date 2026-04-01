@@ -24,13 +24,13 @@
 			<p>
 				<strong>Break the Box GmbH</strong><br />
 				Brigitte Hulliger<br />
-				Bernstrasse 130<br />
-				3072 Ostermundigen<br />
+				Mülibüüne 4<br />
+				3422 Kirchberg<br />
 				Schweiz
 			</p>
 			<p>
-				E-Mail: <a href="mailto:hello@breakthebox.ch">hello@breakthebox.ch</a><br />
-				Telefon: <a href="tel:+41764431944">+41 76 443 19 44</a>
+				E-Mail: <a href="mailto:info@breakthebox.ch">info@breakthebox.ch</a><br />
+				Telefon: <a href="tel:+41763092088">+41 76 309 20 88</a>
 			</p>
 		</section>
 
@@ -38,7 +38,7 @@
 			<h2>Unternehmensangaben</h2>
 			<p>
 				Rechtsform: Gesellschaft mit beschränkter Haftung (GmbH)<br />
-				UID: CHE-250.759.498<br />
+				UID: CHE-381.454.659<br />
 				Handelsregister: Kanton Bern
 			</p>
 		</section>

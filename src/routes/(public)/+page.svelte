@@ -898,10 +898,10 @@
 	.pillar-card-image {
 		width: 100%;
 		height: 140px;
-		border-radius: var(--radius-card) var(--radius-card) 0 0;
+		border-radius: var(--radius-card-lg) var(--radius-card-lg) 0 0;
 		overflow: hidden;
-		margin: -28px -28px 16px -28px;
-		width: calc(100% + 56px);
+		margin: -32px -32px 16px -32px;
+		width: calc(100% + 64px);
 	}
 	.pillar-card-image img {
 		width: 100%;
@@ -1567,6 +1567,12 @@
 		}
 		.pillars-grid {
 			grid-template-columns: 1fr;
+		}
+		.pillar-card-image {
+			height: 200px;
+		}
+		.pillar-flip {
+			min-height: 480px;
 		}
 		.about-grid {
 			grid-template-columns: 1fr;
