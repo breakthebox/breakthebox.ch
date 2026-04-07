@@ -990,7 +990,7 @@
 	}
 	.pillar-card-image {
 		width: calc(100% + 64px);
-		aspect-ratio: 16 / 9;
+		height: 140px;
 		border-radius: var(--radius-card-lg) var(--radius-card-lg) 0 0;
 		overflow: hidden;
 		margin: -32px -32px 16px -32px;
@@ -1792,6 +1792,9 @@
 		}
 		.pillars-grid {
 			grid-template-columns: 1fr;
+		}
+		.pillar-card-image {
+			height: 180px;
 		}
 		.pillar-flip {
 			min-height: 580px;
