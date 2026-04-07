@@ -989,12 +989,12 @@
 		z-index: 2;
 	}
 	.pillar-card-image {
-		width: 100%;
-		height: 140px;
+		width: calc(100% + 64px);
+		aspect-ratio: 16 / 9;
 		border-radius: var(--radius-card-lg) var(--radius-card-lg) 0 0;
 		overflow: hidden;
 		margin: -32px -32px 16px -32px;
-		width: calc(100% + 64px);
+		flex-shrink: 0;
 	}
 	.pillar-card-image img {
 		width: 100%;
@@ -1793,11 +1793,8 @@
 		.pillars-grid {
 			grid-template-columns: 1fr;
 		}
-		.pillar-card-image {
-			height: 200px;
-		}
 		.pillar-flip {
-			min-height: 480px;
+			min-height: 580px;
 		}
 		.about-grid {
 			grid-template-columns: 1fr;
