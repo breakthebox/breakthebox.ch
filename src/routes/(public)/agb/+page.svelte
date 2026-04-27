@@ -5,6 +5,7 @@
 
 <svelte:head>
 	<title>Allgemeine Geschäftsbedingungen — Break the Box</title>
+	<meta name="description" content={m.meta_agb_description()} />
 </svelte:head>
 
 <div class="legal-page">

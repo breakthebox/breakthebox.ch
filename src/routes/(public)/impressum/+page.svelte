@@ -5,6 +5,7 @@
 
 <svelte:head>
 	<title>Impressum — Break the Box</title>
+	<meta name="description" content={m.meta_impressum_description()} />
 </svelte:head>
 
 <div class="legal-page">

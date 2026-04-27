@@ -5,6 +5,7 @@
 
 <svelte:head>
 	<title>Datenschutzerklärung — Break the Box</title>
+	<meta name="description" content={m.meta_datenschutz_description()} />
 </svelte:head>
 
 <div class="legal-page">

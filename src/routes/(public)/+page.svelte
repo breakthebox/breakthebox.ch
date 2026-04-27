@@ -159,7 +159,7 @@
 <section class="hero">
 	<div class="hero-inner reveal">
 		<span class="hero-badge">{m.hero_badge()}</span>
-		<img src="/box.webp" alt="Break the Box" class="hero-box" />
+		<img src="/box.webp" alt="Break the Box" class="hero-box" fetchpriority="high" decoding="async" width="200" height="200" />
 		<h1 class="hero-title">
 			{@html m.hero_name().split('.').filter(Boolean).map((word: string, i: number) => {
 				const colors = ['var(--btb-steel)', 'var(--btb-teal)', 'var(--btb-steel)'];
@@ -238,7 +238,7 @@
 						<div class="pillar-front">
 							{#if pillar.image}
 								<div class="pillar-card-image">
-									<img src={pillar.image} alt={pillar.title} />
+									<img src={pillar.image} alt={pillar.title} loading="lazy" decoding="async" />
 								</div>
 							{/if}
 							<h3>{pillar.title}</h3>
@@ -317,7 +317,7 @@
 		</div>
 		<div class="about-sidebar reveal">
 			<div class="about-avatar">
-				<img src="/avatar_bhu.svg" alt="Brigitte Hulliger" class="avatar-img" />
+				<img src="/avatar_bhu.svg" alt="Brigitte Hulliger" class="avatar-img" loading="lazy" decoding="async" />
 			</div>
 			<span class="about-sketch-note">{m.about_sketch_note()}</span>
 			<!-- CV Video -->
@@ -363,7 +363,7 @@
 				<div class="inno-card reveal" style="--stagger: {pi}">
 					<div class="inno-card-accent"></div>
 					{#if platform.image}
-						<img src={platform.image} alt={platform.name} class="inno-card-image" />
+						<img src={platform.image} alt={platform.name} class="inno-card-image" loading="lazy" decoding="async" />
 					{/if}
 					<h3 class="inno-card-name">{platform.name}</h3>
 					<span class="inno-card-sketch">{platform.sketch}</span>
@@ -393,7 +393,7 @@
 				{/if}
 			</div>
 			{#if walkthetalk.missbizzy.image}
-				<img src={walkthetalk.missbizzy.image} alt={walkthetalk.missbizzy.title} class="inno-proof-image" />
+				<img src={walkthetalk.missbizzy.image} alt={walkthetalk.missbizzy.title} class="inno-proof-image" loading="lazy" decoding="async" />
 			{/if}
 		</div>
 	</div>
@@ -420,7 +420,7 @@
 						{#if client.websiteUrl}
 							<a href={client.websiteUrl} target="_blank" rel="noopener noreferrer" class="logo-item logo-item-link">
 								{#if client.logoUrl}
-									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" loading="lazy" decoding="async" />
 								{:else}
 									<span class="logo-item-text">{client.name}</span>
 								{/if}
@@ -428,7 +428,7 @@
 						{:else}
 							<span class="logo-item">
 								{#if client.logoUrl}
-									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" loading="lazy" decoding="async" />
 								{:else}
 									<span class="logo-item-text">{client.name}</span>
 								{/if}
@@ -445,7 +445,7 @@
 						{#if client.websiteUrl}
 							<a href={client.websiteUrl} target="_blank" rel="noopener noreferrer" class="logo-item logo-item-link">
 								{#if client.logoUrl}
-									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" loading="lazy" decoding="async" />
 								{:else}
 									<span class="logo-item-text">{client.name}</span>
 								{/if}
@@ -453,7 +453,7 @@
 						{:else}
 							<span class="logo-item">
 								{#if client.logoUrl}
-									<img src={client.logoUrl} alt={client.name} class="logo-item-img" />
+									<img src={client.logoUrl} alt={client.name} class="logo-item-img" loading="lazy" decoding="async" />
 								{:else}
 									<span class="logo-item-text">{client.name}</span>
 								{/if}
@@ -483,7 +483,7 @@
 				{#each latestPosts as post, i}
 					<a href={localizeHref(`/blog/${post.slug}`)} class="blog-card">
 						{#if post.headerImage}
-							<img src={post.headerImage} alt="" class="blog-card-img" />
+							<img src={post.headerImage} alt={post.title} class="blog-card-img" loading="lazy" decoding="async" />
 						{:else}
 							<div class="blog-card-img blog-card-img-{i + 1}"></div>
 						{/if}

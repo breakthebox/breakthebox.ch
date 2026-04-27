@@ -19,6 +19,11 @@
 <svelte:head>
 	<title>{m.blog_page_title()} — Break the Box</title>
 	<meta name="description" content={m.blog_page_subtitle()} />
+	<meta property="og:title" content={m.blog_page_title()} />
+	<meta property="og:description" content={m.blog_page_subtitle()} />
+	<meta property="og:type" content="website" />
+	<meta name="twitter:title" content={m.blog_page_title()} />
+	<meta name="twitter:description" content={m.blog_page_subtitle()} />
 </svelte:head>
 
 <div class="blog-page">
@@ -45,7 +50,7 @@
 			{#each posts as post}
 				<a href={localizeHref(`/blog/${post.slug}`)} class="blog-card">
 					{#if post.headerImage}
-						<img src={post.headerImage} alt="" class="blog-card-img" />
+						<img src={post.headerImage} alt={post.title} class="blog-card-img" loading="lazy" decoding="async" />
 					{:else}
 						<div class="blog-card-img blog-card-placeholder"></div>
 					{/if}
