@@ -2,13 +2,43 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
+	import { env } from '$env/dynamic/public';
 	import BlockRenderer from '$lib/components/blog/BlockRenderer.svelte';
+	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { buildArticle, buildBreadcrumb, buildGraph } from '$lib/utils/schema';
+	import { readingTimeMinutes } from '$lib/utils/reading-time';
 	import type { BlogContentBlocks } from '$lib/types/content';
 
 	let { data } = $props();
 	let post = $derived(data.post);
 	let renderedContent = $derived(data.renderedContent);
 	let contentBlocks = $derived(data.post.contentBlocks as BlogContentBlocks | null);
+
+	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
+	let pageUrl = $derived(SITE_URL + page.url.pathname);
+	let plainText = $derived((renderedContent ?? '').replace(/<[^>]+>/g, ' '));
+	let minutes = $derived(readingTimeMinutes(plainText || post.excerpt));
+
+	let schemaGraph = $derived(
+		buildGraph([
+			buildArticle({
+				siteUrl: SITE_URL,
+				pageUrl,
+				title: post.metaTitle || post.title,
+				description: post.metaDescription || post.excerpt || undefined,
+				image: post.ogImage || post.headerImage || undefined,
+				datePublished: post.publishDate ?? post.createdAt,
+				dateModified: post.updatedAt,
+				tags: post.tags
+			}),
+			buildBreadcrumb([
+				{ name: m.blog_breadcrumb_home(), url: SITE_URL + '/' },
+				{ name: m.blog_breadcrumb_blog(), url: SITE_URL + '/blog' },
+				{ name: post.title }
+			])
+		])
+	);
 
 	function formatDate(date: Date | string | null): string {
 		if (!date) return '';
@@ -46,8 +76,22 @@
 	<meta property="og:type" content="article" />
 	{#if post.ogImage || post.headerImage}
 		<meta property="og:image" content={post.ogImage || post.headerImage} />
+		<meta name="twitter:image" content={post.ogImage || post.headerImage} />
 	{/if}
+	<meta name="twitter:title" content={post.metaTitle || post.title} />
+	<meta name="twitter:description" content={post.metaDescription || post.excerpt || ''} />
+	{#if post.publishDate}
+		<meta property="article:published_time" content={new Date(post.publishDate).toISOString()} />
+	{/if}
+	{#if post.updatedAt}
+		<meta property="article:modified_time" content={new Date(post.updatedAt).toISOString()} />
+	{/if}
+	{#each post.tags as tag}
+		<meta property="article:tag" content={tag} />
+	{/each}
 </svelte:head>
+
+<JsonLd data={schemaGraph} />
 
 <div class="post-page">
 	<!-- Nav -->
@@ -62,7 +106,7 @@
 	<article class="post-article">
 		<!-- Header Image -->
 		{#if post.headerImage}
-			<img src={post.headerImage} alt="" class="post-hero-img" />
+			<img src={post.headerImage} alt={post.title} class="post-hero-img" />
 		{/if}
 
 		<!-- Meta -->
@@ -75,9 +119,15 @@
 		<!-- Title -->
 		<h1 class="post-title">{post.title}</h1>
 
-		<!-- Date -->
-		<div class="post-date">
-			{m.blog_published_on()} {formatDate(post.publishDate)}
+		<!-- Byline -->
+		<div class="post-byline">
+			<span class="post-author">{m.blog_by_author()} <strong>Brigitte Hulliger</strong></span>
+			<span class="post-byline-sep">·</span>
+			<time datetime={post.publishDate ? new Date(post.publishDate).toISOString() : ''}>
+				{m.blog_published_on()} {formatDate(post.publishDate)}
+			</time>
+			<span class="post-byline-sep">·</span>
+			<span class="post-reading-time">{minutes} {m.blog_min_read()}</span>
 		</div>
 
 		<!-- Content -->
@@ -167,10 +217,21 @@
 		line-height: 1.2;
 		margin-bottom: 12px;
 	}
-	.post-date {
-		font-size: 0.85rem;
+	.post-byline {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+		font-size: 0.9rem;
 		color: var(--text-muted);
 		margin-bottom: var(--space-xl);
+	}
+	.post-byline strong {
+		color: var(--text);
+		font-weight: 600;
+	}
+	.post-byline-sep {
+		opacity: 0.5;
 	}
 
 	/* ═══════ Content (Prose) ═══════ */
