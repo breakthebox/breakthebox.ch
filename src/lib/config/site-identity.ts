@@ -38,6 +38,39 @@ export function buildSiteIdentity(siteUrl: string): SiteIdentity {
 		orgCountry: 'CH',
 		orgLocality: 'Kirchberg',
 		orgPostalCode: '3422',
-		orgStreetAddress: 'Mülibüüne 4'
+		orgStreetAddress: 'Mülibüüne 4',
+		orgAreaServed: ['Schweiz', 'Deutschland', 'Österreich'],
+		orgServices: [
+			{
+				name: 'IT-Strategieberatung',
+				description:
+					'Begleitung von Geschäftsleitungen bei IT-Gesamtstrategie, Digitalisierungs-Roadmaps, KI-Readiness und Architektur-Reviews.',
+				serviceType: 'IT-Strategie'
+			},
+			{
+				name: 'IT-Governance & Verwaltungsrat',
+				description:
+					'IT-Governance-Frameworks, Digital-Aufsicht, Budget-Benchmarking und Brückenfunktion zwischen Verwaltungsrat und operativer IT.',
+				serviceType: 'Corporate Governance'
+			},
+			{
+				name: 'KI-Strategie & KI-Readiness',
+				description:
+					'KI-Bewertungen, Shadow-AI-Governance und strategische Begleitung beim Einsatz generativer KI in Schweizer KMU.',
+				serviceType: 'AI Strategy'
+			},
+			{
+				name: 'Evaluationen & Machbarkeitsstudien',
+				description:
+					'Strukturierte Variantenstudien, Anforderungskataloge und Machbarkeitsstudien für IT-Investitionsentscheide.',
+				serviceType: 'IT-Evaluation'
+			},
+			{
+				name: 'Keynotes & Workshops',
+				description:
+					'Praxisnahe Vorträge und Workshops zu IT-Strategie, KI-Governance, systemischem Denken und digitaler Transformation.',
+				serviceType: 'Education'
+			}
+		]
 	};
 }

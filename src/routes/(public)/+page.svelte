@@ -5,6 +5,9 @@
 	import type { BlogPostRow } from '$lib/server/db/queries/blog';
 	import { renderMarkdown } from '$lib/utils/markdown';
 	import { Coffee } from 'lucide-svelte';
+	import { env } from '$env/dynamic/public';
+	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { buildFaqPage, buildGraph } from '$lib/utils/schema';
 
 	let { data } = $props();
 
@@ -43,6 +46,16 @@
 	let flipped = $state(pillars.pillars.map(() => false));
 	let navScrolled = $state(false);
 	let activeSection = $state('');
+
+	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
+	const faqItems = [
+		{ question: m.faq1_q(), answer: m.faq1_a() },
+		{ question: m.faq2_q(), answer: m.faq2_a() },
+		{ question: m.faq3_q(), answer: m.faq3_a() },
+		{ question: m.faq4_q(), answer: m.faq4_a() },
+		{ question: m.faq5_q(), answer: m.faq5_a() }
+	];
+	const faqGraph = buildGraph([buildFaqPage(SITE_URL + '/', faqItems)]);
 
 	function toggleFlip(index: number) {
 		flipped[index] = !flipped[index];
@@ -516,6 +529,27 @@
 		</div>
 	</div>
 </section>
+
+<!-- ═══════ FAQ ═══════ -->
+<section id="faq" class="section-light">
+	<div class="container faq-container">
+		<span class="sketch-label reveal">{m.section_faq_label()}</span>
+		<h2 class="section-title reveal">{m.section_faq_title()}</h2>
+		<div class="faq-list reveal">
+			{#each faqItems as item, i}
+				<details class="faq-item" open={i === 0}>
+					<summary class="faq-question">
+						<span>{item.question}</span>
+						<span class="faq-icon" aria-hidden="true">+</span>
+					</summary>
+					<p class="faq-answer">{item.answer}</p>
+				</details>
+			{/each}
+		</div>
+	</div>
+</section>
+
+<JsonLd data={faqGraph} />
 
 <!-- ═══════ WAVY DIVIDER ═══════ -->
 <div class="wavy-divider" aria-hidden="true">
@@ -1889,5 +1923,56 @@
 		.section-avatar {
 			display: none;
 		}
+	}
+
+	/* ═══════ FAQ ═══════ */
+	.faq-container { max-width: 820px; }
+	.faq-list {
+		margin-top: var(--space-xl);
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.faq-item {
+		background: var(--bg-elevated, #fff);
+		border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+		border-radius: var(--radius-card, 12px);
+		padding: 0;
+		transition: border-color var(--t-fast, 180ms);
+	}
+	.faq-item[open] {
+		border-color: var(--btb-teal, #2b8a78);
+	}
+	.faq-question {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		padding: 18px 22px;
+		cursor: pointer;
+		font-weight: 600;
+		font-size: 1rem;
+		color: var(--text-heading);
+		list-style: none;
+	}
+	.faq-question::-webkit-details-marker { display: none; }
+	.faq-icon {
+		font-size: 1.4rem;
+		font-weight: 300;
+		color: var(--btb-teal, #2b8a78);
+		transition: transform var(--t-fast, 180ms);
+		flex-shrink: 0;
+	}
+	.faq-item[open] .faq-icon { transform: rotate(45deg); }
+	.faq-answer {
+		padding: 0 22px 20px;
+		margin: 0;
+		color: var(--text-secondary, #555);
+		line-height: 1.65;
+		font-size: 0.95rem;
+	}
+	@media (max-width: 640px) {
+		.faq-question { font-size: 0.95rem; padding: 16px 18px; }
+		.faq-answer { padding: 0 18px 18px; font-size: 0.9rem; }
 	}
 </style>

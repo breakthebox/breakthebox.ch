@@ -1,0 +1,26 @@
+# Break the Box GmbH
+
+> IT-Beratung mit Substanz: IT-Strategie, Digitalisierung, KI-Strategie und Governance für KMU und Verwaltungsräte in der Schweiz. Geführt von Brigitte Hulliger — Strategieberaterin, dreifache Verwaltungsrätin und Dozentin an BFH und Feusi.
+
+Break the Box ist eine inhabergeführte IT-Beratungsfirma mit Sitz in Kirchberg BE, Schweiz. Schwerpunkt: strategische Begleitung von Geschäftsleitungen und Verwaltungsräten bei IT- und Digitalfragen.
+
+## Über
+
+- [Über Brigitte Hulliger](https://breakthebox.ch/#about): Werdegang, Qualifikationen (BSc Informatik, EMBA mit Auszeichnung, CAS Verwaltungsrat), VR-Mandate.
+- [Walk the Talk](https://breakthebox.ch/#walkthetalk): Eigene KI-Plattformen und AI-Agent-Ökosystem als Grundlage für fundierte Empfehlungen.
+
+## Leistungen
+
+- [Strategieberatung & IT-Beratung](https://breakthebox.ch/#pillars): IT-Gesamtstrategie, Digitalisierungs-Roadmaps, KI-Readiness, Evaluationen, Machbarkeitsstudien, Architektur-Reviews.
+- [Governance & Verwaltungsrat](https://breakthebox.ch/#pillars): IT-Governance, Digital-Aufsicht, Budget-Benchmarking, Brückenfunktion zwischen VR und operativer IT.
+- [Lehre & Thought Leadership](https://breakthebox.ch/#pillars): Keynotes, Workshops, Hochschulmodule zu Projektmanagement, Innovation, Shadow AI Governance, systemischem Denken.
+
+## Inhalte
+
+- [Blog](https://breakthebox.ch/blog): Erfahrungsberichte zu KI-Agenten, IT-Strategie, Subcontracting, Verwaltungsratsarbeit.
+
+## Optional
+
+- [Kontakt](https://breakthebox.ch/#contact)
+- [Impressum](https://breakthebox.ch/impressum)
+- [Datenschutz](https://breakthebox.ch/datenschutz)

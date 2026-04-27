@@ -33,6 +33,32 @@ export interface Organization {
 		postalCode?: string;
 		streetAddress?: string;
 	};
+	areaServed?: string | string[];
+	hasOfferCatalog?: OfferCatalog;
+}
+
+export interface OfferCatalog {
+	'@type': 'OfferCatalog';
+	name: string;
+	itemListElement: Array<{
+		'@type': 'Offer';
+		itemOffered: {
+			'@type': 'Service';
+			name: string;
+			description: string;
+			serviceType?: string;
+		};
+	}>;
+}
+
+export interface FAQPage {
+	'@type': 'FAQPage';
+	'@id': string;
+	mainEntity: Array<{
+		'@type': 'Question';
+		name: string;
+		acceptedAnswer: { '@type': 'Answer'; text: string };
+	}>;
 }
 
 export interface Article {
@@ -70,7 +96,7 @@ export interface WebSite {
 	publisher?: { '@id': string };
 }
 
-export type SchemaNode = Person | Organization | Article | BreadcrumbList | WebSite;
+export type SchemaNode = Person | Organization | Article | BreadcrumbList | WebSite | FAQPage;
 
 export interface SchemaGraph {
 	'@context': 'https://schema.org';
@@ -101,6 +127,8 @@ export interface SiteIdentity {
 	orgLocality?: string;
 	orgPostalCode?: string;
 	orgStreetAddress?: string;
+	orgAreaServed?: string | string[];
+	orgServices?: Array<{ name: string; description: string; serviceType?: string }>;
 }
 
 export function buildPerson(id: SiteIdentity): Person {
@@ -133,7 +161,42 @@ export function buildOrganization(id: SiteIdentity): Organization {
 			...(id.orgLocality ? { addressLocality: id.orgLocality } : {}),
 			...(id.orgPostalCode ? { postalCode: id.orgPostalCode } : {}),
 			...(id.orgStreetAddress ? { streetAddress: id.orgStreetAddress } : {})
-		}
+		},
+		...(id.orgAreaServed ? { areaServed: id.orgAreaServed } : {}),
+		...(id.orgServices && id.orgServices.length
+			? {
+					hasOfferCatalog: {
+						'@type': 'OfferCatalog' as const,
+						name: `${id.orgName} — Leistungen`,
+						itemListElement: id.orgServices.map((s) => ({
+							'@type': 'Offer' as const,
+							itemOffered: {
+								'@type': 'Service' as const,
+								name: s.name,
+								description: s.description,
+								...(s.serviceType ? { serviceType: s.serviceType } : {})
+							}
+						}))
+					}
+				}
+			: {})
+	};
+}
+
+export interface FaqItem {
+	question: string;
+	answer: string;
+}
+
+export function buildFaqPage(pageUrl: string, items: FaqItem[]): FAQPage {
+	return {
+		'@type': 'FAQPage',
+		'@id': `${pageUrl}#faq`,
+		mainEntity: items.map((item) => ({
+			'@type': 'Question',
+			name: item.question,
+			acceptedAnswer: { '@type': 'Answer', text: item.answer }
+		}))
 	};
 }
 
