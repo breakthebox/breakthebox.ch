@@ -30,6 +30,8 @@ export interface Organization {
 		'@type': 'PostalAddress';
 		addressCountry: string;
 		addressLocality?: string;
+		postalCode?: string;
+		streetAddress?: string;
 	};
 }
 
@@ -97,6 +99,8 @@ export interface SiteIdentity {
 	orgSameAs: string[];
 	orgCountry: string;
 	orgLocality?: string;
+	orgPostalCode?: string;
+	orgStreetAddress?: string;
 }
 
 export function buildPerson(id: SiteIdentity): Person {
@@ -126,7 +130,9 @@ export function buildOrganization(id: SiteIdentity): Organization {
 		address: {
 			'@type': 'PostalAddress',
 			addressCountry: id.orgCountry,
-			...(id.orgLocality ? { addressLocality: id.orgLocality } : {})
+			...(id.orgLocality ? { addressLocality: id.orgLocality } : {}),
+			...(id.orgPostalCode ? { postalCode: id.orgPostalCode } : {}),
+			...(id.orgStreetAddress ? { streetAddress: id.orgStreetAddress } : {})
 		}
 	};
 }

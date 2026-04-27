@@ -36,6 +36,8 @@ export function buildSiteIdentity(siteUrl: string): SiteIdentity {
 			'https://www.youtube.com/channel/UC1b1A2dUD8zVEtwah1de2zQ'
 		],
 		orgCountry: 'CH',
-		orgLocality: 'Schweiz'
+		orgLocality: 'Kirchberg',
+		orgPostalCode: '3422',
+		orgStreetAddress: 'Mülibüüne 4'
 	};
 }
