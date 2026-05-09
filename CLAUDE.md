@@ -10,6 +10,41 @@ Gebaut mit SvelteKit, TypeScript und Tailwind CSS.
 - Verbindliche Projektprinzipien stehen in `.specify/memory/constitution.md`.
 - Bei Widersprüchen gelten die Regeln in der Constitution vor lokalen Gewohnheiten.
 
+## Arbeitsweise (Behavioral Guidelines)
+
+Diese Leitplanken gelten für alle nicht-trivialen Änderungen. Bei trivialen Tasks (Tippfehler, einzelne Strings) Augenmass nutzen.
+
+### 1. Erst denken, dann coden
+- Annahmen **explizit** benennen, nicht stillschweigend treffen. Bei Unsicherheit nachfragen.
+- Mehrere mögliche Interpretationen → vorlegen, nicht einseitig entscheiden.
+- Wenn eine einfachere Lösung existiert: ansprechen und ggf. zurückfragen.
+- Unklarheit → stoppen und benennen, was unklar ist.
+
+### 2. Einfachheit zuerst
+- Minimaler Code, der das Problem löst. Nichts Spekulatives.
+- Keine Features über das Geforderte hinaus.
+- Keine Abstraktionen für Einmal-Verwendungen.
+- Keine "Flexibilität" oder Konfigurierbarkeit, die nicht verlangt wurde.
+- Keine Fehlerbehandlung für unmögliche Szenarien (vgl. Constitution: nur an Systemgrenzen validieren).
+- Selbsttest: "Würde ein Senior Engineer sagen, das ist überkompliziert?" → Wenn ja, vereinfachen.
+
+### 3. Chirurgische Änderungen
+- Nur anfassen, was nötig ist. Nur eigenen Müll wegräumen.
+- Angrenzenden Code, Kommentare oder Formatierung **nicht** "verbessern".
+- Bestehenden Stil matchen, auch wenn man es anders machen würde.
+- Pre-existing Dead Code: erwähnen, nicht löschen (ausser auf Auftrag).
+- Eigene neu erzeugte Waisen (ungenutzte Imports/Variablen/Funktionen aus dem aktuellen Diff): entfernen.
+- Test: Jede geänderte Zeile lässt sich direkt auf den Auftrag zurückführen.
+
+### 4. Zielgetriebene Ausführung
+- Erfolgs­kriterien vor der Implementierung formulieren. Beispiele:
+  - "Validierung hinzufügen" → "Tests für ungültige Inputs schreiben und grün bekommen"
+  - "Bug fixen" → "Test, der den Bug reproduziert, schreiben und dann grün bekommen"
+  - "X refactoren" → "Tests vorher und nachher grün"
+- Bei mehrstufigen Tasks: kurzen Plan mit Verifikation pro Schritt vorlegen.
+
+Diese Regeln **ergänzen** die projektspezifischen Vorgaben weiter unten (Drizzle-Workflow, i18n-Vollständigkeit, Design-System, Schweizer Rechtschreibung). Bei Konflikten gelten die projektspezifischen Vorgaben.
+
 ## Tech Stack
 
 - **Framework:** SvelteKit 2 / Svelte 5 / Vite 7

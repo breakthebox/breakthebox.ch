@@ -1,8 +1,10 @@
 # Break the Box — Design Style Guide & Visual Identity
 
-**Version:** 1.0 · März 2026
+**Version:** 3.0 · April 2026
 **Marke:** Break the Box GmbH · Brigitte Hulliger
 **Zweck:** Grundlage für alle visuellen Auftritte — Webseite, Präsentationen, Social Media, Drucksachen
+**Quelle der Wahrheit:** `src/app.css` (Design-Tokens) + `src/routes/(public)/+page.svelte` (Page-Patterns)
+**Visuelle Referenz:** [`breakthebox-design-system-v3.html`](./breakthebox-design-system-v3.html)
 
 ---
 
@@ -25,43 +27,72 @@ IT-Beratung, Strategieentwicklung und Governance für Schweizer KMU — mit echt
 
 ---
 
-## 2. Farbpalette
+## 2. Farbpalette — Signal (Steel + Teal)
 
-### Primärfarben
+Die Palette heisst **Signal** und ersetzt die frühere Gold/Cream-Richtung. Steel bleibt die Leitfarbe, Teal (statt Gold) ist die neue Akzent-/Signal-Farbe — ruhiger, tech-näher und besser für Dual-Mode geeignet. Alle Tokens leben in `src/app.css`.
 
-| Rolle | Name | Hex | Verwendung |
+### Brand-Farben
+
+| Rolle | Token | Hex | Verwendung |
 |---|---|---|---|
-| **Primary** | Steel | **#527A98** | Primärfarbe. Buttons, Navigation, Headlines, Grafiken. Transportiert Kompetenz und Vertrauenswürdigkeit. |
-| **Accent** | Amber/Gold | **#E8AF30** | Akzentfarbe. Sketch-Notizen, Highlights, Hover-States, Call-to-Actions, Icons. Transportiert Energie und Neugier. |
-| **Background** | Cream | **#F5EED6** | Haupthintergrund. Warmer, papierartiger Ton — kein kühles Weiss. Passt zum Sketch-Charakter. |
+| **Primary** | `--btb-steel` | **#527A98** | Buttons, Navigation, Nummernkreise, Primär-Headlines, Keyword-Underlines in hellen Sektionen. |
+| Primary Light | `--btb-steel-light` | #6A94B2 | Hover, sekundäre Links. |
+| Primary Hover | `--btb-steel-hover` | #628EA8 | Button-Hover. |
+| Primary Subtle | `--btb-steel-subtle` | rgba(82,122,152,.15) | Flächige Hintergrundakzente, Tag-Backgrounds. |
+| **Accent** | `--btb-teal` | **#2B8A78** | Sketch-Labels, Keyword-Underlines in dunklen Sektionen, Badges, CTAs auf Dark-BG. |
+| Accent Light | `--btb-teal-light` | #DBF0EB | Tag-Hintergründe, Hover-States. |
+| Accent Dark | `--btb-teal-dark` | #1A6557 | Text auf Teal-Light. |
+| Accent Subtle | `--btb-teal-subtle` | rgba(43,138,120,.12) | Kategorie-Hintergründe. |
 
-### Sekundärfarben
+### Flächen — Light Mode
 
-| Rolle | Name | Hex | Verwendung |
-|---|---|---|---|
-| **Dark Primary** | Navy | **#1B344D** | Dunkle Sektionen (Footer, Kontakt, Metriken-Leiste), dunkle Karten. Alternative zu Schwarz. |
-| **Ink** | Charcoal | **#262626** | Primäre Textfarbe. Kräftiges Dunkelgrau, nicht reines Schwarz. |
-
-### Erweiterte Palette (abgeleitet)
-
-| Stufe | Steel-Ramp | Gold-Ramp |
+| Rolle | Token | Hex |
 |---|---|---|
-| 50 (hellster Hintergrund) | #E8EFF4 | #FDF8E8 |
-| 100 (leichter Hintergrund) | #C6D6E2 | #F9ECC0 |
-| 200 (Borders, Dividers) | #9EBCCE | #F3D98A |
-| 300 (Hover) | #759EAF | #EDC55A |
-| 400 (Mittel) | #6291AC | #E8AF30 |
-| **500 (Primary)** | **#527A98** | — |
-| 600 (Dunkel) | #3F6280 | #C99520 |
-| 700 (Dunkelster Akzent) | #2F4D66 | #A07A18 |
+| Seite | `--bg-page` | #F5F5F2 |
+| Karte / Surface | `--bg-surface` | #FFFFFF |
+| Alternative Sektion | `--bg-section-alt` | #F0F1EE |
+| Elevated (Icon-Container) | `--bg-elevated` | #EAEAE5 |
+| Border | `--border` | #DDDDD8 |
+| Border Subtle | `--border-subtle` | rgba(0,0,0,.06) |
+
+### Flächen — Dark Mode (CTA, Footer, Feature-Sektionen)
+
+| Rolle | Token | Hex |
+|---|---|---|
+| Seite | `--bg-page-dark` | #0F1420 |
+| Elevated | `--bg-elevated-dark` | #0F1729 |
+| Surface (glassig) | `--bg-surface-dark` | rgba(255,255,255,.04) |
+| Border | `--border-dark` | rgba(255,255,255,.08) |
+| Navy (Metriken, Kontakt) | `--navy` | #1B344D |
+
+### Text
+
+| Rolle | Token (Light / Dark) | Hex |
+|---|---|---|
+| Primär | `--text-primary` / `--text-primary-dark` | #262626 / #E8EDF5 |
+| Sekundär | `--text-secondary` / `--text-secondary-dark` | #64748B / #94A3B8 |
+| Muted | `--text-muted` / `--text-muted-dark` | #94A3B8 / #64748B |
+| Heading | `--text-heading` / `--text-heading-dark` | #1A2332 / #FFFFFF |
+
+### Semantische Farben
+
+| Rolle | Token | Hex |
+|---|---|---|
+| Erfolg | `--color-success` | #34D399 |
+| Warnung | `--color-warning` | #FBBF24 |
+| Fehler | `--color-error` | #FB7185 |
+| Info | `--color-info` | #527A98 |
+
+### Kategorie-Farben (optional, für Diagramme/Tags)
+`--cat-steel`, `--cat-teal`, `--cat-violet` (#8B5CF6), `--cat-amber` (#F59E0B), `--cat-emerald` (#10B981), `--cat-rose` (#F43F5E) — jeweils mit .12–.15 Alpha. Nur wenn wirklich mehrere Kategorien unterschieden werden müssen.
 
 ### Farbregeln
-- **Steel #527A98 ist die Leitfarbe** — sie muss in jedem Medium dominant vorkommen
-- **Gold #E8AF30 sparsam einsetzen** — als Akzent, nie als Fläche. Maximal 15–20% der Farbfläche
-- **Cream #F5EED6 als Hintergrund** — gibt dem Sketch-Stil den passenden "Papier"-Charakter
-- **Navy #1B344D** nur für dunkle Sektionen und Text auf hellem Grund
-- **Keine weiteren Farben** — Drittfarben (Rot, Grün, Violett) nur in Ausnahmefällen (z.B. in Diagrammen)
-- **Kontrastverhältnisse einhalten**: Steel auf Cream = 4.8:1 ✓, Charcoal auf Cream = 12.7:1 ✓
+- **Steel ist die Leitfarbe** — dominiert in jeder Ansicht Buttons, Nummernkreise, Underlines auf Light-BG.
+- **Teal ist die Signatur-Akzentfarbe** — Sketch-Labels, Underlines auf Dark-BG, Badges, CTAs in Navy-Sektionen. Sparsam einsetzen (≤15–20 % Flächenanteil).
+- **Kein Gold, kein Cream mehr.** Frühere Gold-Ramps (#E8AF30 etc.) sind entfernt.
+- **Navy `#1B344D`** ist für Metriken-Leiste und Kontakt-Sektion reserviert.
+- **Dual Mode:** Helle Sektionen nutzen `--bg-page`, dunkle nutzen `--bg-page-dark` oder `--navy`. Section-Abfolge auf der Landingpage wechselt bewusst (hell → dunkel → hell → dunkel).
+- **Keine hardcodierten Farben in Komponenten** — immer Tokens via `var(--btb-steel)` oder Tailwind-Arbitrary-Values `bg-[var(--btb-steel)]`.
 
 ---
 
@@ -69,32 +100,54 @@ IT-Beratung, Strategieentwicklung und Governance für Schweizer KMU — mit echt
 
 ### Primäre Schriftarten
 
-| Rolle | Font | Gewicht | Verwendung |
-|---|---|---|---|
-| **Headlines** | **Outfit** | 600 (SemiBold) | Seitentitel, Section-Überschriften, Navigation |
-| **Body** | **Outfit** | 300 (Light), 400 (Regular) | Fliesstext, Beschreibungen |
-| **Sketch/Handschrift** | **Caveat** | 400–600 | Sketch-Notizen, Labels, Claim, persönliche Akzente |
-| **Code/Daten** | **JetBrains Mono** | 400 | Technische Inhalte, Zahlen in Dashboards |
+| Rolle | Font | Token | Gewichte | Verwendung |
+|---|---|---|---|---|
+| **UI / Body / Headlines** | **Plus Jakarta Sans** | `--ff-ui` | 300, 400, 500, 600, 700, 800 | Alles ausser Handschrift und Code. Ersetzt Outfit. |
+| **Sketch / Handschrift** | **Shadows Into Light** | `--ff-sketch` | 400 (nur dieser Schnitt) | Sketch-Labels, Notizen, Claim. Ersetzt Caveat. |
+| **Code / Daten** | **JetBrains Mono** | `--ff-mono` | 400, 500 | Code-Snippets, monospaced Zahlen. |
 
 ### Schrifthierarchie
 
 | Element | Font | Grösse | Gewicht | Farbe |
 |---|---|---|---|---|
-| Page Title (H1) | Outfit | 48–60px (clamp) | 600 | #262626 |
-| Section Title (H2) | Outfit | 32–42px (clamp) | 600 | #262626 |
-| Section Label | Caveat | 20–22px | 500 | #E8AF30 |
-| Card Title (H3) | Outfit | 20–24px | 600 | #262626 |
-| Sketch-Notiz | Caveat | 16–18px | 500 | #C99520 (Gold-600) |
-| Body | Outfit | 16–17px | 300 | #5a6570 |
-| Small / Tags | Outfit | 12–13px | 500 | #527A98 |
-| Claim | Caveat | 26–28px | 500 | #E8AF30 |
+| Hero Title (H1) | Plus Jakarta Sans | `clamp(2.4rem, 5vw, 3.4rem)` | 800 | `--text-heading` / Steel |
+| Section Title (H2) | Plus Jakarta Sans | `clamp(1.6rem, 3vw, 2.2rem)` | 800 | `--text-heading` |
+| Card Title (H3) | Plus Jakarta Sans | 1.2–1.4rem | 700 | `--text-heading` |
+| Sketch-Label | Shadows Into Light | 1.3–1.4rem | 400 | `--btb-teal` |
+| Sketch-Notiz / Claim | Shadows Into Light | 1.0–1.6rem | 400 | `--btb-teal` / `--btb-teal-dark` |
+| Body | Plus Jakarta Sans | 1rem–1.05rem | 400–500 | `--text-primary` |
+| Small / Tag | Plus Jakarta Sans | 0.78–0.88rem | 500–700 | `--text-secondary` / `--btb-steel` |
+| Metadata / Uppercase-Label | Plus Jakarta Sans | 0.72–0.78rem | 600–700 + `letter-spacing: 0.1em; text-transform: uppercase` | `--text-muted` oder `--btb-teal` |
+
+### Signature-Pattern: Keyword Underlines
+
+Das definierende Typo-Pattern der Marke: ein oder zwei Keywords pro Headline werden durch einen farbigen Unterstrich betont, oft zusätzlich kursiv.
+
+```html
+<h1>Deine <em class="underline-steel">Strategie</em>.</h1>
+```
+
+```css
+em {
+  font-style: italic;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--btb-steel); /* Light-BG */
+  /* Dark-BG → var(--btb-teal) */
+}
+```
+
+- **Light-Sektion** → Unterstrich in Steel.
+- **Dark-Sektion** → Unterstrich in Teal.
+- Maximal **ein** unterstrichenes Keyword pro Headline. Niemals ganze Sätze unterstreichen.
 
 ### Typografie-Regeln
-- **Caveat nur für persönliche, handschriftliche Elemente** — niemals für Buttons, Navigation, Fliesstext
-- **Outfit als Arbeitstier** — 300 für Body, 400 für UI-Elemente, 500 für Emphasis, 600 für Headlines
-- **Zeilenabstand**: Body = 1.7, Headlines = 1.1–1.2, Sketch-Notizen = 1.4
-- **Letter-Spacing**: Headlines = -0.02em (enger), Body = 0 (normal), Labels/Tags = 0.06em (weiter)
-- **Schweizer Rechtschreibung**: ss statt ß, gängige Umlaute (ä, ö, ü)
+- **Shadows Into Light nur für handschriftliche Elemente** — Labels, Notizen, Claim. Niemals für Buttons, Navigation, Fliesstext oder mehr als ~6 Wörter am Stück.
+- **Plus Jakarta Sans als Arbeitstier** — 400 für Body, 500 für UI, 600 für Betonung, 700 für Card-Titel, 800 für Headlines.
+- **Zeilenhöhe:** Body 1.6, Headlines 1.1, Sketch 1.4.
+- **Letter-Spacing:** Headlines `-0.02em` bis `-0.03em` (enger), Uppercase-Labels `0.1em` (weiter).
+- **Schweizer Rechtschreibung:** ss statt ß, Umlaute ä/ö/ü immer als Unicode (nie ae/oe/ue).
 
 ---
 
@@ -107,20 +160,18 @@ Der Sketch-Stil ist kein dekoratives Element — er transportiert Brigittes Arbe
 
 | Element | Beschreibung | Einsatz |
 |---|---|---|
-| **Handgezeichnete Icons** | SVG-Icons mit leicht unregelmässigen Linien, gestrichelten Elementen, Kreisen statt Punkten | Säulen-Icons, Feature-Icons, Illustrationen |
-| **Sketch-Notizen** | Text in Caveat-Font mit leichter Rotation (2–5°), als ob auf einem Whiteboard notiert | Zwischen-Überschriften, persönliche Kommentare, Pfeile |
-| **Wellenlinien-Divider** | SVG-Pfade als Sektions-Trenner statt gerader Linien | Zwischen Sektionen |
-| **Dashed Circles & Borders** | Gestrichelte Kreise und Rahmen als Hintergrundelemente | Dekorative Akzente, Hervorhebungen |
-| **Sketch-Pfeile** | Handgezeichnete Pfeile (SVG) statt standardisierter Pfeile | Verweise, Annotationen, Call-outs |
-| **Wolken-Illustrationen** | Die hero_clouds.svg als Signatur-Illustration | Hero-Bereich, Hintergrund-Dekoration |
-| **Whiteboard-Prozesse** | Die Frame.svg-Illustration (Prozessfluss auf Whiteboard) | Methodik-Erklärungen, Über-mich |
+| **Sketch-Labels** | Handschrift-Text in Shadows Into Light, Teal-Farbe, oft eingeleitet mit „→" | Section-Labels, Zwischen-Überschriften, persönliche Kommentare |
+| **Wellenlinien-Divider** | SVG-Pfade als weiche Übergänge zwischen hellen und dunklen Sektionen; Reverse-Variante für Dark → Light | Zwischen allen Hauptsektionen der Landingpage |
+| **Nummernkreise** | Kreisförmige Steel-Badges mit Ziffer (1–4), flankieren Section-Titel der vier Pillars | Pillar-Karten, Schritt-Listen |
+| **Wolken-Illustrationen** | `hero_clouds.svg` als Signatur-Illustration im Hero | Hero-Hintergrund, animiert |
+| **Whiteboard-Prozesse** | `Frame.svg` (Prozessfluss auf Whiteboard) | Methodik-Erklärungen, Über-mich |
+| **Flippable Pillar-Cards** | 3D-Flip beim Hover/Tap — Vorderseite zeigt Bild + Titel + Tags, Rückseite zeigt Beispiele | Pillars-Sektion |
 
 ### Sketch-Regeln
-- **Sketch-Elemente ergänzen, ersetzen nicht** — der Hauptinhalt bleibt klar und professionell
-- **Maximal 2–3 Sketch-Elemente pro Bildschirmansicht** — nicht überladen
-- **Sketch-Farben**: Hauptsächlich #262626 (Charcoal) für die Linien, #E8AF30 (Gold) für Akzente, #527A98 (Steel) für Hintergrund-Sketch-Elemente
-- **Sketch-Opacity**: Hintergrund-Elemente bei 10–20% Opacity, Vordergrund-Elemente bei 100%
-- **Rotation**: Sketch-Notizen leicht gedreht (max. ±5°), nie exakt gerade
+- **Sketch-Elemente ergänzen, ersetzen nicht** — der Hauptinhalt bleibt klar und professionell.
+- **Maximal 2–3 Sketch-Elemente pro Viewport** — nicht überladen.
+- **Sketch-Farben:** Shadows-Into-Light-Labels in `--btb-teal` (Light-BG) oder `--btb-teal-light` (Dark-BG). Nummernkreise in `--btb-steel`.
+- **Keine Rotation mehr.** Frühere Regel „Sketch-Notizen ±5° gedreht" ist entfernt — der aktuelle Look ist gerade und ruhig, die Handschrift allein trägt den Charakter.
 
 ---
 
@@ -143,10 +194,10 @@ Das Logo zeigt einen **aufgebrochenen Würfel** (3D-Box mit Bruchlinien) neben d
 
 | Kontext | Würfel | Schrift |
 |---|---|---|
-| Auf Cream/Hell | #262626 (wie heute) | #262626 |
-| Auf Dunkel (Navy) | #F5EED6 (Cream) | #F5EED6 |
+| Auf `--bg-page` (#F5F5F2) | #262626 | #262626 |
+| Auf Navy / Dark | #E8EDF5 | #E8EDF5 |
 | Akzentuiert | #527A98 (Steel) | #262626 |
-| Inverse | Weiss | Weiss |
+| Inverse | #FFFFFF | #FFFFFF |
 
 ### Logo-Schutzzone
 Mindestabstand = Höhe des Würfels zu allen Seiten. Kein Text, Bild oder andere Elemente innerhalb der Schutzzone.
@@ -156,62 +207,115 @@ Mindestabstand = Höhe des Würfels zu allen Seiten. Kein Text, Bild oder andere
 ## 6. Layout & Spacing
 
 ### Grid-System
-- **Max-Width**: 1180px (Content-Bereich)
-- **Seitenränder**: 40px (Desktop), 24px (Mobile)
-- **Spalten**: 2-spaltig für Pillars, 3-spaltig für Blog-Karten, 5-spaltig für Metriken
+- **Max-Width:** 1160–1180px (Content-Bereich).
+- **Seitenränder:** 32px Desktop, 16–24px Mobile.
+- **Haupt-Grids:** 2-spaltig für Pillars und About, 5-spaltig für Metriken (Desktop → 1-spaltig Mobile), Marquee für References.
 
-### Spacing-Scale
+### Spacing-Scale (aus `src/app.css`)
+
+| Token | Wert |
+|---|---|
+| `--space-xs` | 4px |
+| `--space-sm` | 8px |
+| `--space-md` | 16px |
+| `--space-lg` | 24px |
+| `--space-xl` | 32px |
+| `--space-2xl` | 48px |
+| `--space-3xl` | 64px |
+| `--space-4xl` | 96px |
+
+### Border-Radius (aus `src/app.css`)
+
 | Token | Wert | Verwendung |
 |---|---|---|
-| xs | 8px | Inline-Gaps, Tag-Spacing |
-| sm | 12px | Karten-Innenabstände, kleine Gaps |
-| md | 20px | Grid-Gaps, Karten-Abstände |
-| lg | 40px | Section-Padding (horizontal) |
-| xl | 64px | Grid-Gaps (Desktop) |
-| 2xl | 100px | Section-Padding (vertikal) |
+| `--radius-sm` | 8px | Kleine UI-Elemente, Input |
+| `--radius-md` | 12px | Standard-Flächen |
+| `--radius-button` | 10px | Buttons |
+| `--radius-card` | 16px | Karten |
+| `--radius-card-lg` | 20px | Grosse Feature-Karten |
+| `--radius-pill` | 9999px | Pills, Tags, Nummernkreise |
 
-### Border-Radius
-- **Karten**: 12px
-- **Buttons**: 6px
-- **Tags/Badges**: 4px (eckig) oder 20px (Pill)
-- **Input-Felder**: 6px
+### Shadows
+
+| Token | Wert | Verwendung |
+|---|---|---|
+| `--shadow-card` | `0 1px 3px rgba(0,0,0,.05)` | Karten im Ruhezustand |
+| `--shadow-card-hover` | `0 4px 16px rgba(0,0,0,.07)` | Karten-Hover |
+
+### Z-Index-Skala (aus `src/app.css` / CLAUDE.md)
+
+`--z-dropdown: 100` → `--z-sidebar: 200` → `--z-sticky: 400` → `--z-overlay: 500` → `--z-modal: 1000` → `--z-toast: 2000`. Immer Tokens verwenden — nie hardcodierte Zahlen.
+
+### Transitions
+- `--t-fast: 150ms ease` — Hover, kleine State-Wechsel.
+- `--t-normal: 250ms ease` — Karten-Flip, Fade-Übergänge.
+- Reveal-Animationen: 700ms `cubic-bezier(0.16, 1, 0.3, 1)`.
 
 ---
 
-## 7. Komponenten
+## 7. Komponenten & Patterns
 
 ### Buttons
 
 | Typ | Hintergrund | Text | Border | Einsatz |
 |---|---|---|---|---|
-| Primary | #527A98 | Weiss | — | Haupt-CTA: "Strategiegespräch vereinbaren" |
-| Secondary | transparent | #262626 | 1.5px #9EBCCE | Neben-CTA: "Angebot entdecken" |
-| Accent | #E8AF30 | Weiss | — | Sparsam: Kontakt-Seite CTA |
-| Ghost | transparent | #527A98 | — | Inline-Links, "Mehr erfahren" |
+| **Primary** | `--btb-steel` | #FFF | — | Haupt-CTA in Light-Sektionen: „Strategiegespräch vereinbaren". Hover → `--btb-steel-hover`. |
+| **Primary Dark** | `--btb-teal` | #FFF | — | Haupt-CTA in Navy/Dark-Sektionen. |
+| **Secondary** | transparent | `--text-primary` | 1.5px `--border` | Neben-CTA, „Mehr erfahren". |
+| **Ghost** | transparent | `--btb-steel` | — | Inline-Links, Navigation. |
+
+Alle Buttons: `border-radius: var(--radius-button)` (10px), Padding ~12px 24px, Font 500–600, Transition `--t-fast`.
 
 ### Karten
-- Hintergrund: #F5EED6 (Cream) oder #efe7cb (etwas dunkler)
-- Border: 1px solid rgba(38,38,38,0.03) oder 1.5px dashed #E8AF30 (Sketch-Variante)
-- Schatten: nur bei Hover — `0 10px 36px rgba(28,42,53,0.06)`
-- Padding: 32–40px
+- Hintergrund: `--bg-surface` (Light) / `--bg-surface-dark` (Dark).
+- Border: `1px solid var(--border)` / `var(--border-dark)`.
+- Radius: `--radius-card` (16px), grosse Feature-Karten `--radius-card-lg` (20px).
+- Shadow: `--shadow-card` ruhend, `--shadow-card-hover` bei Hover.
+- Padding: 24–32px.
 
-### Tags
-- Hintergrund: Steel-50 (#E8EFF4)
-- Text: Steel-600 (#3F6280)
-- Font: Outfit 500, 12px
-- Padding: 4px 11px
-- Border-Radius: 4px
+### Tags / Badges
+- **Steel-Tag:** `background: var(--btb-steel-subtle); color: var(--btb-steel); border-radius: var(--radius-pill); padding: 4px 11px; font: 500 0.78rem/1 'Plus Jakarta Sans';`
+- **Teal-Tag:** `background: var(--btb-teal-light); color: var(--btb-teal-dark);` — Rest analog.
+- **Kategorie-Badge:** kleine Pill mit `--cat-*` Hintergrund, passendem Vollton als Text.
 
-### Sketch-Notizen (als Komponente)
-- Font: Caveat 500, 16–18px
-- Farbe: Gold-600 (#C99520)
-- Rotation: -2° bis +5°
-- Oft eingeleitet mit "→" als Prefix
+### Nummernkreise (Brand Signature)
+- 48–64px Kreis in `--btb-steel`, weisse Ziffer, Font 700, flankiert den Section-Titel der vier Pillars.
+- Variante auf Dark-BG: `--btb-teal` statt Steel.
+
+### Sketch-Labels (als Komponente)
+- Font: Shadows Into Light 400, 1.3–1.4rem.
+- Farbe: `--btb-teal` (Light-BG) / `--btb-teal-light` (Dark-BG).
+- Oft eingeleitet mit „→ " oder „← ".
+- Keine Rotation (bewusste Änderung gegenüber früheren Versionen).
 
 ### Metriken-Leiste
-- Hintergrund: Navy (#1B344D)
-- Zahlen: Caveat 600, 48px, Weiss
-- Labels: Outfit 400, 13px, rgba(255,255,255,0.4), Uppercase
+- Hintergrund: `--navy` (#1B344D).
+- Zahlen: Plus Jakarta Sans 800, `clamp(2rem, 4vw, 3rem)`, Weiss, mit Count-up-Animation bei Scroll.
+- Labels: Plus Jakarta Sans 600, 0.78rem, `rgba(255,255,255,.6)`, Uppercase, Letter-Spacing 0.1em.
+
+### Pillar-Flip-Cards
+- 3D-CSS-Flip bei Hover (Desktop) / Tap (Mobile).
+- Vorderseite: Bild oben (fixe Höhe Desktop, auto Mobile), Titel, Beschreibung, Tags.
+- Rückseite: Steel-Hintergrund, Beispiele als Liste.
+- Radius `--radius-card-lg`, Transition `transform 600ms`.
+
+### Reveal-Animationen
+- Scroll-getriggerte Einblendung via `.reveal` / `.reveal.is-visible`.
+- Staggered Varianten mit `.reveal-stagger` + `--stagger` CSS-Variable (100ms pro Step).
+- **PFLICHT:** `prefers-reduced-motion: reduce` respektieren — `src/app.css` deaktiviert dann alle Animationen und Reveals.
+
+### Wavy Dividers
+- SVG-Pfad zwischen Light- und Dark-Sektionen.
+- Eigene `reverse`-Variante für Dark → Light Übergang.
+- Immer in der Füllfarbe der nächsten Sektion.
+
+### Vorhandene Svelte-Komponenten (`src/lib/components/`)
+- **ImageUpload.svelte** — Datei-Upload mit Vorschau (Admin).
+- **BlockEditor.svelte** — Blockbasierter Content-Editor (Admin).
+- **BlockRenderer.svelte** — Rendert Content-Blöcke auf öffentlichen Seiten.
+- **AiAssistPanel.svelte** — Panel für Claude-gestützte Inhalts-Generierung im Admin.
+
+> Die Landingpage nutzt bewusst Inline-CSS-Klassen (`.pillar-flip`, `.section-light`, `.section-dark`, `.section-navy`) statt einer Component-Library — das hält den Code nah an `+page.svelte` und erlaubt schnelle Iteration.
 
 ---
 
@@ -244,53 +348,72 @@ Mindestabstand = Höhe des Würfels zu allen Seiten. Kein Text, Bild oder andere
 
 ## 10. Anwendungsbeispiele
 
-### Webseite
-- Cream-Hintergrund, Steel-Buttons, Gold-Akzente
-- Sketch-Notizen zwischen den Sektionen
-- Caveat für Section-Labels, Outfit für alles andere
-- Logo im Header (horizontal), Wolken im Hero
+### Webseite — Landingpage-Struktur (`src/routes/(public)/+page.svelte`)
+
+Die Landingpage wechselt bewusst zwischen hellen und dunklen Sektionen, getrennt durch Wavy Dividers:
+
+| # | Sektion | ID | BG | Kerninhalt |
+|---|---|---|---|---|
+| 1 | **Hero** | — | Light | Logo-Box, Headline mit Steel- und Teal-Underlines, zwei CTAs, animierte Wolken |
+| 2 | **Metriken-Leiste** | — | Navy | 5 Stats mit Count-up (10 Jahre · 50+ Kunden · 3 VR · 2 Unis · 80+ Projekte) |
+| 3 | **Pillars** | `#pillars` | Light | Vier Flip-Karten mit Bild, Titel, Tags — Rückseite zeigt Beispiele |
+| 4 | **About** | `#about` | Dark | Zweispaltig: Text + Qualifikationen links, Avatar + Video + Rollen rechts |
+| 5 | **Walk the Talk** | `#walkthetalk` | Light | Plattformen-Grid (2-spaltig bei nur 2 Einträgen) + Avatar |
+| 6 | **References** | `#references` | Dark | Kunden-Logos als zweireihige Marquee |
+| 7 | **Blog** | `#blog` | Light | Neueste Posts-Grid, Back-Button nutzt Browser-History |
+| 8 | **Contact** | `#contact` | Navy | CTA-Sektion mit Avatar (links positioniert, um Textüberlappung zu vermeiden) |
+
+### Webseite — Allgemein
+- `--bg-page` als Basis, Buttons in Steel, Sketch-Labels in Teal.
+- Shadows Into Light nur für Section-Labels, Notizen und den Claim.
+- Logo im Header (horizontal), Wolken im Hero, Wavy Dividers zwischen Sektionen.
 
 ### LinkedIn
-- Banner: Steel-Hintergrund mit Cream-Text und Gold-Akzent
-- Profilbild: Professionelles Foto (kein Logo als Profilbild)
+- Banner: Steel- oder Navy-Hintergrund, Text in `--text-primary-dark`, Teal-Akzent.
+- Profilbild: Professionelles Foto (kein Logo als Profilbild).
 
 ### Präsentationen
-- Titelfolie: Navy-Hintergrund, Cream-Text, Gold-Akzent
-- Inhaltsfolien: Cream-Hintergrund, Steel-Überschriften
-- Sketch-Elemente als Dekoration, nicht als Inhalt
-- Logo auf jeder Folie (klein, unten rechts)
+- Titelfolie: Navy-Hintergrund, weisser Text, Teal-Akzent.
+- Inhaltsfolien: `--bg-page`, Steel-Überschriften.
+- Sketch-Elemente als Dekoration, nicht als Inhalt.
+- Logo auf jeder Folie (klein, unten rechts).
 
 ### Visitenkarte
-- Vorderseite: Cream-Hintergrund, Logo, Name, Titel
-- Rückseite: Steel-Hintergrund, Kontaktdaten in Cream
-- Gold als Akzentlinie
+- Vorderseite: `--bg-page`, Logo, Name, Titel.
+- Rückseite: Steel-Hintergrund, Kontaktdaten in Weiss.
+- Teal als Akzentlinie.
 
 ### E-Mail-Signatur
-- Name: Outfit 600, #262626
-- Titel: Outfit 300, #5a6570
-- Logo: Klein, horizontal
-- Trennlinie: Steel (#527A98)
+- Name: Plus Jakarta Sans 700, `--text-primary`.
+- Titel: Plus Jakarta Sans 400, `--text-secondary`.
+- Logo: Klein, horizontal.
+- Trennlinie: Steel (`--btb-steel`).
 
 ---
 
 ## 11. Do's and Don'ts
 
 ### Do's ✓
-- Steel #527A98 als Leitfarbe in allen Medien verwenden
-- Sketch-Elemente (Caveat, handgezeichnete Icons, Wellenlinien) einsetzen
-- Cream-Hintergrund für warme, papierartige Anmutung
-- Persönliche Sketch-Notizen als Stilmittel
-- Klare Hierarchie: Headline → Sketch-Label → Body
-- Den Würfel als Logo-Element beibehalten
+- Steel `#527A98` als Leitfarbe, Teal `#2B8A78` als Signatur-Akzent in allen Medien verwenden.
+- Design-Tokens (`var(--btb-steel)`, `var(--bg-page)`, …) statt hardcodierter Werte — auch in Tailwind via `bg-[var(--btb-steel)]`.
+- Sketch-Labels (Shadows Into Light, Teal) und Wavy Dividers als Brand-Signatures einsetzen.
+- Keyword Underlines: ein Wort pro Headline, Steel auf Light, Teal auf Dark.
+- Klare Hierarchie: Headline → Sketch-Label → Body.
+- Dual-Mode-Wechsel: bewusste Abfolge Light → Dark → Light → Navy.
+- `prefers-reduced-motion` respektieren — alle Reveals und Flips fallen dann weg.
+- Den Würfel als Logo-Element beibehalten.
 
 ### Don'ts ✗
-- Reines Weiss (#FFFFFF) als Seitenhintergrund verwenden
-- Mehr als 3 Farben gleichzeitig einsetzen (Steel, Gold, Cream + Ink reichen)
-- Caveat-Font für Buttons, Navigation oder lange Fliesstext-Abschnitte
-- Generische Stock-Fotos
-- Übermässig viele Sketch-Elemente (max. 2–3 pro Viewport)
-- Das Logo ohne den Würfel verwenden
-- Gradient-Hintergründe oder Neon-Effekte
+- **Kein Gold (#E8AF30) und kein Cream (#F5EED6) mehr** — veraltete v1/v2-Palette, durch Teal + `#F5F5F2` ersetzt.
+- **Kein Outfit, kein Caveat** — ersetzt durch Plus Jakarta Sans und Shadows Into Light.
+- Reines Weiss als Seiten-BG verwenden (nur für Karten-Surfaces).
+- Mehr als ~3 Farben pro Viewport.
+- Shadows Into Light für Buttons, Navigation, Fliesstext oder längere Absätze.
+- Hardcodierte Hex-Werte oder z-index-Zahlen in Komponenten.
+- Rotierte Sketch-Notizen (alte v1/v2-Regel, bewusst entfernt).
+- Übermässig viele Sketch-Elemente (max. 2–3 pro Viewport).
+- Generische Stock-Fotos, Gradient-Hintergründe, Neon-Effekte.
+- Das Logo ohne den Würfel verwenden.
 
 ---
 
@@ -301,7 +424,7 @@ Mindestabstand = Höhe des Würfels zu allen Seiten. Kein Text, Bild oder andere
 ## Vorbereitung in Recraft
 
 1. **Stil wählen**: "Sharp Drawn Logo" oder "Geometric Logo" (im Style-Selektor nach "logo" suchen)
-2. **Farbpalette setzen**: Lade die Farben #527A98, #E8AF30, #F5EED6, #1B344D, #262626 als Custom-Palette
+2. **Farbpalette setzen**: Lade die Farben #527A98 (Steel), #2B8A78 (Teal), #F5F5F2 (Page-BG), #1B344D (Navy), #262626 (Ink) als Custom-Palette
 3. **Referenzbild hochladen**: Lade dein bestehendes Logo (logo.png oder logo_komplett.png) als Style-Referenz hoch
 4. **Format**: Quadratisch (1:1) für Icon-Variante, 3:1 für Horizontal-Variante
 
@@ -345,15 +468,15 @@ background. Modern, professional, tech-forward but human. No text.
 Suitable for favicon and large format alike.
 ```
 
-### Variante D — Würfel mit Gold-Akzent (zweifarbig)
+### Variante D — Würfel mit Teal-Akzent (zweifarbig)
 
 ```
-Minimalist logo of a three-dimensional cube outline in dark charcoal 
-with crack lines breaking through the surface. The cracks reveal a 
-warm golden amber glow from inside, suggesting light or energy breaking 
-through. Two-color design: dark charcoal (#262626) for the cube structure, 
-warm amber gold (#E8AF30) for the light emerging from the cracks. 
-White background. Clean vector lines, slightly hand-drawn quality. 
+Minimalist logo of a three-dimensional cube outline in dark charcoal
+with crack lines breaking through the surface. The cracks reveal a
+cool teal glow from inside, suggesting light or energy breaking through.
+Two-color design: dark charcoal (#262626) for the cube structure,
+teal (#2B8A78) for the light emerging from the cracks. Off-white
+background (#F5F5F2). Clean vector lines, slightly hand-drawn quality.
 No text. Symbolizes innovation breaking through conventional structures.
 ```
 
@@ -391,9 +514,9 @@ White background.
 
 ```
 Hand-drawn whiteboard-style illustration of [THEMA], sketched with 
-thin charcoal lines on cream paper background. Simple, clean, 
-visual facilitation style. Small colored accents in steel blue 
-and warm amber. No gradients, no shading. Professional but warm 
+thin charcoal lines on off-white paper background (#F5F5F2). Simple, clean,
+visual facilitation style. Small colored accents in steel blue (#527A98)
+and teal (#2B8A78). No gradients, no shading. Professional but warm 
 and approachable, like a sketch from a strategy workshop.
 ```
 
