@@ -33,6 +33,9 @@ services:
       - DATABASE_URL=postgresql://${DB_USER:-breakthebox}:${DB_PASSWORD}@db:5432/${DB_NAME:-breakthebox}
       - NODE_ENV=production
       - ORIGIN=${PUBLIC_APP_URL:-https://web.breakthebox.ch}
+      # adapter-node begrenzt Request-Bodies auf 512 KB — hochgesetzt, damit
+      # Bild-Uploads bis zur App-Grenze (5 MB, /api/upload) durchkommen.
+      - BODY_SIZE_LIMIT=6M
     env_file:
       - .env
     volumes:
