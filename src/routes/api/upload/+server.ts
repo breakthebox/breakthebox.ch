@@ -13,6 +13,19 @@ const UPLOAD_DIR = process.env.UPLOAD_DIR ?? './uploads';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
 
+// Slug für Dateinamen: lowercase, Umlaute ausgeschrieben, nur [a-z0-9-].
+// Verhindert Leerzeichen/Sonderzeichen in Asset-URLs (Caching/CDN/Sharing).
+function slugify(value: string): string {
+	return value
+		.toLowerCase()
+		.replace(/ä/g, 'ae')
+		.replace(/ö/g, 'oe')
+		.replace(/ü/g, 'ue')
+		.replace(/ß/g, 'ss')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	// Auth check
 	if (!locals.user || locals.user.role !== 'admin') {
@@ -35,10 +48,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		throw error(400, 'Datei ist zu gross (max. 5 MB).');
 	}
 
-	// Generate unique filename
-	const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
+	// Generate unique, URL-sicheren Dateinamen (keine Leerzeichen/Sonderzeichen)
+	const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
 	const timestamp = Date.now();
-	const prefix = section ? `${section}-` : '';
+	const safeSection = section ? slugify(section) : '';
+	const prefix = safeSection ? `${safeSection}-` : '';
 	const filename = `${prefix}header-${timestamp}.${ext}`;
 
 	// Ensure upload directory exists
