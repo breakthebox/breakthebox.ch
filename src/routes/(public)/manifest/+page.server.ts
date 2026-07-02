@@ -6,11 +6,11 @@ import type { PageServerLoad } from './$types';
 import { getAllContent } from '$lib/server/db/queries/content';
 import {
 	defaultManifest,
-	defaultAbout,
+	normalizeAbout,
 	defaultExperiments,
 	normalizeExperiments
 } from '$lib/server/content-defaults';
-import type { ManifestContent, AboutContent } from '$lib/types/content';
+import type { ManifestContent } from '$lib/types/content';
 
 const VR_PATTERN = /verwaltungsrä|vizepräsident|aufsichts|präsident|\bvr\b|gremium/i;
 
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async () => {
 	const all = await getAllContent();
 
 	const manifest: ManifestContent = { ...defaultManifest, ...((all.manifest as Partial<ManifestContent>) ?? {}) };
-	const about: AboutContent = { ...defaultAbout, ...((all.about as Partial<AboutContent>) ?? {}) };
+	const about = normalizeAbout(all.about);
 	const experiments = normalizeExperiments(all.experiments ?? defaultExperiments);
 
 	// Beweis-Spalten

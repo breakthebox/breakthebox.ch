@@ -44,7 +44,9 @@
 					if (entry.isIntersecting) current = Number((entry.target as HTMLElement).dataset.idx);
 				}
 			},
-			{ threshold: 0.55 }
+			// Schmales Band in Viewport-Mitte: aktiv, sobald eine These die Mitte kreuzt —
+			// unabhängig von der Sektionshöhe (feste 55% würden bei langen Thesen nie greifen).
+			{ rootMargin: '-50% 0px -50% 0px' }
 		);
 		acts.forEach((a) => activeIo.observe(a));
 

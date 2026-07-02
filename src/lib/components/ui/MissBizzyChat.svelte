@@ -11,6 +11,14 @@
 		}
 	]);
 	let scroller = $state<HTMLElement>();
+	let replyTimer: ReturnType<typeof setTimeout>;
+	let scrollTimer: ReturnType<typeof setTimeout>;
+
+	// Ausstehende Timer beim Unmount aufräumen (kein stale-State nach Navigation).
+	$effect(() => () => {
+		clearTimeout(replyTimer);
+		clearTimeout(scrollTimer);
+	});
 
 	const qa: { q: string; a: string }[] = [
 		{
@@ -36,7 +44,7 @@
 	];
 
 	function scrollSoon() {
-		setTimeout(() => scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }), 40);
+		scrollTimer = setTimeout(() => scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }), 40);
 	}
 
 	function ask(item: { q: string; a: string }) {
@@ -45,7 +53,7 @@
 		typing = true;
 		scrollSoon();
 		const delay = Math.min(1400, 500 + item.a.length * 7);
-		setTimeout(() => {
+		replyTimer = setTimeout(() => {
 			typing = false;
 			messages.push({ from: 'bot', text: item.a });
 			scrollSoon();

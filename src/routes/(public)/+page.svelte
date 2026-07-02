@@ -45,6 +45,9 @@
 		flipped[i] = !flipped[i];
 	}
 	function onPillarKey(e: KeyboardEvent, i: number) {
+		// Nur reagieren, wenn die Karte selbst fokussiert ist — sonst würde Enter
+		// auf einem Rückseiten-Link dessen Navigation blockieren und die Karte flippen.
+		if (e.target !== e.currentTarget) return;
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
 			toggleFlip(i);

@@ -20,9 +20,16 @@
 		content.pillars[pillarIndex].examples.splice(exIndex, 1);
 	}
 
+	function uniquePillarKey() {
+		const keys = new Set(content.pillars.map((p) => p.key));
+		let n = content.pillars.length + 1;
+		while (keys.has('pillar-' + n)) n++;
+		return 'pillar-' + n;
+	}
+
 	function addPillar() {
 		content.pillars.push({
-			key: 'pillar-' + (content.pillars.length + 1),
+			key: uniquePillarKey(),
 			title: '',
 			note: '',
 			desc: '',
@@ -144,7 +151,7 @@
 					{#if expandedPillar === i}
 						<div class="accordion-body">
 							<!-- Karten-Bild -->
-							<ImageUpload bind:value={pillar.image} section="pillar-{pillar.key}" label="Karten-Bild" />
+							<ImageUpload bind:value={pillar.image} section="pillar-{i}" label="Karten-Bild" />
 
 							<div class="field-group">
 								<label class="field-label" for="title-{i}">Titel</label>

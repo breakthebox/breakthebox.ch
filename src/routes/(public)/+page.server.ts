@@ -8,7 +8,7 @@ import { getAllContent } from '$lib/server/db/queries/content';
 import { getLatestBlogPosts } from '$lib/server/db/queries/blog';
 import {
 	defaultPillars,
-	defaultAbout,
+	normalizeAbout,
 	defaultReferences,
 	defaultBlog,
 	defaultAngebot,
@@ -19,7 +19,6 @@ import {
 } from '$lib/server/content-defaults';
 import type {
 	PillarsContent,
-	AboutContent,
 	ReferencesContent,
 	BlogContent,
 	AngebotContent,
@@ -35,17 +34,18 @@ export const load: PageServerLoad = async () => {
 		getLatestBlogPosts(3)
 	]);
 
+	// Merge mit Defaults, damit unvollständige/ältere DB-Einträge nicht crashen,
+	// wenn die Public-Seite verschachtelte Felder (z.B. .items, .clients) dereferenziert.
 	return {
-		pillars: (allContent.pillars as PillarsContent) ?? defaultPillars,
-		// Merge mit Defaults, damit ältere DB-Einträge ohne title/socials nicht crashen
-		about: { ...defaultAbout, ...((allContent.about as Partial<AboutContent>) ?? {}) },
-		references: (allContent.references as ReferencesContent) ?? defaultReferences,
+		pillars: { ...defaultPillars, ...((allContent.pillars as Partial<PillarsContent>) ?? {}) },
+		about: normalizeAbout(allContent.about),
+		references: { ...defaultReferences, ...((allContent.references as Partial<ReferencesContent>) ?? {}) },
 		blog: (allContent.blog as BlogContent) ?? defaultBlog,
-		angebot: (allContent.angebot as AngebotContent) ?? defaultAngebot,
-		testimonials: (allContent.testimonials as TestimonialsContent) ?? defaultTestimonials,
-		metrics: (allContent.metrics as MetricsContent) ?? defaultMetrics,
-		partners: (allContent.partners as PartnersContent) ?? defaultPartners,
-		faq: (allContent.faq as FaqContent) ?? defaultFaq,
+		angebot: { ...defaultAngebot, ...((allContent.angebot as Partial<AngebotContent>) ?? {}) },
+		testimonials: { ...defaultTestimonials, ...((allContent.testimonials as Partial<TestimonialsContent>) ?? {}) },
+		metrics: { ...defaultMetrics, ...((allContent.metrics as Partial<MetricsContent>) ?? {}) },
+		partners: { ...defaultPartners, ...((allContent.partners as Partial<PartnersContent>) ?? {}) },
+		faq: { ...defaultFaq, ...((allContent.faq as Partial<FaqContent>) ?? {}) },
 		latestPosts
 	};
 };

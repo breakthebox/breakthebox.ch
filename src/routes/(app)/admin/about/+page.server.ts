@@ -1,14 +1,14 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getSectionContent, saveSectionContent } from '$lib/server/db/queries/content';
-import { defaultAbout } from '$lib/server/content-defaults';
+import { normalizeAbout } from '$lib/server/content-defaults';
 import type { AboutContent } from '$lib/types/content';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
 	const content = await getSectionContent<AboutContent>('about');
 	return {
-		// Merge mit Defaults, damit ältere Einträge ohne title/socials vollständig sind
-		content: { ...defaultAbout, ...(content ?? {}) }
+		// Merge mit Defaults, damit ältere/unvollständige Einträge vollständig sind
+		content: normalizeAbout(content)
 	};
 };
 

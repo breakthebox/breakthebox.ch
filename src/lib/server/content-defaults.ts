@@ -96,6 +96,19 @@ export const defaultAbout: AboutContent = {
 	videoLabel: 'mein CV in 2 Minuten'
 };
 
+// Härtet einen (evtl. unvollständigen oder legacy) About-DB-Eintrag gegen
+// fehlende/null Array-Felder, die auf den Public-Seiten dereferenziert werden.
+export function normalizeAbout(raw: unknown): AboutContent {
+	const c = { ...defaultAbout, ...((raw as Partial<AboutContent>) ?? {}) };
+	return {
+		...c,
+		texts: Array.isArray(c.texts) ? c.texts : defaultAbout.texts,
+		qualifications: Array.isArray(c.qualifications) ? c.qualifications : defaultAbout.qualifications,
+		roles: Array.isArray(c.roles) ? c.roles : defaultAbout.roles,
+		socials: Array.isArray(c.socials) ? c.socials : defaultAbout.socials
+	};
+}
+
 export const defaultMetrics: MetricsContent = {
 	items: [
 		{ value: '10', label: 'Jahre', caption: 'Erfahrung' },
