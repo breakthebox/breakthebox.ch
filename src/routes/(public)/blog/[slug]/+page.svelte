@@ -99,6 +99,7 @@
 
 <div class="post-page">
 	<ScrollProgress />
+	<div class="post-inner">
 	<!-- Nav -->
 	<nav class="post-nav">
 		<SubpageBrand subtitle="Blog" />
@@ -150,6 +151,7 @@
 			</button>
 		</div>
 	</article>
+	</div>
 
 	<ContactBand />
 	<SiteFooter />
@@ -157,7 +159,8 @@
 
 <style>
 	/* ═══════ Page ═══════ */
-	.post-page {
+	/* Voll­breite Seite, damit ContactBand/SiteFooter randlos laufen. */
+	.post-inner {
 		max-width: 780px;
 		margin: 0 auto;
 		padding: 0 24px 80px;
