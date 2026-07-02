@@ -57,7 +57,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 		// ─── Whitelist Check ───
 		if (!ALLOWED_EMAILS.includes(email)) {
-			throw redirect(302, '/auth/login?error=not_allowed');
+			console.warn(`[auth] rejected non-whitelisted login: ${email}`);
+			throw redirect(302, '/auth/login?error=failed');
 		}
 
 		// Handle OAuth callback (create/update user + session)
@@ -70,7 +71,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		});
 
 		if (!result.success) {
-			throw redirect(302, '/auth/login?error=email_exists');
+			throw redirect(302, '/auth/login?error=failed');
 		}
 
 		// Ensure first whitelisted user gets admin role
@@ -100,6 +101,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			throw err;
 		}
 		console.error('OAuth callback error:', err);
-		throw redirect(302, '/auth/login?error=callback_failed');
+		throw redirect(302, '/auth/login?error=failed');
 	}
 };

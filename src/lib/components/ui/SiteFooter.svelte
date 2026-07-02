@@ -12,7 +12,6 @@
 			<a href={localizeHref('/impressum')}>{m.footer_impressum()}</a>
 			<a href={localizeHref('/datenschutz')}>{m.footer_datenschutz()}</a>
 			<a href={localizeHref('/agb')}>{m.footer_agb()}</a>
-			<a href="/auth/login" class="sf-admin">Admin</a>
 		</div>
 		<div>© {year} {m.footer_copyright()}</div>
 	</div>
@@ -53,9 +52,6 @@
 	}
 	.sf-legal a:hover {
 		color: var(--btb-steel);
-	}
-	.sf-admin {
-		opacity: 0.5;
 	}
 	@media (max-width: 560px) {
 		.sf-in {

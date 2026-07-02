@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	// Generische Fehlermeldungen — keine Rückschlüsse auf Konto-/Whitelist-Status.
+	const GENERIC_ERROR = 'Anmeldung fehlgeschlagen. Bitte versuche es erneut.';
 	const errorMessages: Record<string, string> = {
-		not_allowed: 'Dein Konto ist nicht für den Admin-Bereich freigeschaltet.',
-		email_exists: 'Diese E-Mail ist bereits mit einem anderen Provider verknüpft.',
-		callback_failed: 'Anmeldung fehlgeschlagen. Bitte versuche es erneut.'
+		rate_limited: 'Zu viele Anmeldeversuche. Bitte versuche es in einigen Minuten erneut.'
 	};
 
 	let errorParam = $derived($page.url.searchParams.get('error'));
-	let errorMessage = $derived(errorParam ? errorMessages[errorParam] ?? 'Ein Fehler ist aufgetreten.' : null);
+	let errorMessage = $derived(errorParam ? (errorMessages[errorParam] ?? GENERIC_ERROR) : null);
 </script>
 
 <svelte:head>
