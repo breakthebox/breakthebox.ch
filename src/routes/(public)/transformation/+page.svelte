@@ -25,23 +25,23 @@
 </script>
 
 <svelte:head>
-	<title>Referenzprojekte — Brigitte Hulliger | Break the Box</title>
+	<title>Transformation — Brigitte Hulliger | Break the Box</title>
 	<meta
 		name="description"
-		content="Ausgewählte Referenzprojekte von Brigitte Hulliger — Strategie, Governance und Umsetzung aus der Praxis."
+		content="Transformationsprojekte von Brigitte Hulliger — Strategie, Governance und Umsetzung aus der Praxis."
 	/>
 </svelte:head>
 
 <div class="sub">
 	<ScrollProgress />
 	<header class="subbar">
-		<SubpageBrand subtitle="Referenzprojekte" />
+		<SubpageBrand subtitle="Transformation" />
 		<a href={localizeHref('/')} class="back">← Zur Startseite</a>
 	</header>
 
 	<section class="hero">
 		<div class="wrap">
-			<div class="kick">Referenzprojekte</div>
+			<div class="kick">Transformation</div>
 			<h1>Substanz, die sich zeigen lässt.</h1>
 			<p class="intro">
 				Eine Auswahl aus Strategie, Governance und Umsetzung — dreh die Karten um für die Details.

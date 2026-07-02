@@ -18,7 +18,7 @@
 		});
 	}
 	function removeItem(i: number) {
-		if (!confirm('Dieses Referenzprojekt wirklich löschen?')) return;
+		if (!confirm('Dieses Projekt wirklich löschen?')) return;
 		content.items.splice(i, 1);
 	}
 	function move(i: number, dir: -1 | 1) {
@@ -38,7 +38,7 @@
 </script>
 
 <svelte:head>
-	<title>Referenzprojekte — Admin — Break the Box</title>
+	<title>Transformation — Admin — Break the Box</title>
 </svelte:head>
 
 <div class="editor-page">
@@ -47,8 +47,8 @@
 			<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 9H3m0 0l5-5M3 9l5 5" /></svg>
 			Zurück zum Dashboard
 		</a>
-		<h1>Referenzprojekte</h1>
-		<p class="page-subtitle">Drehbare Karten für die Subseite «Referenzprojekte». Vorderseite: Titel & Einordnung. Rückseite: Beschreibung.</p>
+		<h1>Transformation</h1>
+		<p class="page-subtitle">Drehbare Karten für die Subseite «Transformation». Vorderseite: Titel & Einordnung. Rückseite: Beschreibung.</p>
 	</div>
 
 	{#if showSuccess}<div class="toast toast-success">Änderungen erfolgreich gespeichert.</div>{/if}
@@ -62,7 +62,7 @@
 				<div class="item-card">
 					<div class="item-head">
 						<span class="item-num">{i + 1}</span>
-						<span class="item-title">{item.title || 'Neues Referenzprojekt'}</span>
+						<span class="item-title">{item.title || 'Neues Projekt'}</span>
 						<div class="item-actions">
 							<button type="button" class="icon-btn" onclick={() => move(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
 							<button type="button" class="icon-btn" onclick={() => move(i, 1)} disabled={i === content.items.length - 1} aria-label="Nach unten">↓</button>
@@ -82,7 +82,7 @@
 			{/each}
 		</div>
 
-		<button type="button" class="btn-add" onclick={addItem}>+ Referenzprojekt hinzufügen</button>
+		<button type="button" class="btn-add" onclick={addItem}>+ Projekt hinzufügen</button>
 
 		<div class="form-actions">
 			<button type="submit" class="btn-save" disabled={saving}>{saving ? 'Speichern...' : 'Speichern'}</button>

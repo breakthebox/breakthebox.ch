@@ -60,7 +60,7 @@
 				</a>
 				<a href="/admin/referenzprojekte" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="12" height="10" rx="1.5"/><path d="M3 8h12M9 4v10"/></svg>
-					Referenzprojekte
+					Transformation
 				</a>
 				<a href="/admin/references" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3h12v12H3z"/><path d="M3 7h12M7 3v12"/></svg>

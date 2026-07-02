@@ -40,8 +40,8 @@
 		},
 		{
 			id: 'referenzprojekte',
-			title: 'Referenzprojekte',
-			description: 'Drehbare Karten für die Subseite «Referenzprojekte»',
+			title: 'Transformation',
+			description: 'Drehbare Karten für die Subseite «Transformation»',
 			icon: '▤'
 		},
 		{
