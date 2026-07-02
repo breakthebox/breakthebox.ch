@@ -32,6 +32,7 @@
 
 <div class="blog-page">
 	<ScrollProgress />
+	<div class="blog-inner">
 	<!-- Nav -->
 	<nav class="blog-nav">
 		<SubpageBrand subtitle="Blog" />
@@ -73,6 +74,7 @@
 			{/each}
 		</div>
 	{/if}
+	</div>
 
 	<ContactBand />
 	<SiteFooter />
@@ -80,7 +82,8 @@
 
 <style>
 	/* ═══════ Page ═══════ */
-	.blog-page {
+	/* Voll­breite Seite, damit ContactBand/SiteFooter randlos laufen. */
+	.blog-inner {
 		max-width: 1080px;
 		margin: 0 auto;
 		padding: 0 24px 80px;
