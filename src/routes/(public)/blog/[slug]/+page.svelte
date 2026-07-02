@@ -75,24 +75,7 @@
 <svelte:head>
 	<title>{post.metaTitle || post.title} — Brigitte Hulliger | Break the Box</title>
 	<meta name="description" content={post.metaDescription || post.excerpt || ''} />
-	<meta property="og:title" content={post.metaTitle || post.title} />
-	<meta property="og:description" content={post.metaDescription || post.excerpt || ''} />
-	<meta property="og:type" content="article" />
-	{#if post.ogImage || post.headerImage}
-		<meta property="og:image" content={post.ogImage || post.headerImage} />
-		<meta name="twitter:image" content={post.ogImage || post.headerImage} />
-	{/if}
-	<meta name="twitter:title" content={post.metaTitle || post.title} />
-	<meta name="twitter:description" content={post.metaDescription || post.excerpt || ''} />
-	{#if post.publishDate}
-		<meta property="article:published_time" content={new Date(post.publishDate).toISOString()} />
-	{/if}
-	{#if post.updatedAt}
-		<meta property="article:modified_time" content={new Date(post.updatedAt).toISOString()} />
-	{/if}
-	{#each post.tags as tag}
-		<meta property="article:tag" content={tag} />
-	{/each}
+	<!-- OG/Twitter/article-Tags werden zentral im Root-Layout aus `data.meta` gesetzt. -->
 </svelte:head>
 
 <JsonLd data={schemaGraph} />

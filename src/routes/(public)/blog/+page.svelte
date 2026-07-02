@@ -23,11 +23,6 @@
 <svelte:head>
 	<title>{m.blog_page_title()} — Brigitte Hulliger | Break the Box</title>
 	<meta name="description" content={m.blog_page_subtitle()} />
-	<meta property="og:title" content={m.blog_page_title()} />
-	<meta property="og:description" content={m.blog_page_subtitle()} />
-	<meta property="og:type" content="website" />
-	<meta name="twitter:title" content={m.blog_page_title()} />
-	<meta name="twitter:description" content={m.blog_page_subtitle()} />
 </svelte:head>
 
 <div class="blog-page">
