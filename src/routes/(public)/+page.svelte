@@ -322,7 +322,6 @@
 			<div class="aboutcol reveal">
 				<div class="aboutpf">
 					<img src="/foto_brigitte_2025.jpg" alt="Brigitte Hulliger" loading="lazy" decoding="async" />
-					<div class="abadge">{m.h_about_badge()}</div>
 				</div>
 				{#if aboutVideoEmbed}
 					<div class="about-video">
@@ -1256,19 +1255,6 @@
 		aspect-ratio: 4 / 4.6;
 		object-fit: cover;
 		object-position: center 12%;
-	}
-	.abadge {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: linear-gradient(transparent, rgba(43, 26, 28, 0.85));
-		color: #fff;
-		font-family: var(--serif);
-		font-size: 13px;
-		letter-spacing: 0.02em;
-		padding: 26px 14px 12px;
-		text-align: center;
 	}
 	.about-h2 {
 		font-weight: 600;
