@@ -23,9 +23,9 @@ export const actions: Actions = {
 		try {
 			const content = JSON.parse(json) as PillarsContent;
 
-			// Basic validation
-			if (!content.pillars || !Array.isArray(content.pillars) || content.pillars.length !== 4) {
-				return fail(400, { error: 'Ungültige Pillar-Daten.' });
+			// Basic validation — Anzahl frei wählbar, mindestens einer
+			if (!content.pillars || !Array.isArray(content.pillars) || content.pillars.length === 0) {
+				return fail(400, { error: 'Mindestens ein Pillar wird benötigt.' });
 			}
 
 			for (const pillar of content.pillars) {

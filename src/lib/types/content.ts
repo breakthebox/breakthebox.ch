@@ -18,6 +18,7 @@ export interface Pillar {
 	image?: string;
 	tags: string[];
 	examples: PillarExample[];
+	subpageUrl?: string; // wenn gesetzt: Pfeil navigiert zur Subseite statt zu flippen
 }
 
 export interface PillarsContent {
@@ -30,11 +31,66 @@ export interface AboutRole {
 	org: string;
 }
 
+export interface SocialLink {
+	platform: string; // 'linkedin' | 'instagram' | 'youtube' | 'x' | 'xing' | 'github' | 'website'
+	url: string;
+}
+
 export interface AboutContent {
+	title: string;
 	texts: string[]; // 3 paragraphs
 	qualifications: string[];
 	roles: AboutRole[];
+	socials: SocialLink[];
 	videoLabel: string;
+}
+
+// ─── Kennzahlen / Metrics ───
+export interface MetricItem {
+	value: string;
+	label: string;
+	caption: string;
+}
+
+export interface MetricsContent {
+	items: MetricItem[];
+}
+
+// ─── Netzwerk / Partner ───
+export interface PartnerPerson {
+	name: string;
+	role: string;
+	expertise: string;
+	linkedin?: string;
+	photo?: string;
+}
+
+export interface Partner {
+	key?: string;
+	name: string;
+	website?: string;
+	logo?: string;
+	persons: PartnerPerson[];
+}
+
+export interface PartnersContent {
+	items: Partner[];
+}
+
+// ─── Manifest ───
+export interface ManifestThesis {
+	text: string; // grosse These; **fett** wird rot, Zeilenumbruch = neue Zeile
+	note?: string; // Positionierung/Erläuterung; **fett** wird rot
+}
+
+export interface ManifestContent {
+	kicker: string;
+	title: string;
+	subtitle: string;
+	theses: ManifestThesis[];
+	closingKicker: string;
+	closingTitle: string;
+	closingText: string;
 }
 
 // ─── Walk the Talk ───
@@ -42,7 +98,7 @@ export interface Platform {
 	key: string;
 	name: string;
 	sketch: string;
-	desc: string;
+	desc: string[]; // mehrere Abschnitte
 	url?: string;
 	image?: string;
 }
@@ -69,6 +125,59 @@ export interface ReferenceItem {
 
 export interface ReferencesContent {
 	clients: ReferenceItem[];
+}
+
+// ─── Angebot ───
+export interface AngebotItem {
+	key?: string;
+	title: string;
+	desc: string;
+	url?: string;
+	image?: string; // optionales Bild (transparent), quadratisch links in der Karte auf blauem Verlauf
+}
+
+export interface AngebotContent {
+	items: AngebotItem[];
+}
+
+// ─── Testimonials (Stimmen / Fremdbild) ───
+export interface Testimonial {
+	quote: string;
+	author: string;
+	role: string;
+	linkedin?: string;
+	photo?: string;
+}
+
+export interface TestimonialsContent {
+	items: Testimonial[];
+}
+
+// ─── Experimentierraum ───
+export interface ExperimentProject {
+	key?: string;
+	name: string;
+	sketch?: string;
+	desc: string;
+	status?: string;
+	url?: string;
+	image?: string;
+}
+
+export interface ExperimentsContent {
+	platforms: Platform[];
+	missbizzy: WalkTheTalkContent['missbizzy'];
+	projects: ExperimentProject[];
+}
+
+// ─── FAQ ───
+export interface FaqItem {
+	question: string;
+	answer: string;
+}
+
+export interface FaqContent {
+	items: FaqItem[];
 }
 
 // ─── Blog ───
@@ -175,11 +284,30 @@ export interface SeoOptimizationResult {
 }
 
 // ─── Section Union ───
-export type SectionKey = 'pillars' | 'about' | 'walkthetalk' | 'references' | 'blog';
+export type SectionKey =
+	| 'pillars'
+	| 'about'
+	| 'walkthetalk'
+	| 'references'
+	| 'blog'
+	| 'angebot'
+	| 'testimonials'
+	| 'experiments'
+	| 'metrics'
+	| 'partners'
+	| 'manifest'
+	| 'faq';
 
 export type SectionContent =
 	| PillarsContent
 	| AboutContent
 	| WalkTheTalkContent
 	| ReferencesContent
-	| BlogContent;
+	| BlogContent
+	| AngebotContent
+	| TestimonialsContent
+	| ExperimentsContent
+	| MetricsContent
+	| PartnersContent
+	| ManifestContent
+	| FaqContent;

@@ -8,17 +8,24 @@ import { getAllContent } from '$lib/server/db/queries/content';
 import { getLatestBlogPosts } from '$lib/server/db/queries/blog';
 import {
 	defaultPillars,
-	defaultAbout,
-	defaultWalkTheTalk,
+	normalizeAbout,
 	defaultReferences,
-	defaultBlog
+	defaultBlog,
+	defaultAngebot,
+	defaultTestimonials,
+	defaultMetrics,
+	defaultPartners,
+	defaultFaq
 } from '$lib/server/content-defaults';
 import type {
 	PillarsContent,
-	AboutContent,
-	WalkTheTalkContent,
 	ReferencesContent,
-	BlogContent
+	BlogContent,
+	AngebotContent,
+	TestimonialsContent,
+	MetricsContent,
+	PartnersContent,
+	FaqContent
 } from '$lib/types/content';
 
 export const load: PageServerLoad = async () => {
@@ -27,12 +34,18 @@ export const load: PageServerLoad = async () => {
 		getLatestBlogPosts(3)
 	]);
 
+	// Merge mit Defaults, damit unvollständige/ältere DB-Einträge nicht crashen,
+	// wenn die Public-Seite verschachtelte Felder (z.B. .items, .clients) dereferenziert.
 	return {
-		pillars: (allContent.pillars as PillarsContent) ?? defaultPillars,
-		about: (allContent.about as AboutContent) ?? defaultAbout,
-		walkthetalk: (allContent.walkthetalk as WalkTheTalkContent) ?? defaultWalkTheTalk,
-		references: (allContent.references as ReferencesContent) ?? defaultReferences,
+		pillars: { ...defaultPillars, ...((allContent.pillars as Partial<PillarsContent>) ?? {}) },
+		about: normalizeAbout(allContent.about),
+		references: { ...defaultReferences, ...((allContent.references as Partial<ReferencesContent>) ?? {}) },
 		blog: (allContent.blog as BlogContent) ?? defaultBlog,
+		angebot: { ...defaultAngebot, ...((allContent.angebot as Partial<AngebotContent>) ?? {}) },
+		testimonials: { ...defaultTestimonials, ...((allContent.testimonials as Partial<TestimonialsContent>) ?? {}) },
+		metrics: { ...defaultMetrics, ...((allContent.metrics as Partial<MetricsContent>) ?? {}) },
+		partners: { ...defaultPartners, ...((allContent.partners as Partial<PartnersContent>) ?? {}) },
+		faq: { ...defaultFaq, ...((allContent.faq as Partial<FaqContent>) ?? {}) },
 		latestPosts
 	};
 };

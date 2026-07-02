@@ -4,7 +4,7 @@
     {
       "name": "dev",
       "runtimeExecutable": "/bin/sh",
-      "runtimeArgs": ["-c", "export PATH=/opt/homebrew/bin:$PATH && DATABASE_URL='postgresql://postgres:postgres@localhost:5433/breakthebox_dev' npm run dev -- --port $PORT"],
+      "runtimeArgs": ["-c", "export PATH=/opt/homebrew/bin:$PATH && DATABASE_URL='postgresql://postgres:postgres@localhost:5432/breakthebox_dev' npm run dev -- --port $PORT"],
       "port": 5175,
       "autoPort": true
     },

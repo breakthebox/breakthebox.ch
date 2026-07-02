@@ -1,6 +1,10 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
+	import ContactBand from '$lib/components/ui/ContactBand.svelte';
+	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 </script>
 
 <svelte:head>
@@ -9,11 +13,9 @@
 </svelte:head>
 
 <div class="legal-page">
+	<ScrollProgress />
 	<nav class="legal-nav">
-		<a href={localizeHref('/')} class="legal-nav-brand">
-			<img src="/box.svg" alt="Break the Box" width="32" height="32" />
-			<span>Break the Box</span>
-		</a>
+		<SubpageBrand subtitle="Impressum" />
 		<a href={localizeHref('/')} class="legal-nav-back">&larr; Zur Hauptseite</a>
 	</nav>
 
@@ -67,9 +69,8 @@
 		</section>
 	</article>
 
-	<footer class="legal-footer">
-		<a href={localizeHref('/')}>&larr; Zurück zur Hauptseite</a>
-	</footer>
+	<ContactBand />
+	<SiteFooter />
 </div>
 
 <style>
@@ -85,16 +86,6 @@
 		align-items: center;
 		padding: 20px 0;
 		margin-bottom: var(--space-xl);
-	}
-
-	.legal-nav-brand {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		text-decoration: none;
-		font-weight: 800;
-		font-size: 1.1rem;
-		color: var(--text-heading);
 	}
 
 	.legal-nav-back {
@@ -139,21 +130,4 @@
 		margin-bottom: var(--space-lg);
 	}
 
-	.legal-footer {
-		margin-top: var(--space-2xl);
-		padding-top: var(--space-xl);
-		border-top: 1px solid var(--border);
-	}
-
-	.legal-footer a {
-		font-size: 0.9rem;
-		font-weight: 600;
-		color: var(--btb-steel);
-		text-decoration: none;
-		transition: color var(--t-fast);
-	}
-
-	.legal-footer a:hover {
-		color: var(--btb-steel-hover);
-	}
 </style>

@@ -20,6 +20,42 @@
 		content.pillars[pillarIndex].examples.splice(exIndex, 1);
 	}
 
+	function uniquePillarKey() {
+		const keys = new Set(content.pillars.map((p) => p.key));
+		let n = content.pillars.length + 1;
+		while (keys.has('pillar-' + n)) n++;
+		return 'pillar-' + n;
+	}
+
+	function addPillar() {
+		content.pillars.push({
+			key: uniquePillarKey(),
+			title: '',
+			note: '',
+			desc: '',
+			tags: [],
+			examples: []
+		});
+		expandedPillar = content.pillars.length - 1;
+	}
+
+	function removePillar(index: number) {
+		if (!confirm('Diesen Pillar wirklich löschen?')) return;
+		content.pillars.splice(index, 1);
+		if (expandedPillar !== null && expandedPillar >= content.pillars.length) {
+			expandedPillar = content.pillars.length - 1;
+		}
+	}
+
+	function movePillar(index: number, dir: -1 | 1) {
+		const target = index + dir;
+		if (target < 0 || target >= content.pillars.length) return;
+		const arr = content.pillars;
+		[arr[index], arr[target]] = [arr[target], arr[index]];
+		if (expandedPillar === index) expandedPillar = target;
+		else if (expandedPillar === target) expandedPillar = index;
+	}
+
 	function updateTags(pillarIndex: number, value: string) {
 		content.pillars[pillarIndex].tags = value
 			.split(',')
@@ -56,8 +92,8 @@
 			</svg>
 			Zurück zum Dashboard
 		</a>
-		<h1>Was ich anbiete</h1>
-		<p class="page-subtitle">Bearbeite die 4 Pillar-Karten mit Beschreibungen, Tags und Praxisbeispielen.</p>
+		<h1>Pillars</h1>
+		<p class="page-subtitle">Verwalte deine Pillar-Karten — Anzahl, Reihenfolge und Inhalte frei anpassbar.</p>
 	</div>
 
 	<!-- Notifications -->
@@ -82,37 +118,40 @@
 		<div class="accordion">
 			{#each content.pillars as pillar, i}
 				<div class="accordion-item" class:expanded={expandedPillar === i}>
-					<button
-						type="button"
-						class="accordion-header"
-						onclick={() => togglePillar(i)}
-					>
-						<div class="accordion-header-left">
+					<div class="accordion-header">
+						<button type="button" class="accordion-toggle" onclick={() => togglePillar(i)}>
 							<span class="pillar-number">{i + 1}</span>
 							<div>
 								<span class="pillar-title">{pillar.title || 'Neuer Pillar'}</span>
 								<span class="pillar-key">{pillar.key}</span>
 							</div>
+						</button>
+						<div class="accordion-actions">
+							<button type="button" class="icon-btn" onclick={() => movePillar(i, -1)} disabled={i === 0} title="Nach oben verschieben" aria-label="Nach oben verschieben">↑</button>
+							<button type="button" class="icon-btn" onclick={() => movePillar(i, 1)} disabled={i === content.pillars.length - 1} title="Nach unten verschieben" aria-label="Nach unten verschieben">↓</button>
+							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removePillar(i)} title="Pillar löschen" aria-label="Pillar löschen">&times;</button>
+							<button type="button" class="icon-btn" onclick={() => togglePillar(i)} title="Bearbeiten" aria-label="Bearbeiten">
+								<svg
+									class="chevron"
+									class:chevron-open={expandedPillar === i}
+									width="20"
+									height="20"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M6 8l4 4 4-4" />
+								</svg>
+							</button>
 						</div>
-						<svg
-							class="chevron"
-							class:chevron-open={expandedPillar === i}
-							width="20"
-							height="20"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M6 8l4 4 4-4" />
-						</svg>
-					</button>
+					</div>
 
 					{#if expandedPillar === i}
 						<div class="accordion-body">
 							<!-- Karten-Bild -->
-							<ImageUpload bind:value={pillar.image} section="pillar-{pillar.key}" label="Karten-Bild" />
+							<ImageUpload bind:value={pillar.image} section="pillar-{i}" label="Karten-Bild" />
 
 							<div class="field-group">
 								<label class="field-label" for="title-{i}">Titel</label>
@@ -161,9 +200,25 @@
 								/>
 							</div>
 
+							<!-- Subpage-Link -->
+							<div class="field-group">
+								<label class="field-label" for="subpage-{i}">Subseiten-Link (optional)
+									<span class="field-hint">Wenn gesetzt, springt der Pfeil zur Subseite statt die Karte zu flippen — z.B. /experimentierraum</span>
+								</label>
+								<input
+									id="subpage-{i}"
+									type="text"
+									class="field-input"
+									bind:value={pillar.subpageUrl}
+									placeholder="z.B. /experimentierraum (leer lassen für Flip zu Beispielen)"
+								/>
+							</div>
+
 							<!-- Examples -->
 							<div class="field-group">
-								<label class="field-label">Praxisbeispiele</label>
+								<label class="field-label">Praxisbeispiele
+									<span class="field-hint">Ohne Subseiten-Link: Pfeil flippt die Karte zu diesen Beispielen. Ohne beides: kein Pfeil.</span>
+								</label>
 								<div class="examples-list">
 									{#each pillar.examples as example, j}
 										<div class="example-row">
@@ -211,6 +266,8 @@
 				</div>
 			{/each}
 		</div>
+
+		<button type="button" class="btn-add-pillar" onclick={addPillar}>+ Pillar hinzufügen</button>
 
 		<div class="form-actions">
 			<button type="submit" class="btn-save" disabled={saving}>
@@ -299,10 +356,17 @@
 	}
 
 	.accordion-header {
-		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 8px;
+		padding-right: 14px;
+	}
+	.accordion-toggle {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 16px;
 		padding: 20px 24px;
 		background: none;
 		border: none;
@@ -310,13 +374,58 @@
 		text-align: left;
 		transition: background 0.15s;
 	}
-	.accordion-header:hover {
+	.accordion-toggle:hover {
 		background: var(--bg-elevated);
 	}
-	.accordion-header-left {
+	.accordion-actions {
 		display: flex;
 		align-items: center;
-		gap: 16px;
+		gap: 4px;
+		flex-shrink: 0;
+	}
+	.icon-btn {
+		width: 32px;
+		height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--border);
+		background: var(--bg-surface);
+		border-radius: var(--radius-sm);
+		color: var(--text-secondary);
+		font-size: 1rem;
+		cursor: pointer;
+		transition: all 0.15s;
+	}
+	.icon-btn:hover:not(:disabled) {
+		border-color: var(--btb-steel);
+		color: var(--btb-steel);
+		background: var(--bg-elevated);
+	}
+	.icon-btn:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+	.icon-btn-danger:hover:not(:disabled) {
+		border-color: var(--color-error);
+		color: var(--color-error);
+		background: rgba(251, 113, 133, 0.08);
+	}
+	.btn-add-pillar {
+		width: 100%;
+		padding: 14px;
+		border: 1.5px dashed var(--btb-steel);
+		border-radius: var(--radius-card);
+		background: none;
+		color: var(--btb-steel);
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.15s;
+		margin-bottom: var(--space-xl);
+	}
+	.btn-add-pillar:hover {
+		background: var(--btb-steel-subtle);
 	}
 
 	.pillar-number {
