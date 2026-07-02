@@ -25,7 +25,7 @@
 </script>
 
 <svelte:head>
-	<title>Referenzprojekte — Break the Box</title>
+	<title>Referenzprojekte — Brigitte Hulliger | Break the Box</title>
 	<meta
 		name="description"
 		content="Ausgewählte Referenzprojekte von Brigitte Hulliger — Strategie, Governance und Umsetzung aus der Praxis."

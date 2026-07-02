@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>Allgemeine Geschäftsbedingungen — Break the Box</title>
+	<title>Allgemeine Geschäftsbedingungen — Brigitte Hulliger | Break the Box</title>
 	<meta name="description" content={m.meta_agb_description()} />
 </svelte:head>
 

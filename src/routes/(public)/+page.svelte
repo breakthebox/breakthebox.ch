@@ -108,7 +108,7 @@
 </script>
 
 <svelte:head>
-	<title>{m.app_name()} — {m.hero_name()}</title>
+	<title>Brigitte Hulliger — IT-Strategie, Verwaltungsrat & KI | Break the Box</title>
 	<meta name="description" content={m.hero_subline()} />
 </svelte:head>
 

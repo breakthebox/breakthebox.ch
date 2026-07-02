@@ -58,7 +58,7 @@
 </script>
 
 <svelte:head>
-	<title>{m.manifest_page_title()} — Break the Box</title>
+	<title>{m.manifest_page_title()} — Brigitte Hulliger | Break the Box</title>
 	<meta name="description" content={manifest.subtitle} />
 </svelte:head>
 

@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>Datenschutzerklärung — Break the Box</title>
+	<title>Datenschutzerklärung — Brigitte Hulliger | Break the Box</title>
 	<meta name="description" content={m.meta_datenschutz_description()} />
 </svelte:head>
 

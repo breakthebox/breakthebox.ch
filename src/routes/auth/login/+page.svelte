@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>Anmelden — Break the Box</title>
+	<title>Anmelden — Brigitte Hulliger | Break the Box</title>
 </svelte:head>
 
 <div class="login-page">

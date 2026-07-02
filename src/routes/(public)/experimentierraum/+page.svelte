@@ -49,7 +49,7 @@
 </script>
 
 <svelte:head>
-	<title>{m.exp_page_title()} — Break the Box</title>
+	<title>{m.exp_page_title()} — Brigitte Hulliger | Break the Box</title>
 	<meta name="description" content={m.exp_page_subtitle()} />
 </svelte:head>
 

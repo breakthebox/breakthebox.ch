@@ -73,7 +73,7 @@
 </script>
 
 <svelte:head>
-	<title>{post.metaTitle || post.title} — Break the Box</title>
+	<title>{post.metaTitle || post.title} — Brigitte Hulliger | Break the Box</title>
 	<meta name="description" content={post.metaDescription || post.excerpt || ''} />
 	<meta property="og:title" content={post.metaTitle || post.title} />
 	<meta property="og:description" content={post.metaDescription || post.excerpt || ''} />
