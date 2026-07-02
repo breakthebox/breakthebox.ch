@@ -5,57 +5,58 @@
    Signal (Steel + Teal) · Plus Jakarta Sans · Shadows Into Light · Dual Mode
 ═══════════════════════════════════════════════════════════ */
 :root {
-	/* Typography — Font Families */
-	--ff-ui: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
+	/* Typography — Font Families (Himbeere: Fraunces + Inter + Shadows Into Light) */
+	--ff-ui: 'Inter', -apple-system, system-ui, sans-serif;
+	--ff-serif: 'Fraunces', Georgia, serif;
 	--ff-sketch: 'Shadows Into Light', cursive;
 	--ff-mono: 'JetBrains Mono', monospace;
 
-	/* Brand — Steel (Primary) */
-	--btb-steel: #527a98;
-	--btb-steel-light: #6a94b2;
-	--btb-steel-subtle: rgba(82, 122, 152, 0.15);
-	--btb-steel-hover: #628ea8;
+	/* Brand — Red (Primary) */
+	--btb-steel: #b11e2c;
+	--btb-steel-light: #c63a47;
+	--btb-steel-subtle: rgba(177, 30, 44, 0.12);
+	--btb-steel-hover: #8e1622;
 
-	/* Brand — Teal (Accent) */
-	--btb-teal: #2b8a78;
-	--btb-teal-light: #dbf0eb;
-	--btb-teal-dark: #1a6557;
-	--btb-teal-subtle: rgba(43, 138, 120, 0.12);
+	/* Brand — Red Accent (formerly Teal) */
+	--btb-teal: #b11e2c;
+	--btb-teal-light: #f6d9d5;
+	--btb-teal-dark: #8e1622;
+	--btb-teal-subtle: rgba(177, 30, 44, 0.1);
 
-	/* Light Mode — Surfaces */
-	--bg-page: #f5f5f2;
+	/* Light Mode — Surfaces (Cream) */
+	--bg-page: #fbf1ec;
 	--bg-surface: #ffffff;
-	--bg-section-alt: #f0f1ee;
-	--bg-elevated: #eaeae5;
-	--border: #ddddd8;
-	--border-subtle: rgba(0, 0, 0, 0.06);
-	--text-primary: #262626;
-	--text-secondary: #64748b;
-	--text-muted: #94a3b8;
-	--text-heading: #1a2332;
+	--bg-section-alt: #f7e4df;
+	--bg-elevated: #f7e4df;
+	--border: #ebd8d3;
+	--border-subtle: rgba(43, 26, 28, 0.07);
+	--text-primary: #2b1a1c;
+	--text-secondary: #8a6e6f;
+	--text-muted: #b29a99;
+	--text-heading: #2b1a1c;
 
-	/* Dark Mode — Surfaces (CTA, Footer, Feature-Sektionen) */
-	--bg-page-dark: #0f1420;
-	--bg-elevated-dark: #0f1729;
-	--bg-surface-dark: rgba(255, 255, 255, 0.04);
-	--border-dark: rgba(255, 255, 255, 0.08);
-	--text-primary-dark: #e8edf5;
-	--text-secondary-dark: #94a3b8;
-	--text-muted-dark: #64748b;
+	/* Dark Mode — Surfaces (warm chocolate: Admin-Nav, Login, CTA) */
+	--bg-page-dark: #2b1a1c;
+	--bg-elevated-dark: #34211f;
+	--bg-surface-dark: rgba(255, 255, 255, 0.05);
+	--border-dark: rgba(255, 255, 255, 0.1);
+	--text-primary-dark: #f4e7e2;
+	--text-secondary-dark: #c9aea9;
+	--text-muted-dark: #9c807c;
 	--text-heading-dark: #ffffff;
 
-	/* Navy (Metriken, Kontakt) */
-	--navy: #1b344d;
+	/* Navy → warmes Dunkelbraun (Admin-Nav) */
+	--navy: #2b1a1c;
 
 	/* Category Colors */
-	--cat-steel: rgba(82, 122, 152, 0.15);
-	--cat-teal: rgba(43, 138, 120, 0.12);
+	--cat-steel: rgba(177, 30, 44, 0.14);
+	--cat-teal: rgba(177, 30, 44, 0.1);
 
 	/* Semantic */
 	--color-success: #34d399;
 	--color-warning: #fbbf24;
 	--color-error: #fb7185;
-	--color-info: #527a98;
+	--color-info: #b11e2c;
 
 	/* Shadows */
 	--shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -102,6 +103,14 @@ body {
 	color: var(--text-primary);
 	font-family: var(--ff-ui);
 	line-height: 1.6;
+}
+
+/* Himbeere: Serif-Headlines site-weit (Homepage scoped sich selbst) */
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--ff-serif);
 }
 
 /* ═══════ Scroll-Triggered Entrance Animations ═══════ */

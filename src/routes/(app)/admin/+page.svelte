@@ -4,9 +4,15 @@
 	const sections = [
 		{
 			id: 'pillars',
-			title: 'Was ich anbiete',
-			description: '4 Pillar-Karten mit Beschreibungen, Tags und Praxisbeispielen',
+			title: 'Pillars',
+			description: 'Pillar-Karten — Anzahl, Reihenfolge und Inhalte frei anpassbar',
 			icon: '◆'
+		},
+		{
+			id: 'angebot',
+			title: 'Angebot',
+			description: 'Angebots-Kacheln der Landing-Section «Angebot»',
+			icon: '❖'
 		},
 		{
 			id: 'about',
@@ -15,22 +21,52 @@
 			icon: '◎'
 		},
 		{
-			id: 'walkthetalk',
-			title: 'Ich verstehe, wovon ich rede',
-			description: 'KI-Plattform-Karten und Miss Bizzy',
+			id: 'manifest',
+			title: 'Manifest',
+			description: 'Provokante Thesen für die Scroll-Seite «Mein Manifest»',
+			icon: '§'
+		},
+		{
+			id: 'experimentierraum',
+			title: 'Experimentierraum',
+			description: 'Plattformen und laufende Projekte (Subseite)',
 			icon: '⚡'
 		},
 		{
+			id: 'testimonials',
+			title: 'Stimmen',
+			description: 'Testimonials — «Fremdbild statt Eigenlob»',
+			icon: '❝'
+		},
+		{
 			id: 'references',
-			title: 'Kunden & Partner',
-			description: 'Kundenlogos verwalten',
+			title: 'Kundenlogos',
+			description: 'Logos der Referenz-Marquee verwalten',
 			icon: '★'
+		},
+		{
+			id: 'metrics',
+			title: 'Kennzahlen',
+			description: 'Die Kennzahlen-Leiste unterhalb der Kundenlogos',
+			icon: '▦'
+		},
+		{
+			id: 'partners',
+			title: 'Netzwerk / Partner',
+			description: 'Partnerfirmen mit Personen (Name, Rolle, Expertise)',
+			icon: '⬡'
 		},
 		{
 			id: 'blog',
 			title: 'Blog',
 			description: 'Blogposts erstellen, bearbeiten und veröffentlichen',
 			icon: '✎'
+		},
+		{
+			id: 'faq',
+			title: 'Häufige Fragen',
+			description: 'Fragen und Antworten der FAQ-Sektion',
+			icon: '?'
 		}
 	];
 </script>

@@ -7,7 +7,8 @@ import { fail } from '@sveltejs/kit';
 export const load: PageServerLoad = async () => {
 	const content = await getSectionContent<AboutContent>('about');
 	return {
-		content: content ?? defaultAbout
+		// Merge mit Defaults, damit ältere Einträge ohne title/socials vollständig sind
+		content: { ...defaultAbout, ...(content ?? {}) }
 	};
 };
 

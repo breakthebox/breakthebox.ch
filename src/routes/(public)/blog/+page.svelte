@@ -2,6 +2,10 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import type { BlogPostRow } from '$lib/server/db/queries/blog';
+	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
+	import ContactBand from '$lib/components/ui/ContactBand.svelte';
+	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 
 	let { data } = $props();
 	let posts = $derived(data.posts as BlogPostRow[]);
@@ -27,12 +31,10 @@
 </svelte:head>
 
 <div class="blog-page">
+	<ScrollProgress />
 	<!-- Nav -->
 	<nav class="blog-nav">
-		<a href={localizeHref('/')} class="blog-nav-brand">
-			<img src="/box.svg" alt="Break the Box" width="32" height="32" />
-			<span>Break the Box</span>
-		</a>
+		<SubpageBrand subtitle="Blog" />
 		<a href={localizeHref('/')} class="blog-nav-back">&larr; Zur Hauptseite</a>
 	</nav>
 
@@ -71,6 +73,9 @@
 			{/each}
 		</div>
 	{/if}
+
+	<ContactBand />
+	<SiteFooter />
 </div>
 
 <style>
@@ -88,15 +93,6 @@
 		align-items: center;
 		padding: 20px 0;
 		margin-bottom: var(--space-lg);
-	}
-	.blog-nav-brand {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		text-decoration: none;
-		font-weight: 800;
-		font-size: 1.1rem;
-		color: var(--text-heading);
 	}
 	.blog-nav-back {
 		font-size: 0.85rem;

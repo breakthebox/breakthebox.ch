@@ -217,7 +217,7 @@
 
 <style>
 	.ai-panel {
-		border: 1px solid var(--color-border, #e2e8f0);
+		border: 1px solid var(--color-border, var(--border));
 		border-radius: 0.5rem;
 		padding: 1rem;
 		background: var(--color-surface, #fff);
@@ -230,7 +230,7 @@
 		font-size: 0.875rem;
 		font-weight: 600;
 		margin-bottom: 0.75rem;
-		color: var(--color-heading, #0f172a);
+		color: var(--color-heading, var(--text-heading));
 	}
 
 	.ai-error {
@@ -265,7 +265,7 @@
 
 	.score-bar-track {
 		height: 6px;
-		background: var(--color-border, #e2e8f0);
+		background: var(--color-border, var(--border));
 		border-radius: 3px;
 		margin-bottom: 0.25rem;
 		overflow: hidden;
@@ -293,8 +293,8 @@
 		padding: 0.5rem;
 		font-size: 0.8125rem;
 		font-weight: 500;
-		border: 1px solid var(--color-primary, #0f766e);
-		color: var(--color-primary, #0f766e);
+		border: 1px solid var(--color-primary, var(--btb-teal));
+		color: var(--color-primary, var(--btb-teal));
 		background: transparent;
 		border-radius: 0.375rem;
 		cursor: pointer;
@@ -302,7 +302,7 @@
 	}
 
 	.ai-btn:hover:not(:disabled) {
-		background: var(--color-primary, #0f766e);
+		background: var(--color-primary, var(--btb-teal));
 		color: white;
 	}
 
@@ -338,7 +338,7 @@
 		font-size: 0.75rem;
 		line-height: 1.4;
 		padding: 0.375rem;
-		background: var(--color-surface-hover, #f8fafc);
+		background: var(--color-surface-hover, var(--bg-elevated));
 		border-radius: 0.25rem;
 	}
 
@@ -349,14 +349,14 @@
 
 	.meta-preview {
 		font-size: 0.75rem;
-		color: var(--color-text-muted, #64748b);
+		color: var(--color-text-muted, var(--text-secondary));
 		margin-top: 0.5rem;
 		line-height: 1.4;
 	}
 
 	.char-count {
 		font-size: 0.6875rem;
-		color: var(--color-text-muted, #94a3b8);
+		color: var(--color-text-muted, var(--text-muted));
 	}
 
 	.char-count.over {
@@ -374,7 +374,7 @@
 
 	.meta-current {
 		font-size: 0.75rem;
-		color: var(--color-text-muted, #64748b);
+		color: var(--color-text-muted, var(--text-secondary));
 		margin-top: 0.5rem;
 		line-height: 1.4;
 	}
@@ -406,8 +406,8 @@
 		padding: 0.375rem 0.5rem;
 		font-size: 0.75rem;
 		background: transparent;
-		color: var(--color-text-muted, #64748b);
-		border: 1px solid var(--color-border, #e2e8f0);
+		color: var(--color-text-muted, var(--text-secondary));
+		border: 1px solid var(--color-border, var(--border));
 		border-radius: 0.25rem;
 		cursor: pointer;
 		transition: all 0.15s;

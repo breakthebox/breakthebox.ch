@@ -91,7 +91,7 @@
 	.block-editor {
 		position: relative;
 		min-height: 400px;
-		border: 1px solid var(--color-border, #e2e8f0);
+		border: 1px solid var(--color-border, var(--border));
 		border-radius: 0.5rem;
 		background: var(--color-surface, #fff);
 	}
@@ -102,14 +102,14 @@
 		justify-content: center;
 		gap: 0.5rem;
 		padding: 2rem;
-		color: var(--color-text-muted, #64748b);
+		color: var(--color-text-muted, var(--text-secondary));
 	}
 
 	.loading-spinner {
 		width: 1.25rem;
 		height: 1.25rem;
-		border: 2px solid var(--color-border, #e2e8f0);
-		border-top-color: var(--color-primary, #0f766e);
+		border: 2px solid var(--color-border, var(--border));
+		border-top-color: var(--color-primary, var(--btb-teal));
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
 	}
@@ -135,15 +135,15 @@
 	}
 
 	.block-editor :global(.ce-toolbar__plus) {
-		color: var(--color-primary, #0f766e);
+		color: var(--color-primary, var(--btb-teal));
 	}
 
 	.block-editor :global(.ce-toolbar__settings-btn) {
-		color: var(--color-text-muted, #64748b);
+		color: var(--color-text-muted, var(--text-secondary));
 	}
 
 	.block-editor :global(.ce-block--focused) {
-		background: var(--color-surface-hover, #f8fafc);
+		background: var(--color-surface-hover, var(--bg-elevated));
 	}
 
 	.block-editor :global(.ce-paragraph) {
@@ -156,7 +156,7 @@
 	}
 
 	.block-editor :global(.cdx-quote__text) {
-		border-left: 3px solid var(--color-primary, #0f766e);
+		border-left: 3px solid var(--color-primary, var(--btb-teal));
 		padding-left: 1rem;
 		font-style: italic;
 	}

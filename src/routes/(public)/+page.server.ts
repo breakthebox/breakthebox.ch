@@ -9,16 +9,24 @@ import { getLatestBlogPosts } from '$lib/server/db/queries/blog';
 import {
 	defaultPillars,
 	defaultAbout,
-	defaultWalkTheTalk,
 	defaultReferences,
-	defaultBlog
+	defaultBlog,
+	defaultAngebot,
+	defaultTestimonials,
+	defaultMetrics,
+	defaultPartners,
+	defaultFaq
 } from '$lib/server/content-defaults';
 import type {
 	PillarsContent,
 	AboutContent,
-	WalkTheTalkContent,
 	ReferencesContent,
-	BlogContent
+	BlogContent,
+	AngebotContent,
+	TestimonialsContent,
+	MetricsContent,
+	PartnersContent,
+	FaqContent
 } from '$lib/types/content';
 
 export const load: PageServerLoad = async () => {
@@ -29,10 +37,15 @@ export const load: PageServerLoad = async () => {
 
 	return {
 		pillars: (allContent.pillars as PillarsContent) ?? defaultPillars,
-		about: (allContent.about as AboutContent) ?? defaultAbout,
-		walkthetalk: (allContent.walkthetalk as WalkTheTalkContent) ?? defaultWalkTheTalk,
+		// Merge mit Defaults, damit ältere DB-Einträge ohne title/socials nicht crashen
+		about: { ...defaultAbout, ...((allContent.about as Partial<AboutContent>) ?? {}) },
 		references: (allContent.references as ReferencesContent) ?? defaultReferences,
 		blog: (allContent.blog as BlogContent) ?? defaultBlog,
+		angebot: (allContent.angebot as AngebotContent) ?? defaultAngebot,
+		testimonials: (allContent.testimonials as TestimonialsContent) ?? defaultTestimonials,
+		metrics: (allContent.metrics as MetricsContent) ?? defaultMetrics,
+		partners: (allContent.partners as PartnersContent) ?? defaultPartners,
+		faq: (allContent.faq as FaqContent) ?? defaultFaq,
 		latestPosts
 	};
 };

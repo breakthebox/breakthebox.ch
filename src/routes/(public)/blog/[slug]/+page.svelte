@@ -1,6 +1,10 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
+	import ContactBand from '$lib/components/ui/ContactBand.svelte';
+	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
@@ -94,12 +98,10 @@
 <JsonLd data={schemaGraph} />
 
 <div class="post-page">
+	<ScrollProgress />
 	<!-- Nav -->
 	<nav class="post-nav">
-		<a href={localizeHref('/')} class="post-nav-brand">
-			<img src="/box.svg" alt="Break the Box" width="32" height="32" />
-			<span>Break the Box</span>
-		</a>
+		<SubpageBrand subtitle="Blog" />
 		<button type="button" onclick={goBack} class="post-nav-back">&larr; {m.blog_all_posts()}</button>
 	</nav>
 
@@ -148,6 +150,9 @@
 			</button>
 		</div>
 	</article>
+
+	<ContactBand />
+	<SiteFooter />
 </div>
 
 <style>
@@ -165,15 +170,6 @@
 		align-items: center;
 		padding: 20px 0;
 		margin-bottom: var(--space-xl);
-	}
-	.post-nav-brand {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		text-decoration: none;
-		font-weight: 800;
-		font-size: 1.1rem;
-		color: var(--text-heading);
 	}
 	.post-nav-back {
 		font-size: 0.85rem;

@@ -304,7 +304,7 @@
 	.editor-header h1 {
 		font-size: 1.5rem;
 		font-weight: 700;
-		color: var(--color-heading, #0f172a);
+		color: var(--color-heading, var(--text-heading));
 	}
 
 	.view-count {
@@ -312,7 +312,7 @@
 		align-items: center;
 		gap: 0.375rem;
 		font-size: 0.875rem;
-		color: var(--color-text-muted, #64748b);
+		color: var(--color-text-muted, var(--text-secondary));
 	}
 
 	.editor-main {
@@ -327,7 +327,7 @@
 		display: block;
 		font-size: 0.8125rem;
 		font-weight: 500;
-		color: var(--color-text, #334155);
+		color: var(--color-text, var(--text-primary));
 		margin-bottom: 0.375rem;
 	}
 
@@ -335,7 +335,7 @@
 	.field textarea {
 		width: 100%;
 		padding: 0.5rem 0.75rem;
-		border: 1px solid var(--color-border, #e2e8f0);
+		border: 1px solid var(--color-border, var(--border));
 		border-radius: 0.375rem;
 		font-size: 0.9375rem;
 		background: var(--color-surface, #fff);
@@ -345,7 +345,7 @@
 	.field input:focus,
 	.field textarea:focus {
 		outline: none;
-		border-color: var(--color-primary, #0f766e);
+		border-color: var(--color-primary, var(--btb-teal));
 		box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.1);
 	}
 
@@ -359,7 +359,7 @@
 	}
 
 	.sidebar-section {
-		border: 1px solid var(--color-border, #e2e8f0);
+		border: 1px solid var(--color-border, var(--border));
 		border-radius: 0.5rem;
 		padding: 0.75rem;
 		background: var(--color-surface, #fff);
@@ -369,7 +369,7 @@
 		display: block;
 		font-size: 0.8125rem;
 		font-weight: 500;
-		color: var(--color-text, #334155);
+		color: var(--color-text, var(--text-primary));
 		margin-bottom: 0.375rem;
 	}
 
@@ -378,7 +378,7 @@
 	.sidebar-section select {
 		width: 100%;
 		padding: 0.375rem 0.5rem;
-		border: 1px solid var(--color-border, #e2e8f0);
+		border: 1px solid var(--color-border, var(--border));
 		border-radius: 0.375rem;
 		font-size: 0.8125rem;
 		background: var(--color-surface, #fff);
@@ -388,12 +388,12 @@
 	.sidebar-section textarea:focus,
 	.sidebar-section select:focus {
 		outline: none;
-		border-color: var(--color-primary, #0f766e);
+		border-color: var(--color-primary, var(--btb-teal));
 	}
 
 	.hint {
 		font-size: 0.6875rem;
-		color: var(--color-text-muted, #94a3b8);
+		color: var(--color-text-muted, var(--text-muted));
 		margin-top: 0.25rem;
 		display: block;
 	}
@@ -418,7 +418,7 @@
 		font-size: 0.8125rem;
 		font-weight: 600;
 		cursor: pointer;
-		color: var(--color-heading, #0f172a);
+		color: var(--color-heading, var(--text-heading));
 	}
 
 	.toggle-icon {
@@ -447,7 +447,7 @@
 		gap: 0.375rem;
 		width: 100%;
 		padding: 0.625rem;
-		background: var(--color-primary, #0f766e);
+		background: var(--color-primary, var(--btb-teal));
 		color: white;
 		border: none;
 		border-radius: 0.375rem;
@@ -470,8 +470,8 @@
 		width: 100%;
 		padding: 0.5rem;
 		background: transparent;
-		color: var(--color-primary, #0f766e);
-		border: 1px solid var(--color-primary, #0f766e);
+		color: var(--color-primary, var(--btb-teal));
+		border: 1px solid var(--color-primary, var(--btb-teal));
 		border-radius: 0.375rem;
 		font-size: 0.8125rem;
 		font-weight: 500;
@@ -480,7 +480,7 @@
 	}
 
 	.btn-secondary:hover:not(:disabled) {
-		background: var(--color-primary, #0f766e);
+		background: var(--color-primary, var(--btb-teal));
 		color: white;
 	}
 
@@ -489,13 +489,13 @@
 		text-align: center;
 		padding: 0.375rem;
 		font-size: 0.8125rem;
-		color: var(--color-text-muted, #64748b);
+		color: var(--color-text-muted, var(--text-secondary));
 		text-decoration: none;
 		transition: color 0.15s;
 	}
 
 	.btn-ghost:hover {
-		color: var(--color-text, #334155);
+		color: var(--color-text, var(--text-primary));
 	}
 
 	/* Image upload */
@@ -520,7 +520,7 @@
 	.btn-sm {
 		font-size: 0.75rem;
 		padding: 0.25rem 0.5rem;
-		border: 1px solid var(--color-border, #e2e8f0);
+		border: 1px solid var(--color-border, var(--border));
 		border-radius: 0.25rem;
 		background: transparent;
 		cursor: pointer;
@@ -528,7 +528,7 @@
 	}
 
 	.btn-sm:hover {
-		background: var(--color-surface-hover, #f8fafc);
+		background: var(--color-surface-hover, var(--bg-elevated));
 	}
 
 	.btn-danger {
@@ -542,7 +542,7 @@
 	}
 
 	.dropzone {
-		border: 2px dashed var(--color-border, #e2e8f0);
+		border: 2px dashed var(--color-border, var(--border));
 		border-radius: 0.5rem;
 		padding: 1rem;
 		text-align: center;
@@ -551,7 +551,7 @@
 	}
 
 	.dropzone:hover {
-		border-color: var(--color-primary, #0f766e);
+		border-color: var(--color-primary, var(--btb-teal));
 	}
 
 	.dropzone-label {
@@ -560,7 +560,7 @@
 		align-items: center;
 		gap: 0.375rem;
 		cursor: pointer;
-		color: var(--color-text-muted, #64748b);
+		color: var(--color-text-muted, var(--text-secondary));
 		font-size: 0.8125rem;
 	}
 

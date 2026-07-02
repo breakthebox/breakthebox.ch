@@ -31,6 +31,15 @@
 		content.roles = content.roles.filter((_, i) => i !== index);
 	}
 
+	// ─── Socials ───
+	const socialPlatforms = ['linkedin', 'instagram', 'youtube', 'x', 'xing', 'github', 'website'];
+	function addSocial() {
+		content.socials = [...content.socials, { platform: 'linkedin', url: '' }];
+	}
+	function removeSocial(index: number) {
+		content.socials = content.socials.filter((_, i) => i !== index);
+	}
+
 	// ─── Form submission ───
 	let jsonPayload = $derived(JSON.stringify(content));
 
@@ -78,6 +87,22 @@
 
 	<form method="POST" onsubmit={handleSubmit}>
 		<input type="hidden" name="content" value={jsonPayload} />
+
+		<!-- ═══════ Titel ═══════ -->
+		<section class="editor-section">
+			<div class="section-header">
+				<div>
+					<h2>Titel</h2>
+					<p class="section-desc">Die Überschrift der «Über mich»-Sektion.</p>
+				</div>
+			</div>
+			<input
+				type="text"
+				class="field-input"
+				placeholder="z.B. Strategin, Verwaltungsrätin, Dozentin — und Builderin"
+				bind:value={content.title}
+			/>
+		</section>
 
 		<!-- ═══════ Texte ═══════ -->
 		<section class="editor-section">
@@ -186,6 +211,40 @@
 								/>
 							</div>
 						</div>
+					</div>
+				{/each}
+			</div>
+		</section>
+
+		<!-- ═══════ Social Media ═══════ -->
+		<section class="editor-section">
+			<div class="section-header">
+				<div>
+					<h2>Social Media</h2>
+					<p class="section-desc">Links zu deinen Profilen. Icon wird automatisch aus der Plattform gewählt.</p>
+				</div>
+				<button type="button" class="btn-add" onclick={addSocial}>
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
+					Link hinzufügen
+				</button>
+			</div>
+			<div class="items-list">
+				{#each content.socials as social, i}
+					<div class="item-row">
+						<select class="field-input field-select" bind:value={content.socials[i].platform}>
+							{#each socialPlatforms as p}
+								<option value={p}>{p}</option>
+							{/each}
+						</select>
+						<input
+							type="url"
+							class="field-input"
+							placeholder="https://…"
+							bind:value={content.socials[i].url}
+						/>
+						<button type="button" class="btn-remove" onclick={() => removeSocial(i)}>
+							<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+						</button>
 					</div>
 				{/each}
 			</div>
@@ -336,6 +395,10 @@
 	}
 	.item-row .field-input {
 		flex: 1;
+	}
+	.item-row .field-select {
+		flex: 0 0 140px;
+		cursor: pointer;
 	}
 
 	/* ═══════ Role fields ═══════ */
