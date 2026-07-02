@@ -250,20 +250,32 @@
 			</div>
 		</section>
 
-		<!-- ═══════ Video-Label ═══════ -->
+		<!-- ═══════ Video ═══════ -->
 		<section class="editor-section">
 			<div class="section-header">
 				<div>
-					<h2>Video-Label</h2>
-					<p class="section-desc">Beschriftung des Video-Buttons.</p>
+					<h2>Video</h2>
+					<p class="section-desc">YouTube-Link und Beschriftung. Leerer Link blendet das Video aus.</p>
 				</div>
 			</div>
-			<input
-				type="text"
-				class="field-input"
-				placeholder="z.B. mein CV in 2 Minuten"
-				bind:value={content.videoLabel}
-			/>
+			<div class="field-group" style="margin-bottom: 12px;">
+				<label class="field-label">Video-Label</label>
+				<input
+					type="text"
+					class="field-input"
+					placeholder="z.B. mein CV in 2 Minuten"
+					bind:value={content.videoLabel}
+				/>
+			</div>
+			<div class="field-group">
+				<label class="field-label">YouTube-Link</label>
+				<input
+					type="url"
+					class="field-input"
+					placeholder="z.B. https://www.youtube.com/watch?v=…"
+					bind:value={content.videoUrl}
+				/>
+			</div>
 		</section>
 
 		<!-- ═══════ Save ═══════ -->

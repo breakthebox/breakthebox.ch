@@ -39,6 +39,12 @@
 			icon: '❝'
 		},
 		{
+			id: 'referenzprojekte',
+			title: 'Referenzprojekte',
+			description: 'Drehbare Karten für die Subseite «Referenzprojekte»',
+			icon: '▤'
+		},
+		{
 			id: 'references',
 			title: 'Kundenlogos',
 			description: 'Logos der Referenz-Marquee verwalten',

@@ -16,6 +16,7 @@ import type {
 	MetricsContent,
 	PartnersContent,
 	ManifestContent,
+	ReferenceProjectsContent,
 	FaqContent
 } from '$lib/types/content';
 
@@ -93,7 +94,8 @@ export const defaultAbout: AboutContent = {
 		{ platform: 'linkedin', url: 'https://www.linkedin.com/in/bhulliger/' },
 		{ platform: 'instagram', url: 'https://www.instagram.com/brigitte.hulliger/' }
 	],
-	videoLabel: 'mein CV in 2 Minuten'
+	videoLabel: 'mein CV in 2 Minuten',
+	videoUrl: 'https://www.youtube.com/watch?v=uCzVUW3xY8I'
 };
 
 // Härtet einen (evtl. unvollständigen oder legacy) About-DB-Eintrag gegen
@@ -324,6 +326,59 @@ export const defaultFaq: FaqContent = {
 			question: 'Arbeite ich auch ausserhalb der Schweiz?',
 			answer:
 				'Mein Schwerpunkt ist die Deutschschweiz. Mandate in Deutschland und Österreich sind möglich, sofern sie remote oder mit punktuellen Vor-Ort-Tagen durchführbar sind.'
+		},
+		{
+			question: 'Für wen bin ich nicht die Richtige?',
+			answer:
+				'Für träge Organisationen ohne echten Veränderungswillen und für reines Projektmanagement oder Daily-Business. Ich bin auch nicht die «KI-Stimme» der Schweiz und nicht die Infrastruktur-Ingenieurin — sondern die strategische Übersetzerin zwischen Business und Technik. Es zählt die Haltung, nicht die Branche.'
+		},
+		{
+			question: 'Ist KI bei mir ein Verkaufsargument?',
+			answer:
+				'Nein. KI ist für mich selbstverständliches Werkzeug, keine Überschrift. Ich betreibe selbst ein AI-Agenten-Ökosystem (Miss Bizzy), EntOrakel und Ductivo — ich verstehe Technik von innen und empfehle nur Erprobtes. «Walk the talk» statt heisse Luft.'
+		},
+		{
+			question: 'Warum die Personenmarke Brigitte Hulliger — und was ist mit der Wucht GmbH?',
+			answer:
+				'Vertrauen gilt der Person: VR-Mandate, Beratung und Bühne laufen über mich, nicht über eine Firma. «Break the Box» ist Claim und Haltung — die bestehende GmbH mit Domain, Verträgen und Referenzen bleibt vollständig erhalten und trägt die Marke weiter.'
+		},
+		{
+			question: 'Wie komme ich am besten zu Dir — und was kostet ein Erstgespräch?',
+			answer:
+				'Am direktesten über eine kurze Mail an info@breakthebox.ch oder eine Empfehlung aus meinem Netzwerk. Ein erstes Kennenlernen ist unverbindlich und kostenlos — darin klären wir, ob Anliegen und Zusammenarbeit passen, bevor wir über ein Mandat sprechen.'
+		}
+	]
+};
+
+export const defaultReferenceProjects: ReferenceProjectsContent = {
+	items: [
+		{
+			key: 'transformation',
+			title: 'IT-Gesamtstrategie & Transformation',
+			subtitle: 'Versicherung · GL-Begleitung',
+			description:
+				'Begleitung der Geschäftsleitung von der Standortbestimmung über die Digitalisierungs-Roadmap bis zur Umsetzung — Strategie und Realisierung aus einer Hand, über 6 bis 12 Monate. Kein Konzept, das liegen bleibt, sondern eine Roadmap, die verankert wird.'
+		},
+		{
+			key: 'governance',
+			title: 'Digitale Urteilskraft im Verwaltungsrat',
+			subtitle: 'VR-Mandat · Governance',
+			description:
+				'Als Verwaltungsrätin bringe ich digitale und KI-Fragen auf die Wirkungsseite ins Gremium — IT wird beurteilt, nicht nur als Kostenblock verwaltet. Verantwortung nach OR 716a heisst: beurteilen können statt abnicken.'
+		},
+		{
+			key: 'ki-readiness',
+			title: 'KI-Readiness & Shadow-AI-Governance',
+			subtitle: 'KMU · Strategie & Sicherheit',
+			description:
+				'Evaluation der KI-Reife, Aufbau eines pragmatischen Governance-Rahmens für den Umgang mit KI-Werkzeugen und Identifikation der Anwendungsfälle mit echtem Hebel — ohne Hype, mit Substanz aus eigener Praxis.'
+		},
+		{
+			key: 'keynote',
+			title: 'Keynotes & Befähigung',
+			subtitle: 'Hochschulen & Unternehmen',
+			description:
+				'Vorträge und Workshops zu KI, Digitalisierung und digitaler Urteilskraft — gebaut aus gelebter Praxis (BFH, Feusi, CAS). Substanz statt Show: befähigen statt dozieren, damit das Publikum mitkommt und weiterträgt.'
 		}
 	]
 };

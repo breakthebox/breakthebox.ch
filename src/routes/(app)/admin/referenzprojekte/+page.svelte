@@ -1,23 +1,30 @@
 <script lang="ts">
-	import type { TestimonialsContent } from '$lib/types/content';
+	import type { ReferenceProjectsContent } from '$lib/types/content';
 	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
 
 	let { data, form } = $props();
-	let content = $state<TestimonialsContent>(structuredClone(data.content));
+	let content = $state<ReferenceProjectsContent>(structuredClone(data.content));
 	let saving = $state(false);
 	let showSuccess = $state(false);
 
 	function addItem() {
-		content.items.push({ quote: '', author: '', role: '', linkedin: '', photo: '', videoUrl: '' });
+		content.items.push({
+			key: 'ref-' + (content.items.length + 1),
+			title: '',
+			subtitle: '',
+			description: '',
+			url: '',
+			image: ''
+		});
 	}
-	function removeItem(index: number) {
-		if (!confirm('Diese Stimme wirklich löschen?')) return;
-		content.items.splice(index, 1);
+	function removeItem(i: number) {
+		if (!confirm('Dieses Referenzprojekt wirklich löschen?')) return;
+		content.items.splice(i, 1);
 	}
-	function move(index: number, dir: -1 | 1) {
-		const t = index + dir;
+	function move(i: number, dir: -1 | 1) {
+		const t = i + dir;
 		if (t < 0 || t >= content.items.length) return;
-		[content.items[index], content.items[t]] = [content.items[t], content.items[index]];
+		[content.items[i], content.items[t]] = [content.items[t], content.items[i]];
 	}
 
 	$effect(() => {
@@ -31,7 +38,7 @@
 </script>
 
 <svelte:head>
-	<title>Stimmen — Admin — Break the Box</title>
+	<title>Referenzprojekte — Admin — Break the Box</title>
 </svelte:head>
 
 <div class="editor-page">
@@ -40,8 +47,8 @@
 			<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 9H3m0 0l5-5M3 9l5 5" /></svg>
 			Zurück zum Dashboard
 		</a>
-		<h1>Stimmen</h1>
-		<p class="page-subtitle">Testimonials aus der Section «Fremdbild statt Eigenlob» — Anzahl, Reihenfolge und Inhalte frei anpassbar.</p>
+		<h1>Referenzprojekte</h1>
+		<p class="page-subtitle">Drehbare Karten für die Subseite «Referenzprojekte». Vorderseite: Titel & Einordnung. Rückseite: Beschreibung.</p>
 	</div>
 
 	{#if showSuccess}<div class="toast toast-success">Änderungen erfolgreich gespeichert.</div>{/if}
@@ -55,43 +62,27 @@
 				<div class="item-card">
 					<div class="item-head">
 						<span class="item-num">{i + 1}</span>
-						<span class="item-title">{item.author || 'Neue Stimme'}</span>
+						<span class="item-title">{item.title || 'Neues Referenzprojekt'}</span>
 						<div class="item-actions">
 							<button type="button" class="icon-btn" onclick={() => move(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
 							<button type="button" class="icon-btn" onclick={() => move(i, 1)} disabled={i === content.items.length - 1} aria-label="Nach unten">↓</button>
 							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeItem(i)} aria-label="Löschen">&times;</button>
 						</div>
 					</div>
-					<div class="field">
-						<label class="field-label" for="quote-{i}">Zitat <span class="field-hint">Text mit **doppelten Sternchen** wird rot hervorgehoben</span></label>
-						<textarea id="quote-{i}" class="field-textarea" bind:value={item.quote} rows="3" placeholder="z.B. Sie ist **das Bindeglied** zwischen Technik und Business…"></textarea>
-					</div>
 					<div class="field-row">
-						<div class="field">
-							<label class="field-label" for="author-{i}">Name</label>
-							<input id="author-{i}" type="text" class="field-input" bind:value={item.author} placeholder="z.B. Marcel Zahnd" />
-						</div>
-						<div class="field">
-							<label class="field-label" for="role-{i}">Rolle / Bezug</label>
-							<input id="role-{i}" type="text" class="field-input" bind:value={item.role} placeholder="z.B. Co-Dozent" />
-						</div>
+						<div class="field"><label class="field-label" for="rt-{i}">Titel <span class="field-hint">Vorderseite</span></label><input id="rt-{i}" type="text" class="field-input" bind:value={item.title} placeholder="z.B. IT-Gesamtstrategie & Transformation" /></div>
+						<div class="field"><label class="field-label" for="rs-{i}">Einordnung <span class="field-hint">Vorderseite, optional</span></label><input id="rs-{i}" type="text" class="field-input" bind:value={item.subtitle} placeholder="z.B. Versicherung · GL-Begleitung" /></div>
 					</div>
+					<div class="field"><label class="field-label" for="rd-{i}">Beschreibung <span class="field-hint">Rückseite der Karte</span></label><textarea id="rd-{i}" class="field-textarea" bind:value={item.description} rows="4"></textarea></div>
 					<div class="field-row">
-						<div class="field">
-							<label class="field-label" for="li-{i}">LinkedIn-Profil (URL, optional)</label>
-							<input id="li-{i}" type="url" class="field-input" bind:value={item.linkedin} placeholder="https://www.linkedin.com/in/…" />
-						</div>
-						<div class="field">
-							<label class="field-label" for="vid-{i}">Video-Statement (YouTube-Link, optional)</label>
-							<input id="vid-{i}" type="url" class="field-input" bind:value={item.videoUrl} placeholder="https://youtu.be/…" />
-						</div>
+						<div class="field"><label class="field-label" for="ru-{i}">Link <span class="field-hint">optional</span></label><input id="ru-{i}" type="text" class="field-input" bind:value={item.url} placeholder="https://…" /></div>
+						<div class="field field-full"><ImageUpload bind:value={item.image} section="refproject-{i}" label="Bild (optional)" /></div>
 					</div>
-					<ImageUpload bind:value={item.photo} section="testimonial-{i}" label="Foto (optional)" />
 				</div>
 			{/each}
 		</div>
 
-		<button type="button" class="btn-add" onclick={addItem}>+ Stimme hinzufügen</button>
+		<button type="button" class="btn-add" onclick={addItem}>+ Referenzprojekt hinzufügen</button>
 
 		<div class="form-actions">
 			<button type="submit" class="btn-save" disabled={saving}>{saving ? 'Speichern...' : 'Speichern'}</button>
@@ -151,7 +142,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
-		margin-bottom: var(--space-lg);
+		margin-bottom: var(--space-md);
 	}
 	.item-card {
 		background: var(--bg-surface);
@@ -225,6 +216,12 @@
 	.field-row {
 		display: flex;
 		gap: 14px;
+	}
+	.field-row:has(.field-full) {
+		flex-wrap: wrap;
+	}
+	.field-full {
+		flex: 1 1 100%;
 	}
 	.field-label {
 		font-size: 0.82rem;

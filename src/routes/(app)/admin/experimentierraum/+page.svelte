@@ -39,6 +39,34 @@
 		[content.projects[i], content.projects[t]] = [content.projects[t], content.projects[i]];
 	}
 
+	// Projekt (Work in Progress) → Plattform verschieben (desc-String → Abschnitte-Array)
+	function projectToPlatform(i: number) {
+		const p = content.projects[i];
+		content.platforms.push({
+			key: p.key ?? 'platform-' + (content.platforms.length + 1),
+			name: p.name,
+			sketch: p.sketch ?? '',
+			desc: p.desc ? [p.desc] : [''],
+			url: p.url ?? '',
+			image: p.image ?? ''
+		});
+		content.projects.splice(i, 1);
+	}
+	// Plattform → Projekt (Work in Progress) verschieben (Abschnitte → desc-String)
+	function platformToProject(i: number) {
+		const p = content.platforms[i];
+		content.projects.push({
+			key: p.key ?? 'project-' + (content.projects.length + 1),
+			name: p.name,
+			sketch: p.sketch ?? '',
+			desc: (p.desc ?? []).filter(Boolean).join('\n\n'),
+			status: '',
+			url: p.url ?? '',
+			image: p.image ?? ''
+		});
+		content.platforms.splice(i, 1);
+	}
+
 	$effect(() => {
 		if (form?.success) {
 			showSuccess = true;
@@ -60,7 +88,7 @@
 			Zurück zum Dashboard
 		</a>
 		<h1>Experimentierraum</h1>
-		<p class="page-subtitle">Plattformen und laufende Projekte für die Subseite «Experimentierraum».</p>
+		<p class="page-subtitle">Plattformen und laufende Projekte für die Subseite «Experimentierraum». Mit ⇄ verschiebst Du einen Eintrag zwischen «Projekte in Arbeit» und «Plattformen» — ohne ihn neu zu erfassen.</p>
 	</div>
 
 	{#if showSuccess}<div class="toast toast-success">Änderungen erfolgreich gespeichert.</div>{/if}
@@ -79,6 +107,7 @@
 						<div class="item-actions">
 							<button type="button" class="icon-btn" onclick={() => movePlatform(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
 							<button type="button" class="icon-btn" onclick={() => movePlatform(i, 1)} disabled={i === content.platforms.length - 1} aria-label="Nach unten">↓</button>
+							<button type="button" class="icon-btn icon-btn-move" onclick={() => platformToProject(i)} title="Zu «Projekte in Arbeit» verschieben" aria-label="Zu Projekten verschieben">⇄</button>
 							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removePlatform(i)} aria-label="Löschen">&times;</button>
 						</div>
 					</div>
@@ -117,6 +146,7 @@
 						<div class="item-actions">
 							<button type="button" class="icon-btn" onclick={() => moveProject(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
 							<button type="button" class="icon-btn" onclick={() => moveProject(i, 1)} disabled={i === content.projects.length - 1} aria-label="Nach unten">↓</button>
+							<button type="button" class="icon-btn icon-btn-move" onclick={() => projectToPlatform(i)} title="Zu «Plattformen» verschieben" aria-label="Zu Plattformen verschieben">⇄</button>
 							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeProject(i)} aria-label="Löschen">&times;</button>
 						</div>
 					</div>
@@ -263,6 +293,13 @@
 	.icon-btn-danger:hover:not(:disabled) {
 		border-color: var(--color-error);
 		color: var(--color-error);
+	}
+	.icon-btn-move {
+		font-size: 1.05rem;
+	}
+	.icon-btn-move:hover:not(:disabled) {
+		border-color: var(--btb-teal);
+		color: var(--btb-teal);
 	}
 	.field {
 		display: flex;

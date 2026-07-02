@@ -43,6 +43,7 @@ export interface AboutContent {
 	roles: AboutRole[];
 	socials: SocialLink[];
 	videoLabel: string;
+	videoUrl?: string; // YouTube-Link (watch/youtu.be/shorts/embed) — wird als Embed dargestellt
 }
 
 // ─── Kennzahlen / Metrics ───
@@ -147,6 +148,7 @@ export interface Testimonial {
 	role: string;
 	linkedin?: string;
 	photo?: string;
+	videoUrl?: string; // optionaler Link zu einem Short/Video (z.B. YouTube), damit die Person selbst spricht
 }
 
 export interface TestimonialsContent {
@@ -168,6 +170,20 @@ export interface ExperimentsContent {
 	platforms: Platform[];
 	missbizzy: WalkTheTalkContent['missbizzy'];
 	projects: ExperimentProject[];
+}
+
+// ─── Referenzprojekte ───
+export interface ReferenceProject {
+	key?: string;
+	title: string;
+	subtitle?: string; // kurze Einordnung / Branche / Rolle (Vorderseite)
+	description: string; // ausführlicher Text auf der Rückseite der Flip-Karte
+	image?: string;
+	url?: string;
+}
+
+export interface ReferenceProjectsContent {
+	items: ReferenceProject[];
 }
 
 // ─── FAQ ───
@@ -296,6 +312,7 @@ export type SectionKey =
 	| 'metrics'
 	| 'partners'
 	| 'manifest'
+	| 'referenzprojekte'
 	| 'faq';
 
 export type SectionContent =
@@ -310,4 +327,5 @@ export type SectionContent =
 	| MetricsContent
 	| PartnersContent
 	| ManifestContent
+	| ReferenceProjectsContent
 	| FaqContent;

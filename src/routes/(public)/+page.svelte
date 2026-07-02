@@ -25,6 +25,16 @@
 	const latestPosts: BlogPostRow[] = data.latestPosts ?? [];
 	const hasRealPosts = latestPosts.length > 0;
 
+	// YouTube-Link (watch / youtu.be / shorts / embed / reine ID) → nocookie-Embed-URL
+	function ytEmbed(url: string | undefined): string {
+		if (!url) return '';
+		const id =
+			url.match(/(?:youtu\.be\/|\/embed\/|\/shorts\/|[?&]v=)([\w-]{11})/)?.[1] ??
+			(/^[\w-]{11}$/.test(url.trim()) ? url.trim() : '');
+		return id ? `https://www.youtube-nocookie.com/embed/${id}` : '';
+	}
+	const aboutVideoEmbed = ytEmbed(about.videoUrl);
+
 	// Split client logos into two rows for counter-scrolling marquee
 	const refHalf = Math.ceil(references.clients.length / 2);
 	const refRow1 = references.clients.slice(0, refHalf);
@@ -314,18 +324,20 @@
 					<img src="/foto_brigitte_2025.jpg" alt="Brigitte Hulliger" loading="lazy" decoding="async" />
 					<div class="abadge">{m.h_about_badge()}</div>
 				</div>
-				<div class="about-video">
-					<span class="about-video-label">{about.videoLabel}</span>
-					<div class="about-video-wrapper">
-						<iframe
-							src="https://www.youtube-nocookie.com/embed/uCzVUW3xY8I"
-							title="CV Brigitte Hulliger"
-							frameborder="0"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowfullscreen
-						></iframe>
+				{#if aboutVideoEmbed}
+					<div class="about-video">
+						<span class="about-video-label">{about.videoLabel}</span>
+						<div class="about-video-wrapper">
+							<iframe
+								src={aboutVideoEmbed}
+								title="CV Brigitte Hulliger"
+								frameborder="0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen
+							></iframe>
+						</div>
 					</div>
-				</div>
+				{/if}
 			</div>
 			<div class="reveal">
 				<div class="kick">{m.section_about_label()}</div>
@@ -475,6 +487,9 @@
 								<span class="qa-role">{quote.role}</span>
 							</div>
 						</div>
+						{#if quote.videoUrl}
+							<a class="qt-video" href={quote.videoUrl} target="_blank" rel="noopener noreferrer">▶ Video-Statement ansehen</a>
+						{/if}
 					</div>
 				{/each}
 			</div>
@@ -1414,8 +1429,8 @@
 	}
 	/* Haarlinien-Trenner via 1px-Gap auf --line-Hintergrund — sauber & wrap-fest */
 	.metrics-grid {
-		display: grid;
-		grid-template-columns: repeat(5, 1fr);
+		display: flex;
+		flex-wrap: wrap;
 		gap: 1px;
 		background: var(--line);
 		border: 1px solid var(--line);
@@ -1424,6 +1439,8 @@
 		overflow: hidden;
 	}
 	.metric {
+		/* flex-grow verteilt die Karten über die volle Breite — egal wie viele */
+		flex: 1 1 150px;
 		background: #fff;
 		padding: 34px 24px;
 		display: flex;
@@ -1627,6 +1644,25 @@
 		color: var(--dim);
 		margin-top: 1px;
 	}
+	.qt-video {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		margin-top: 14px;
+		align-self: flex-start;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--red);
+		text-decoration: none;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		padding: 6px 14px;
+		transition: border-color 0.15s, background 0.15s;
+	}
+	.qt-video:hover {
+		border-color: var(--red);
+		background: rgba(177, 30, 44, 0.05);
+	}
 
 	/* ═══════ ABOUT VIDEO ═══════ */
 	.about-video {
@@ -1814,9 +1850,6 @@
 			grid-template-columns: 1fr;
 			gap: 18px;
 		}
-		.metrics-grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
 	}
 	@media (max-width: 720px) {
 		/* Hero stapelt: Text oben, Frucht mit Callout-Zeile darunter */
@@ -1837,26 +1870,8 @@
 			flex-direction: column;
 			align-items: center;
 		}
-		/* Callouts werden zur ruhigen Bildunterschrift unter der Frucht */
+		/* Auf Mobile die Frucht-Callouts ganz ausblenden — zu eng, überlagern das Bild */
 		.annos {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: center;
-			gap: 14px 34px;
-			margin-top: 20px;
-		}
-		.anno {
-			position: static;
-			font-size: 22px;
-			text-align: center;
-		}
-		.a2 {
-			text-align: center;
-		}
-		.anno small {
-			font-size: 15px;
-		}
-		.anno-ar {
 			display: none;
 		}
 	}
@@ -1872,9 +1887,6 @@
 		}
 		section.sec {
 			padding: 50px 0;
-		}
-		.metrics-grid {
-			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 </style>
