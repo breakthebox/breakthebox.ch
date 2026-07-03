@@ -237,6 +237,11 @@
 				Im Administrationsbereich nutzen wir KI-Dienste (Anthropic Claude) für die Unterstützung bei der Texterstellung und SEO-Analyse. Blog-Inhalte, die zur KI-Verarbeitung übermittelt werden, enthalten keine personenbezogenen Daten von Besucherinnen und Besuchern. Die Verarbeitung erfolgt über die API von Anthropic, PBC mit Sitz in den USA.
 			</p>
 
+			<h3>Chat-Assistent «Miss Bizzy»</h3>
+			<p>
+				Auf der Seite «Experimentierraum» bieten wir einen KI-gestützten Chat-Assistenten («Miss Bizzy») an. Wenn Sie diesen nutzen, werden die von Ihnen eingegebenen Nachrichten zur Erzeugung einer Antwort an unser selbst gehostetes Agenten-System und einen nachgelagerten KI-Dienst übermittelt und dort verarbeitet. Die Nutzung ist freiwillig; bitte geben Sie im Chat keine sensiblen personenbezogenen Daten ein.
+			</p>
+
 			<h3>Google Web Fonts</h3>
 			<p>
 				Wir benutzen auf unserer Website zur einheitlichen Darstellung von Schriftarten Web Fonts, die von Google bereitgestellt werden. Beim Aufruf einer unserer Seiten lädt Ihr Browser die benötigten Web Fonts in Ihren Browsercache, um Texte und Schriftarten korrekt anzuzeigen. Der von Ihnen verwendete Browser stellt dabei eine Verbindung zu den Servern von Google her. Hierdurch erlangt Google Kenntnis darüber, dass via Ihre IP-Adresse unsere Website aufgerufen wurde.
