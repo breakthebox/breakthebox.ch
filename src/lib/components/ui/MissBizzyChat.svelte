@@ -1,63 +1,91 @@
 <script lang="ts">
-	// Scripted Demo-Chat mit Miss Bizzy — kein Backend, keine Kosten, kein Missbrauch.
-	type Msg = { from: 'bot' | 'user'; text: string };
+	// Echter Chat mit Miss Bizzy: Freitext → /api/chat → n8n-Webhook.
+	// Bot-Antworten werden als reiner Text gerendert (kein @html) — sicher gegen XSS.
+	type Msg = { from: 'bot' | 'user'; text: string; error?: boolean };
 
 	let open = $state(false);
-	let typing = $state(false);
+	let sending = $state(false);
+	let input = $state('');
+	let sessionId = $state('');
 	let messages = $state<Msg[]>([
 		{
 			from: 'bot',
-			text: 'Hoi! Ich bin Miss Bizzy — Brigittes KI-Agentin. (Demo-Modus 🤖) Frag mich was:'
+			text: 'Hoi! Ich bin Miss Bizzy — Brigittes KI-Agentin. Frag mich zu IT-Strategie, KI oder Brigittes Arbeit.'
 		}
 	]);
 	let scroller = $state<HTMLElement>();
-	let replyTimer: ReturnType<typeof setTimeout>;
+	let inputEl = $state<HTMLInputElement>();
 	let scrollTimer: ReturnType<typeof setTimeout>;
 
-	// Ausstehende Timer beim Unmount aufräumen (kein stale-State nach Navigation).
-	$effect(() => () => {
-		clearTimeout(replyTimer);
-		clearTimeout(scrollTimer);
-	});
+	$effect(() => () => clearTimeout(scrollTimer));
 
-	const qa: { q: string; a: string }[] = [
-		{
-			q: 'Wer bist du?',
-			a: 'Ich bin ein selbstgebautes KI-Agenten-Ökosystem (n8n + spezialisierte Agenten) — für E-Mail, Controlling, Recherche und CRM. Kein Experiment, sondern täglicher Einsatz.'
-		},
-		{
-			q: 'Was baut Brigitte sonst?',
-			a: 'Ductivo (KI-Lernplattform), Ent.Orakel (Systemik-Werkzeug) und diese Website hier. Sie empfiehlt nur, was sie selbst betreibt.'
-		},
-		{
-			q: 'Kann ich Brigitte engagieren?',
-			a: 'Klar — für IT-Strategie, Governance/VR oder Keynotes. Schreib ihr an info@breakthebox.ch. Ich leite es weiter. 😉'
-		},
-		{
-			q: 'Zeig mir was für Nerds',
-			a: 'Psst… probier den Konami-Code: ↑ ↑ ↓ ↓ ← → ← → B A. Und schau mal in die Browser-Konsole. 🕹️'
-		},
-		{
-			q: 'Bist du ein echter KI-Chat?',
-			a: 'Hier nicht — das ist eine kuratierte Demo (keine Kosten, kein Blödsinn). Das echte Miss-Bizzy-System läuft privat im Hintergrund.'
-		}
+	// Gesprächseinstiege — senden echte Fragen an den Agenten.
+	const starters = [
+		'Was macht Brigitte genau?',
+		'Wie geht ihr IT-Strategie an?',
+		'Wie nutzt ihr KI konkret?',
+		'Kann ich Brigitte engagieren?'
 	];
 
 	function scrollSoon() {
-		scrollTimer = setTimeout(() => scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }), 40);
+		scrollTimer = setTimeout(
+			() => scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }),
+			40
+		);
 	}
 
-	function ask(item: { q: string; a: string }) {
-		if (typing) return;
-		messages.push({ from: 'user', text: item.q });
-		typing = true;
+	function toggle() {
+		open = !open;
+		if (open) setTimeout(() => inputEl?.focus(), 60);
+	}
+
+	async function send(text: string) {
+		const q = text.trim();
+		if (!q || sending) return;
+		if (!sessionId) sessionId = crypto.randomUUID();
+
+		// Verlauf VOR der neuen Frage (letzte 8 echten Nachrichten).
+		const history = messages
+			.filter((m) => !m.error)
+			.slice(-8)
+			.map((m) => ({ role: m.from === 'bot' ? 'assistant' : 'user', content: m.text }));
+
+		messages.push({ from: 'user', text: q });
+		input = '';
+		sending = true;
 		scrollSoon();
-		const delay = Math.min(1400, 500 + item.a.length * 7);
-		replyTimer = setTimeout(() => {
-			typing = false;
-			messages.push({ from: 'bot', text: item.a });
+
+		try {
+			const res = await fetch('/api/chat', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ message: q, history, sessionId })
+			});
+			const data = await res.json().catch(() => null);
+			const reply = typeof data?.reply === 'string' ? data.reply : null;
+			messages.push({
+				from: 'bot',
+				text: reply ?? 'Da ist etwas schiefgelaufen. Versuch es bitte nochmal.',
+				error: !res.ok || !reply
+			});
+		} catch {
+			messages.push({
+				from: 'bot',
+				text: 'Keine Verbindung — bitte versuch es gleich nochmal.',
+				error: true
+			});
+		} finally {
+			sending = false;
 			scrollSoon();
-		}, delay);
+			setTimeout(() => inputEl?.focus(), 40);
+		}
+	}
+
+	function onKey(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			send(input);
+		}
 	}
 </script>
 
@@ -68,31 +96,59 @@
 				<span class="mb-avatar" aria-hidden="true">🤖</span>
 				<div class="mb-head-txt">
 					<strong>Miss Bizzy</strong>
-					<span>KI-Agentin · Demo</span>
+					<span>KI-Agentin</span>
 				</div>
 				<button class="mb-close" onclick={() => (open = false)} aria-label="Chat schliessen">×</button>
 			</div>
 
-			<div class="mb-body" bind:this={scroller}>
+			<div class="mb-body" bind:this={scroller} aria-live="polite">
 				{#each messages as msg}
-					<div class="mb-msg mb-msg-{msg.from}">{msg.text}</div>
+					<div class="mb-msg mb-msg-{msg.from}" class:mb-msg-error={msg.error}>{msg.text}</div>
 				{/each}
-				{#if typing}
+				{#if sending}
 					<div class="mb-msg mb-msg-bot mb-typing" aria-label="Miss Bizzy schreibt">
 						<span></span><span></span><span></span>
 					</div>
 				{/if}
+
+				{#if messages.length <= 1}
+					<div class="mb-starters">
+						{#each starters as s}
+							<button type="button" class="mb-chip" onclick={() => send(s)} disabled={sending}>{s}</button>
+						{/each}
+					</div>
+				{/if}
 			</div>
 
-			<div class="mb-quick">
-				{#each qa as item}
-					<button type="button" class="mb-chip" onclick={() => ask(item)} disabled={typing}>{item.q}</button>
-				{/each}
+			<div class="mb-input">
+				<input
+					bind:this={inputEl}
+					bind:value={input}
+					onkeydown={onKey}
+					type="text"
+					placeholder="Frag Miss Bizzy…"
+					aria-label="Nachricht an Miss Bizzy"
+					maxlength="2000"
+					disabled={sending}
+				/>
+				<button
+					type="button"
+					class="mb-send"
+					onclick={() => send(input)}
+					disabled={sending || !input.trim()}
+					aria-label="Senden"
+				>→</button>
 			</div>
+			<p class="mb-note">Deine Eingaben werden zur Beantwortung an einen KI-Dienst gesendet.</p>
 		</div>
 	{/if}
 
-	<button class="mb-fab" class:mb-fab-open={open} onclick={() => (open = !open)} aria-label={open ? 'Chat schliessen' : 'Chat mit Miss Bizzy öffnen'}>
+	<button
+		class="mb-fab"
+		class:mb-fab-open={open}
+		onclick={toggle}
+		aria-label={open ? 'Chat schliessen' : 'Chat mit Miss Bizzy öffnen'}
+	>
 		{#if open}×{:else}<span class="mb-fab-emoji" aria-hidden="true">🤖</span> Miss Bizzy{/if}
 	</button>
 </div>
@@ -204,6 +260,8 @@
 		border-radius: 14px;
 		font-size: 0.88rem;
 		line-height: 1.5;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
 	}
 	.mb-msg-bot {
 		align-self: flex-start;
@@ -217,6 +275,10 @@
 		background: var(--btb-steel);
 		color: #fff;
 		border-bottom-right-radius: 4px;
+	}
+	.mb-msg-error {
+		border-color: var(--color-error, #fb7185);
+		color: var(--color-error, #fb7185);
 	}
 	.mb-typing {
 		display: inline-flex;
@@ -248,19 +310,17 @@
 			opacity: 1;
 		}
 	}
-	.mb-quick {
+	.mb-starters {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 6px;
-		padding: 12px;
-		border-top: 1px solid var(--border);
-		background: var(--bg-surface);
+		margin-top: 4px;
 	}
 	.mb-chip {
 		padding: 7px 12px;
 		border: 1px solid var(--border);
 		border-radius: 999px;
-		background: var(--bg-page);
+		background: var(--bg-surface);
 		color: var(--text-secondary);
 		font-size: 0.78rem;
 		font-weight: 500;
@@ -274,6 +334,56 @@
 	.mb-chip:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+	.mb-input {
+		display: flex;
+		gap: 8px;
+		padding: 12px;
+		border-top: 1px solid var(--border);
+		background: var(--bg-surface);
+	}
+	.mb-input input {
+		flex: 1;
+		min-width: 0;
+		padding: 10px 14px;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--bg-page);
+		color: var(--text-primary);
+		font-family: var(--ff-ui);
+		font-size: 0.88rem;
+	}
+	.mb-input input:focus {
+		outline: none;
+		border-color: var(--btb-steel);
+	}
+	.mb-send {
+		flex-shrink: 0;
+		width: 40px;
+		height: 40px;
+		border: none;
+		border-radius: 50%;
+		background: var(--btb-steel);
+		color: #fff;
+		font-size: 1.2rem;
+		line-height: 1;
+		cursor: pointer;
+		transition: background 0.15s;
+	}
+	.mb-send:hover:not(:disabled) {
+		background: var(--btb-steel-hover);
+	}
+	.mb-send:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+	.mb-note {
+		margin: 0;
+		padding: 0 14px 12px;
+		background: var(--bg-surface);
+		font-size: 0.66rem;
+		color: var(--text-muted);
+		line-height: 1.4;
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.mb-typing span {
