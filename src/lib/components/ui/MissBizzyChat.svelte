@@ -1,50 +1,118 @@
 <script lang="ts">
-	// Echter Chat mit Miss Bizzy: Freitext → /api/chat → n8n-Webhook.
+	// Hybrid-Chat mit Miss Bizzy:
+	//  • Onprem: kuratierte Q&A-Chips → sofortige, lokale Antwort (gratis, unbegrenzt).
+	//  • Remote: Freitext → /api/chat → n8n-Webhook, max. 10 Fragen pro Session.
 	// Bot-Antworten werden als reiner Text gerendert (kein @html) — sicher gegen XSS.
+	import { onMount } from 'svelte';
+
 	type Msg = { from: 'bot' | 'user'; text: string; error?: boolean };
 
+	const REMOTE_LIMIT = 10;
+
 	let open = $state(false);
-	let sending = $state(false);
+	let busy = $state(false);
 	let input = $state('');
 	let sessionId = $state('');
+	let remoteCount = $state(0);
 	let messages = $state<Msg[]>([
 		{
 			from: 'bot',
-			text: 'Hoi! Ich bin Miss Bizzy — Brigittes KI-Agentin. Frag mich zu IT-Strategie, KI oder Brigittes Arbeit.'
+			text: 'Hoi! Ich bin Miss Bizzy 🤖 Klick eine Frage für eine schnelle Antwort — oder tippe unten, dann antwortet mein KI-Agent live.'
 		}
 	]);
 	let scroller = $state<HTMLElement>();
 	let inputEl = $state<HTMLInputElement>();
-	let scrollTimer: ReturnType<typeof setTimeout>;
+	let timers: ReturnType<typeof setTimeout>[] = [];
 
-	$effect(() => () => clearTimeout(scrollTimer));
+	let remoteLeft = $derived(Math.max(0, REMOTE_LIMIT - remoteCount));
 
-	// Gesprächseinstiege — senden echte Fragen an den Agenten.
-	const starters = [
-		'Was macht Brigitte genau?',
-		'Wie geht ihr IT-Strategie an?',
-		'Wie nutzt ihr KI konkret?',
-		'Kann ich Brigitte engagieren?'
+	// ─── Onprem: kuratierte Q&A (sofort, lokal, gratis) ───
+	const qa: { q: string; a: string }[] = [
+		{
+			q: 'Wer bist du?',
+			a: 'Ich bin ein selbstgebautes KI-Agenten-Ökosystem (n8n + spezialisierte Agenten) — für E-Mail, Controlling, Recherche und CRM. Kein Experiment, sondern täglicher Einsatz.'
+		},
+		{
+			q: 'Was baut Brigitte sonst?',
+			a: 'Ductivo (KI-Lernplattform), Ent.Orakel (Systemik-Werkzeug) und diese Website hier. Sie empfiehlt nur, was sie selbst betreibt.'
+		},
+		{
+			q: 'Kann ich Brigitte engagieren?',
+			a: 'Klar — für IT-Strategie, Governance/VR oder Keynotes. Schreib ihr an info@breakthebox.ch. Ich leite es weiter. 😉'
+		},
+		{
+			q: 'Zeig mir was für Nerds',
+			a: 'Psst… probier den Konami-Code: ↑ ↑ ↓ ↓ ← → ← → B A. Und schau mal in die Browser-Konsole. 🕹️'
+		},
+		{
+			q: 'Bist du ein echter KI-Chat?',
+			a: 'Beides! Die Kurzantworten hier sind kuratiert (schnell & gratis). Für echte Fragen tippe unten — dann antwortet mein KI-Agent live (pro Session 10 Fragen).'
+		}
 	];
 
+	onMount(() => {
+		try {
+			sessionId = sessionStorage.getItem('mb_session') || crypto.randomUUID();
+			sessionStorage.setItem('mb_session', sessionId);
+			remoteCount = Number(sessionStorage.getItem('mb_remote_count')) || 0;
+		} catch {
+			sessionId = crypto.randomUUID();
+		}
+		return () => timers.forEach(clearTimeout);
+	});
+
+	function persistCount(n: number) {
+		remoteCount = n;
+		try {
+			sessionStorage.setItem('mb_remote_count', String(n));
+		} catch {
+			/* sessionStorage nicht verfügbar — nur In-Memory-Zähler */
+		}
+	}
+
 	function scrollSoon() {
-		scrollTimer = setTimeout(
-			() => scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }),
-			40
+		timers.push(
+			setTimeout(() => scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }), 40)
 		);
 	}
 
 	function toggle() {
 		open = !open;
-		if (open) setTimeout(() => inputEl?.focus(), 60);
+		if (open) timers.push(setTimeout(() => inputEl?.focus(), 60));
 	}
 
+	// Onprem: sofortige lokale Antwort, kein Remote-Call, kein Zähler.
+	function ask(item: { q: string; a: string }) {
+		if (busy) return;
+		messages.push({ from: 'user', text: item.q });
+		busy = true;
+		scrollSoon();
+		timers.push(
+			setTimeout(
+				() => {
+					busy = false;
+					messages.push({ from: 'bot', text: item.a });
+					scrollSoon();
+				},
+				Math.min(1100, 400 + item.a.length * 6)
+			)
+		);
+	}
+
+	// Remote: Freitext an den KI-Agenten (limitiert).
 	async function send(text: string) {
 		const q = text.trim();
-		if (!q || sending) return;
+		if (!q || busy) return;
+		if (remoteLeft <= 0) {
+			messages.push({
+				from: 'bot',
+				text: 'Für diese Session hast du das Limit von 10 Fragen an den KI-Agenten erreicht 🙏 Für mehr schreib Brigitte direkt: info@breakthebox.ch.'
+			});
+			scrollSoon();
+			return;
+		}
 		if (!sessionId) sessionId = crypto.randomUUID();
 
-		// Verlauf VOR der neuen Frage (letzte 8 echten Nachrichten).
 		const history = messages
 			.filter((m) => !m.error)
 			.slice(-8)
@@ -52,7 +120,7 @@
 
 		messages.push({ from: 'user', text: q });
 		input = '';
-		sending = true;
+		busy = true;
 		scrollSoon();
 
 		try {
@@ -63,6 +131,13 @@
 			});
 			const data = await res.json().catch(() => null);
 			const reply = typeof data?.reply === 'string' ? data.reply : null;
+
+			if (data?.limitReached) {
+				persistCount(REMOTE_LIMIT);
+			} else if (res.ok && reply && !data?.offline) {
+				persistCount(remoteCount + 1);
+			}
+
 			messages.push({
 				from: 'bot',
 				text: reply ?? 'Da ist etwas schiefgelaufen. Versuch es bitte nochmal.',
@@ -75,9 +150,9 @@
 				error: true
 			});
 		} finally {
-			sending = false;
+			busy = false;
 			scrollSoon();
-			setTimeout(() => inputEl?.focus(), 40);
+			timers.push(setTimeout(() => inputEl?.focus(), 40));
 		}
 	}
 
@@ -105,19 +180,17 @@
 				{#each messages as msg}
 					<div class="mb-msg mb-msg-{msg.from}" class:mb-msg-error={msg.error}>{msg.text}</div>
 				{/each}
-				{#if sending}
+				{#if busy}
 					<div class="mb-msg mb-msg-bot mb-typing" aria-label="Miss Bizzy schreibt">
 						<span></span><span></span><span></span>
 					</div>
 				{/if}
+			</div>
 
-				{#if messages.length <= 1}
-					<div class="mb-starters">
-						{#each starters as s}
-							<button type="button" class="mb-chip" onclick={() => send(s)} disabled={sending}>{s}</button>
-						{/each}
-					</div>
-				{/if}
+			<div class="mb-quick" aria-label="Schnellfragen">
+				{#each qa as item}
+					<button type="button" class="mb-chip" onclick={() => ask(item)} disabled={busy}>{item.q}</button>
+				{/each}
 			</div>
 
 			<div class="mb-input">
@@ -126,20 +199,26 @@
 					bind:value={input}
 					onkeydown={onKey}
 					type="text"
-					placeholder="Frag Miss Bizzy…"
-					aria-label="Nachricht an Miss Bizzy"
+					placeholder={remoteLeft > 0 ? 'Frag den KI-Agenten…' : 'Frage-Limit erreicht'}
+					aria-label="Nachricht an den KI-Agenten"
 					maxlength="2000"
-					disabled={sending}
+					disabled={busy || remoteLeft <= 0}
 				/>
 				<button
 					type="button"
 					class="mb-send"
 					onclick={() => send(input)}
-					disabled={sending || !input.trim()}
+					disabled={busy || remoteLeft <= 0 || !input.trim()}
 					aria-label="Senden"
 				>→</button>
 			</div>
-			<p class="mb-note">Deine Eingaben werden zur Beantwortung an einen KI-Dienst gesendet.</p>
+			<p class="mb-note">
+				{#if remoteLeft > 0}
+					Noch {remoteLeft} von {REMOTE_LIMIT} Fragen an den KI-Agenten · Eingaben gehen an einen KI-Dienst.
+				{:else}
+					KI-Agent-Limit erreicht — Schnellfragen oben gehen weiter. Für mehr: info@breakthebox.ch.
+				{/if}
+			</p>
 		</div>
 	{/if}
 
@@ -196,7 +275,7 @@
 	}
 	.mb-panel {
 		width: min(360px, calc(100vw - 32px));
-		height: 460px;
+		height: 500px;
 		max-height: calc(100vh - 120px);
 		background: var(--bg-surface);
 		border: 1px solid var(--border);
@@ -310,17 +389,19 @@
 			opacity: 1;
 		}
 	}
-	.mb-starters {
+	.mb-quick {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 6px;
-		margin-top: 4px;
+		padding: 10px 12px;
+		border-top: 1px solid var(--border);
+		background: var(--bg-surface);
 	}
 	.mb-chip {
 		padding: 7px 12px;
 		border: 1px solid var(--border);
 		border-radius: 999px;
-		background: var(--bg-surface);
+		background: var(--bg-page);
 		color: var(--text-secondary);
 		font-size: 0.78rem;
 		font-weight: 500;
@@ -338,8 +419,7 @@
 	.mb-input {
 		display: flex;
 		gap: 8px;
-		padding: 12px;
-		border-top: 1px solid var(--border);
+		padding: 10px 12px 8px;
 		background: var(--bg-surface);
 	}
 	.mb-input input {
@@ -356,6 +436,9 @@
 	.mb-input input:focus {
 		outline: none;
 		border-color: var(--btb-steel);
+	}
+	.mb-input input:disabled {
+		opacity: 0.6;
 	}
 	.mb-send {
 		flex-shrink: 0;
