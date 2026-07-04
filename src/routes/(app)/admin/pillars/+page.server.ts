@@ -1,13 +1,19 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getSectionContent, saveSectionContent } from '$lib/server/db/queries/content';
-import { defaultPillars } from '$lib/server/content-defaults';
-import type { PillarsContent } from '$lib/types/content';
+import { defaultPillars, resolveActiveTheme } from '$lib/server/content-defaults';
+import type { PillarsContent, ThemeContent } from '$lib/types/content';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
-	const content = await getSectionContent<PillarsContent>('pillars');
+	const [content, theme] = await Promise.all([
+		getSectionContent<PillarsContent>('pillars'),
+		getSectionContent<ThemeContent>('theme')
+	]);
+	// Bilder des aktiven Themes — Standard, falls im Pillar kein Override gesetzt ist.
+	const themePillarImages = resolveActiveTheme(theme).pillarImages ?? {};
 	return {
-		content: content ?? defaultPillars
+		content: content ?? defaultPillars,
+		themePillarImages
 	};
 };
 

@@ -13,6 +13,23 @@
 
 	let { data } = $props();
 
+	// ─── Aktives Theme (Farben + Bilder) ───
+	const theme = data.theme;
+	function safeColor(value: string | undefined, fallback: string): string {
+		return value && /^#[0-9a-fA-F]{3,8}$/.test(value.trim()) ? value.trim() : fallback;
+	}
+	// Homepage-Tokens (.hbb) inline überschreiben — schlägt scoped Defaults.
+	const hbbStyle =
+		`--red:${safeColor(theme?.colors?.primary, '#b11e2c')};` +
+		`--redd:${safeColor(theme?.colors?.primaryDark, '#8e1622')};` +
+		`--ink:${safeColor(theme?.colors?.ink, '#2b1a1c')};` +
+		`--cream:${safeColor(theme?.colors?.cream, '#fbf1ec')};`;
+	const heroImage = theme?.heroImage || '/fruits/hero.png';
+	// Theme-Bild ist die Basis; ein im Pillar gesetztes Bild überschreibt es.
+	function pillarImage(p: PillarsContent['pillars'][number]): string | undefined {
+		return p.image || theme?.pillarImages?.[p.key];
+	}
+
 	// Content from DB (with fallback to defaults in server load)
 	const pillars: PillarsContent = data.pillars;
 	const about: AboutContent = data.about;
@@ -112,7 +129,7 @@
 	<meta name="description" content={m.hero_subline()} />
 </svelte:head>
 
-<div class="hbb">
+<div class="hbb" style={hbbStyle}>
 	<ScrollProgress />
 	{#snippet socialIcon(platform: string)}
 		{#if platform === 'linkedin'}
@@ -165,7 +182,7 @@
 					<div class="berryFrame">
 						<div class="berryStage">
 							<div class="berryShadow" aria-hidden="true"></div>
-							<img class="berryimg" src="/fruits/hero.png" alt="Frucht-Fusion" fetchpriority="high" decoding="async" width="470" height="470" />
+							<img class="berryimg" src={heroImage} alt="Frucht-Fusion" fetchpriority="high" decoding="async" width="470" height="470" />
 						</div>
 						<div class="annos">
 							<div class="anno a1">{m.h_anno1()}<small>{m.h_anno1_sub()}</small>
@@ -193,8 +210,8 @@
 				<p class="sub">{m.h_pillars_sub()}</p>
 			</div>
 			{#snippet pillarFront(pillar: PillarsContent['pillars'][number], showArrow: boolean)}
-				{#if pillar.image}
-					<div class="pcard-img"><img src={pillar.image} alt={pillar.title} loading="lazy" decoding="async" /></div>
+				{#if pillarImage(pillar)}
+					<div class="pcard-img"><img src={pillarImage(pillar)} alt={pillar.title} loading="lazy" decoding="async" /></div>
 				{/if}
 				<h3>{pillar.title}</h3>
 				<div class="un"></div>

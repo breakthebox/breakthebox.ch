@@ -8,9 +8,37 @@
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import type { PageMeta } from '$lib/types/seo';
+	import type { LayoutData } from './$types';
 	import type { Snippet } from 'svelte';
 
-	let { children }: { children: Snippet } = $props();
+	let { children, data }: { children: Snippet; data: LayoutData } = $props();
+
+	// ─── Aktives Theme → globale CSS-Variablen (site-wide) ───
+	// Farbwerte werden sanitisiert (nur Hex), damit @html keine CSS-Injection erlaubt.
+	function safeColor(value: string | undefined, fallback: string): string {
+		return value && /^#[0-9a-fA-F]{3,8}$/.test(value.trim()) ? value.trim() : fallback;
+	}
+	function hexToRgb(hex: string): string {
+		const h = hex.replace('#', '');
+		const full = h.length === 3 ? h.split('').map((ch) => ch + ch).join('') : h;
+		const n = parseInt(full, 16);
+		if (Number.isNaN(n) || full.length !== 6) return '177, 30, 44';
+		return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+	}
+	let tc = $derived(data.theme?.colors);
+	let primary = $derived(safeColor(tc?.primary, '#b11e2c'));
+	let primaryDark = $derived(safeColor(tc?.primaryDark, '#8e1622'));
+	let ink = $derived(safeColor(tc?.ink, '#2b1a1c'));
+	let cream = $derived(safeColor(tc?.cream, '#fbf1ec'));
+	let primaryRgb = $derived(hexToRgb(primary));
+	let themeCss = $derived(
+		`:root:root:root{` +
+			`--btb-steel:${primary};--btb-steel-hover:${primaryDark};` +
+			`--btb-teal:${primary};--btb-teal-dark:${primaryDark};--color-info:${primary};` +
+			`--btb-steel-subtle:rgba(${primaryRgb},0.12);--btb-teal-subtle:rgba(${primaryRgb},0.1);` +
+			`--cat-steel:rgba(${primaryRgb},0.14);--cat-teal:rgba(${primaryRgb},0.1);` +
+			`--bg-page:${cream};--text-heading:${ink};--text-primary:${ink};}`
+	);
 
 	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
 	const SITE_NAME = 'Break the Box';
@@ -57,6 +85,8 @@
 </script>
 
 <svelte:head>
+	<!-- Aktives Theme: globale Farb-Variablen (überschreibt app.css :root) -->
+	{@html `<style id="btb-theme">${themeCss}</style>`}
 	<link rel="canonical" href={canonical} />
 	{#each alternates as alt}
 		<link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
