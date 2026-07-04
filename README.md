@@ -36,7 +36,7 @@ npm run dev
 ## Commands
 
 ```bash
-npm run dev              # Dev server (port 5173)
+npm run dev              # Dev server (port 5174)
 npm run build            # Production build
 npm run check            # TypeScript + Svelte validation
 npm run test             # Vitest watch mode

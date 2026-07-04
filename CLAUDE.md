@@ -63,7 +63,7 @@ Diese Regeln **ergänzen** die projektspezifischen Vorgaben weiter unten (Drizzl
 ```bash
 # Development
 docker compose up -d db    # Start PostgreSQL (first time)
-npm run dev                # Start dev server (port 5173)
+npm run dev                # Start dev server (port 5174)
 npm run build              # Production build
 
 # Type checking
@@ -150,7 +150,7 @@ npm run db:migrate           # Schema anlegen
 npm run dev                  # App starten
 ```
 
-- **PostgreSQL** läuft in einem Docker-Container (Port 5432)
+- **PostgreSQL** läuft in einem Docker-Container (Host-Port 5433 → Container 5432, via `DB_PORT`)
 - **Die App** läuft lokal mit `npm run dev` (nicht im Container)
 - Für Production-Tests: `docker compose --profile full up -d`
 - DB-Daten persistieren im Docker Volume `pgdata`
@@ -306,5 +306,5 @@ See `.env.example` for required configuration. Key variables:
 - `DB_NAME` / `DB_USER` / `DB_PASSWORD` / `DB_PORT` — Docker Compose PostgreSQL config
 - `AUTH0_DOMAIN` / `AUTH0_CLIENT_ID` / `AUTH0_CLIENT_SECRET` — Auth0 OAuth
 - `ANTHROPIC_API_KEY` — Claude API key
-- `PUBLIC_APP_URL` — Application URL (default: `http://localhost:5173`)
+- `PUBLIC_APP_URL` — Application URL (default: `http://localhost:5174`)
 - `UPLOAD_DIR` — File storage directory (default: `./uploads`)
