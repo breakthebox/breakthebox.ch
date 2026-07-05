@@ -28,8 +28,9 @@ import type {
 	FaqContent
 } from '$lib/types/content';
 
-export const load: PageServerLoad = async () => {
-	const [allContent, latestPosts] = await Promise.all([
+export const load: PageServerLoad = async ({ parent }) => {
+	const [parentData, allContent, latestPosts] = await Promise.all([
+		parent(),
 		getAllContent(),
 		getLatestBlogPosts(3)
 	]);
@@ -46,6 +47,7 @@ export const load: PageServerLoad = async () => {
 		metrics: { ...defaultMetrics, ...((allContent.metrics as Partial<MetricsContent>) ?? {}) },
 		partners: { ...defaultPartners, ...((allContent.partners as Partial<PartnersContent>) ?? {}) },
 		faq: { ...defaultFaq, ...((allContent.faq as Partial<FaqContent>) ?? {}) },
+		theme: parentData.theme,
 		latestPosts
 	};
 };

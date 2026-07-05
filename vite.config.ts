@@ -4,6 +4,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
+	server: {
+		port: 5174
+	},
 	ssr: {
 		noExternal: ['lucide-svelte']
 	},

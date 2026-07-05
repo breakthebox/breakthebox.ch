@@ -18,6 +18,10 @@ const TIMEOUT_MS = 25_000;
 const CHAT_MAX = 20;
 const CHAT_WINDOW_MS = 5 * 60 * 1000;
 
+// Token-Schonung: max. Remote-Fragen pro Session (Backstop; Client zählt zusätzlich).
+const SESSION_MAX = 10;
+const SESSION_WINDOW_MS = 6 * 60 * 60 * 1000;
+
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
 const OFFLINE_REPLY =
@@ -27,6 +31,8 @@ const ERROR_REPLY =
 const TIMEOUT_REPLY = 'Das hat leider zu lange gedauert. Versuch es bitte gleich nochmal.';
 const RATELIMIT_REPLY =
 	'Uff, viele Fragen auf einmal! Gib mir kurz eine Pause — oder schreib Brigitte direkt: info@breakthebox.ch.';
+const SESSION_LIMIT_REPLY =
+	'Für diese Session hast du das Limit von 10 Fragen an den KI-Agenten erreicht 🙏 Für mehr schreib Brigitte direkt: info@breakthebox.ch.';
 const EMPTY_REPLY = 'Stell mir zuerst eine Frage 🙂';
 
 export const POST: RequestHandler = async ({ request, getClientAddress, cookies }) => {
@@ -68,6 +74,11 @@ export const POST: RequestHandler = async ({ request, getClientAddress, cookies 
 
 	const locale = cookies.get('locale') || 'de';
 	const sessionId = typeof body.sessionId === 'string' ? body.sessionId.slice(0, 64) : undefined;
+
+	// ─── Session-Limit (Backstop): max. Remote-Fragen pro Session ───
+	if (sessionId && rateLimit(`chatsession:${sessionId}`, SESSION_MAX, SESSION_WINDOW_MS).limited) {
+		return json({ reply: SESSION_LIMIT_REPLY, limitReached: true }, { status: 429 });
+	}
 
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);

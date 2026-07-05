@@ -17,7 +17,9 @@ import type {
 	PartnersContent,
 	ManifestContent,
 	ReferenceProjectsContent,
-	FaqContent
+	FaqContent,
+	Theme,
+	ThemeContent
 } from '$lib/types/content';
 
 export const defaultPillars: PillarsContent = {
@@ -425,4 +427,34 @@ export function normalizeExperiments(raw: unknown): ExperimentsContent {
 		missbizzy: c.missbizzy ?? defaultExperiments.missbizzy,
 		projects: (Array.isArray(c.projects) ? c.projects : []) as ExperimentsContent['projects']
 	};
+}
+
+// ─── Theme ───
+export const DEFAULT_HERO_IMAGE = '/fruits/hero.png';
+
+// Standard-Theme = aktueller Look (nichts ändert sich, bis ein Theme editiert wird).
+export const defaultTheme: ThemeContent = {
+	activeId: 'standard',
+	library: [],
+	themes: [
+		{
+			id: 'standard',
+			name: 'Standard',
+			colors: {
+				primary: '#b11e2c',
+				primaryDark: '#8e1622',
+				ink: '#2b1a1c',
+				cream: '#fbf1ec'
+			},
+			heroImage: DEFAULT_HERO_IMAGE,
+			pillarImages: {}
+		}
+	]
+};
+
+// Aktives Theme robust auflösen (fällt auf das erste bzw. Standard-Theme zurück).
+export function resolveActiveTheme(content: ThemeContent | null | undefined): Theme {
+	const c = content ?? defaultTheme;
+	const themes = Array.isArray(c.themes) && c.themes.length > 0 ? c.themes : defaultTheme.themes;
+	return themes.find((t) => t.id === c.activeId) ?? themes[0];
 }

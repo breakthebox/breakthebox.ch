@@ -34,6 +34,10 @@
 					Dashboard
 				</a>
 				<span class="admin-sidebar-divider"></span>
+				<a href="/admin/themes" class="admin-sidebar-link">
+					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="6.5"/><circle cx="6.3" cy="7" r="0.9" fill="currentColor" stroke="none"/><circle cx="9" cy="5.6" r="0.9" fill="currentColor" stroke="none"/><circle cx="11.7" cy="7" r="0.9" fill="currentColor" stroke="none"/><path d="M9 15.5c1.4 0 2-.9 2-1.8 0-1.2-1.4-1.2-1.4-2.2 0-.6.5-1 1.2-1"/></svg>
+					Themes
+				</a>
 				<a href="/admin/pillars" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h4v4H4zM10 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4z"/></svg>
 					Pillars

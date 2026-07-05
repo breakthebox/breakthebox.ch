@@ -1,20 +1,28 @@
 # Miss Bizzy — n8n-Webhook
 
-Der öffentliche Chat auf `/experimentierraum` ruft **nie** n8n direkt auf. Die Website
-spricht nur mit dem eigenen Server-Endpoint `POST /api/chat`, dieser leitet an den
-n8n-Webhook weiter. So bleiben Webhook-URL und Secret privat, und es greifen
-Rate-Limit, Timeout und generische Fallbacks.
+Der Chat auf `/experimentierraum` ist **hybrid**:
 
-## Datenfluss
+- **Onprem (lokal):** kuratierte Q&A-Chips → sofortige Antwort im Frontend, ohne
+  Backend/Token — unbegrenzt und gratis.
+- **Remote (n8n):** Freitext-Fragen → `POST /api/chat` → n8n-Webhook. **Max. 10
+  Remote-Fragen pro Session** (Client zählt via `sessionStorage`, Server als Backstop
+  per `sessionId`), um Token-Kosten zu begrenzen.
+
+Der Browser ruft **nie** n8n direkt auf — nur den eigenen Endpoint `POST /api/chat`.
+So bleiben Webhook-URL und Secret privat, und es greifen Rate-Limit, Timeout und
+generische Fallbacks.
+
+## Datenfluss (Remote-Pfad)
 
 ```
 Browser → POST /api/chat (SvelteKit)
           • Rate-Limit 20 / 5 Min pro IP
+          • Session-Limit 10 Remote-Fragen (Backstop per sessionId)
           • Input-Check (max. 2000 Zeichen), Verlauf gekappt (letzte 8)
           • Header X-BTB-Secret, Timeout 25 s
         → POST {CHAT_WEBHOOK_URL}  (n8n)
         ← { "reply": "…" }
-Browser ← { "reply": "…" }
+Browser ← { "reply": "…" }   // bei Limit: { "reply": "…", "limitReached": true }
 ```
 
 ## Env (Website)

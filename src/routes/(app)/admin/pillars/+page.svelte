@@ -150,8 +150,18 @@
 
 					{#if expandedPillar === i}
 						<div class="accordion-body">
-							<!-- Karten-Bild -->
-							<ImageUpload bind:value={pillar.image} section="pillar-{i}" label="Karten-Bild" />
+							<!-- Karten-Bild — überschreibt das Bild aus dem aktiven Theme -->
+							<ImageUpload bind:value={pillar.image} section="pillar-{i}" label="Karten-Bild (überschreibt Theme)" />
+							{#if !pillar.image}
+								<p class="theme-hint">
+									{#if data.themePillarImages[pillar.key]}
+										<img src={data.themePillarImages[pillar.key]} alt="" class="theme-hint-thumb" />
+										<span>Aktuell wird das <strong>Theme-Bild</strong> angezeigt — lade hier ein Bild hoch, um es nur für diesen Pillar zu überschreiben.</span>
+									{:else}
+										<span>Kein Theme-Bild gesetzt. Theme-Bilder verwaltest du unter <a href="/admin/themes">Themes</a>.</span>
+									{/if}
+								</p>
+							{/if}
 
 							<div class="field-group">
 								<label class="field-label" for="title-{i}">Titel</label>
@@ -616,5 +626,27 @@
 			padding: 0 16px 16px;
 			padding-top: 16px;
 		}
+	}
+
+	.theme-hint {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin: 8px 0 0;
+		font-size: 0.78rem;
+		color: var(--text-muted);
+		line-height: 1.45;
+	}
+	.theme-hint-thumb {
+		width: 36px;
+		height: 36px;
+		object-fit: contain;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		background: var(--bg-page);
+		flex-shrink: 0;
+	}
+	.theme-hint a {
+		color: var(--btb-steel);
 	}
 </style>

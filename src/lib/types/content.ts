@@ -299,6 +299,35 @@ export interface SeoOptimizationResult {
 	changes: string[];
 }
 
+// ─── Theme ───
+export interface ThemeColors {
+	primary: string; // Hauptfarbe (Rot) — Buttons, Links, Akzente
+	primaryDark: string; // Hover / dunkle Variante
+	ink: string; // Überschriften & Fliesstext
+	cream: string; // Seitenhintergrund
+}
+
+/** Ein hochgeladenes Bild in der gemeinsamen Bibliothek. */
+export interface ThemeImageAsset {
+	id: string;
+	url: string;
+	name: string;
+}
+
+export interface Theme {
+	id: string;
+	name: string;
+	colors: ThemeColors;
+	heroImage?: string; // URL aus der Bibliothek; leer = Standard-Hero
+	pillarImages?: Record<string, string>; // pillarKey → Bild-URL
+}
+
+export interface ThemeContent {
+	activeId: string;
+	library: ThemeImageAsset[]; // gemeinsamer Pool hochgeladener Bilder
+	themes: Theme[];
+}
+
 // ─── Section Union ───
 export type SectionKey =
 	| 'pillars'
@@ -313,7 +342,8 @@ export type SectionKey =
 	| 'partners'
 	| 'manifest'
 	| 'referenzprojekte'
-	| 'faq';
+	| 'faq'
+	| 'theme';
 
 export type SectionContent =
 	| PillarsContent
@@ -328,4 +358,5 @@ export type SectionContent =
 	| PartnersContent
 	| ManifestContent
 	| ReferenceProjectsContent
-	| FaqContent;
+	| FaqContent
+	| ThemeContent;
