@@ -186,6 +186,27 @@ export interface ReferenceProjectsContent {
 	items: ReferenceProject[];
 }
 
+// ─── Keynotes / Bühne (Keynotes, Panels, Workshops) ───
+export interface KeynoteItem {
+	key?: string;
+	title: string;
+	desc: string;
+	date: string; // ISO-Datum 'YYYY-MM-DD' (Start) — steuert kommend/vergangen automatisch
+	endDate?: string; // optionales Enddatum für mehrtägige Anlässe
+	location: string; // Ort / Venue + Stadt
+	event?: string; // Veranstaltung / Host (z.B. «Dänksymposium»)
+	format?: string; // Keynote / Panel / Workshop
+	url?: string; // Programm / Anmeldung
+	image?: string;
+	tags: string[];
+	featured?: boolean;
+	blogSlug?: string; // optionaler Rückblick-Link auf einen Blogbeitrag (Slug)
+}
+
+export interface KeynotesContent {
+	items: KeynoteItem[];
+}
+
 // ─── FAQ ───
 export interface FaqItem {
 	question: string;
@@ -342,6 +363,7 @@ export type SectionKey =
 	| 'partners'
 	| 'manifest'
 	| 'referenzprojekte'
+	| 'keynotes'
 	| 'faq'
 	| 'theme';
 
@@ -358,5 +380,6 @@ export type SectionContent =
 	| PartnersContent
 	| ManifestContent
 	| ReferenceProjectsContent
+	| KeynotesContent
 	| FaqContent
 	| ThemeContent;

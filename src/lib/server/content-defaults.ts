@@ -17,6 +17,7 @@ import type {
 	PartnersContent,
 	ManifestContent,
 	ReferenceProjectsContent,
+	KeynotesContent,
 	FaqContent,
 	Theme,
 	ThemeContent
@@ -300,6 +301,12 @@ export const defaultReferences: ReferencesContent = {
 		{ name: 'GASCHE', sortOrder: 16 },
 		{ name: 'Milchgold Käse', sortOrder: 17 }
 	]
+};
+
+// Bewusst leer: Die Bühnen-Section und der Ankündigungs-Streifen bleiben
+// verborgen, bis im Backoffice ein echter Auftritt erfasst wird.
+export const defaultKeynotes: KeynotesContent = {
+	items: []
 };
 
 export const defaultFaq: FaqContent = {

@@ -63,6 +63,12 @@
 			icon: '⬡'
 		},
 		{
+			id: 'keynotes',
+			title: 'Keynotes',
+			description: 'Keynotes, Panels und Workshops — kommend prominent, vergangen im Rückblick',
+			icon: '◈'
+		},
+		{
 			id: 'blog',
 			title: 'Blog',
 			description: 'Blogposts erstellen, bearbeiten und veröffentlichen',
