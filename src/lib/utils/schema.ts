@@ -96,7 +96,31 @@ export interface WebSite {
 	publisher?: { '@id': string };
 }
 
-export type SchemaNode = Person | Organization | Article | BreadcrumbList | WebSite | FAQPage;
+export interface Event {
+	'@type': 'Event';
+	'@id': string;
+	name: string;
+	startDate: string;
+	endDate?: string;
+	eventStatus: string;
+	eventAttendanceMode: string;
+	description?: string;
+	image?: string;
+	url?: string;
+	location?: {
+		'@type': 'Place';
+		name: string;
+		address: {
+			'@type': 'PostalAddress';
+			addressLocality: string;
+			addressCountry: string;
+		};
+	};
+	performer?: { '@id': string };
+	organizer?: { '@type': 'Organization'; name: string };
+}
+
+export type SchemaNode = Person | Organization | Article | BreadcrumbList | WebSite | FAQPage | Event;
 
 export interface SchemaGraph {
 	'@context': 'https://schema.org';
@@ -197,6 +221,52 @@ export function buildFaqPage(pageUrl: string, items: FaqItem[]): FAQPage {
 			name: item.question,
 			acceptedAnswer: { '@type': 'Answer', text: item.answer }
 		}))
+	};
+}
+
+export interface EventInput {
+	siteUrl: string; // ohne trailing slash — für @id und performer-Referenz
+	id: string; // eindeutiges Fragment, z.B. 'keynote-0'
+	name: string;
+	startDate: string; // ISO 'YYYY-MM-DD'
+	endDate?: string;
+	description?: string;
+	image?: string; // absolute URL
+	url?: string; // absolute URL (Programm / Anmeldung)
+	location?: string; // Ort / Stadt
+	locationCountry?: string; // ISO-Ländercode, Default 'CH'
+	organizer?: string; // Veranstaltung / Host
+}
+
+export function buildEvent(input: EventInput): Event {
+	return {
+		'@type': 'Event',
+		'@id': `${input.siteUrl}/#${input.id}`,
+		name: input.name,
+		startDate: input.startDate,
+		...(input.endDate ? { endDate: input.endDate } : {}),
+		eventStatus: 'https://schema.org/EventScheduled',
+		eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+		...(input.description ? { description: input.description } : {}),
+		...(input.image ? { image: input.image } : {}),
+		...(input.url ? { url: input.url } : {}),
+		...(input.location
+			? {
+					location: {
+						'@type': 'Place' as const,
+						name: input.location,
+						address: {
+							'@type': 'PostalAddress' as const,
+							addressLocality: input.location,
+							addressCountry: input.locationCountry ?? 'CH'
+						}
+					}
+				}
+			: {}),
+		performer: { '@id': `${input.siteUrl}/#person` },
+		...(input.organizer
+			? { organizer: { '@type': 'Organization' as const, name: input.organizer } }
+			: {})
 	};
 }
 

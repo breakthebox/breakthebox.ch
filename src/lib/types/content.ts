@@ -186,8 +186,8 @@ export interface ReferenceProjectsContent {
 	items: ReferenceProject[];
 }
 
-// ─── Auftritte / Bühne (Keynotes, Panels, Workshops) ───
-export interface AuftrittItem {
+// ─── Keynotes / Bühne (Keynotes, Panels, Workshops) ───
+export interface KeynoteItem {
 	key?: string;
 	title: string;
 	desc: string;
@@ -203,8 +203,8 @@ export interface AuftrittItem {
 	blogSlug?: string; // optionaler Rückblick-Link auf einen Blogbeitrag (Slug)
 }
 
-export interface AuftritteContent {
-	items: AuftrittItem[];
+export interface KeynotesContent {
+	items: KeynoteItem[];
 }
 
 // ─── FAQ ───
@@ -363,7 +363,7 @@ export type SectionKey =
 	| 'partners'
 	| 'manifest'
 	| 'referenzprojekte'
-	| 'auftritte'
+	| 'keynotes'
 	| 'faq'
 	| 'theme';
 
@@ -380,6 +380,6 @@ export type SectionContent =
 	| PartnersContent
 	| ManifestContent
 	| ReferenceProjectsContent
-	| AuftritteContent
+	| KeynotesContent
 	| FaqContent
 	| ThemeContent;

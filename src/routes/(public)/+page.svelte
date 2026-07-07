@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import type { PillarsContent, AboutContent, ReferencesContent, BlogContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, AuftritteContent, AuftrittItem, FaqContent } from '$lib/types/content';
+	import type { PillarsContent, AboutContent, ReferencesContent, BlogContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent } from '$lib/types/content';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
@@ -9,7 +9,7 @@
 	import { renderMarkdown } from '$lib/utils/markdown';
 	import { env } from '$env/dynamic/public';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
-	import { buildFaqPage, buildGraph } from '$lib/utils/schema';
+	import { buildFaqPage, buildEvent, buildGraph } from '$lib/utils/schema';
 
 	let { data } = $props();
 
@@ -43,7 +43,7 @@
 	const hasRealPosts = latestPosts.length > 0;
 
 	// ─── Bühne / Auftritte ───
-	const auftritte: AuftritteContent = data.auftritte;
+	const keynotes: KeynotesContent = data.keynotes;
 	const MONTHS_DE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 	const MONTHS_SHORT_DE = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez'];
 	const STRIP_WINDOW_DAYS = 42; // Streifen erscheint 6 Wochen vor dem Termin
@@ -59,7 +59,7 @@
 		return t;
 	}
 	// Ein Auftritt gilt als «kommend», solange sein (End-)Datum nicht vor heute liegt.
-	function isUpcoming(a: AuftrittItem): boolean {
+	function isUpcoming(a: KeynoteItem): boolean {
 		const end = toDate(a.endDate) ?? toDate(a.date);
 		return end ? end >= startOfToday() : false;
 	}
@@ -78,7 +78,7 @@
 		const d = toDate(s);
 		return d ? String(d.getFullYear()) : '';
 	}
-	function fmtRange(a: AuftrittItem): string {
+	function fmtRange(a: KeynoteItem): string {
 		const d1 = toDate(a.date);
 		if (!d1) return '';
 		const d2 = toDate(a.endDate);
@@ -93,16 +93,16 @@
 		}
 		return `${d1.getDate()}. ${MONTHS_DE[d1.getMonth()]} ${d1.getFullYear()} – ${d2.getDate()}. ${MONTHS_DE[d2.getMonth()]} ${d2.getFullYear()}`;
 	}
-	function metaLine(a: AuftrittItem): string {
+	function metaLine(a: KeynoteItem): string {
 		return [a.event, a.format].filter((x) => x?.trim()).join(' · ');
 	}
 
 	// Kommend: hervorgehobene zuerst, dann nach Startdatum aufsteigend. Vergangen: neuste zuerst.
-	const upcoming = auftritte.items.filter(isUpcoming).sort((a, b) => {
+	const upcoming = keynotes.items.filter(isUpcoming).sort((a, b) => {
 		if (!!b.featured !== !!a.featured) return a.featured ? -1 : 1;
 		return ts(a.date) - ts(b.date);
 	});
-	const past = auftritte.items.filter((a) => !isUpcoming(a)).sort((a, b) => ts(b.date) - ts(a.date));
+	const past = keynotes.items.filter((a) => !isUpcoming(a)).sort((a, b) => ts(b.date) - ts(a.date));
 	const hasBuehne = upcoming.length > 0 || past.length > 0;
 
 	// Ankündigungs-Streifen: nächster Termin nach Datum, sofern im Zeitfenster.
@@ -112,7 +112,7 @@
 		(ts(stripCandidate.date) - startOfToday().getTime()) / 86_400_000 <= STRIP_WINDOW_DAYS;
 
 	let stripVisible = $state(false);
-	function stripKey(a: AuftrittItem): string {
+	function stripKey(a: KeynoteItem): string {
 		return 'buehne-strip:' + a.date + ':' + a.title;
 	}
 	// Erst im Browser entscheiden — vermeidet Hydration-Flackern und respektiert «weggeklickt».
@@ -180,7 +180,30 @@
 
 	const faq: FaqContent = data.faq;
 	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
-	const faqGraph = buildGraph([buildFaqPage(SITE_URL + '/', faq.items)]);
+
+	// Relative Uploads/Links zu absoluten URLs machen (Structured Data verlangt absolut).
+	function absUrl(u: string | undefined): string | undefined {
+		if (!u) return undefined;
+		return /^https?:\/\//.test(u) ? u : SITE_URL + (u.startsWith('/') ? '' : '/') + u;
+	}
+	// Event-Structured-Data für jeden Auftritt mit gültigem Datum (E-E-A-T / Google-Events).
+	const keynoteEvents = keynotes.items
+		.filter((k) => k.date?.trim())
+		.map((k, i) =>
+			buildEvent({
+				siteUrl: SITE_URL,
+				id: `keynote-${i}`,
+				name: k.title,
+				startDate: k.date,
+				endDate: k.endDate?.trim() || undefined,
+				description: k.desc?.trim() || undefined,
+				image: absUrl(k.image),
+				url: absUrl(k.url),
+				location: k.location?.trim() || undefined,
+				organizer: k.event?.trim() || undefined
+			})
+		);
+	const jsonLdGraph = buildGraph([buildFaqPage(SITE_URL + '/', faq.items), ...keynoteEvents]);
 
 	// Scroll-aware nav: backdrop + active section
 	$effect(() => {
@@ -534,7 +557,7 @@
 
 	<!-- ═══════ BÜHNE / AUFTRITTE ═══════ -->
 	{#if hasBuehne}
-		{#snippet eventCard(a: AuftrittItem)}
+		{#snippet eventCard(a: KeynoteItem)}
 			<article class="ev-card">
 				<div class="ev-img">
 					{#if a.image}<img src={a.image} alt={a.title} loading="lazy" decoding="async" />{/if}
@@ -568,7 +591,7 @@
 				</div>
 			</article>
 		{/snippet}
-		{#snippet pastInner(a: AuftrittItem, withBlog: boolean)}
+		{#snippet pastInner(a: KeynoteItem, withBlog: boolean)}
 			<div class="past-mini">
 				<span class="mo">{fmtMonthShort(a.date)}</span>
 				<span class="yr">{fmtYear(a.date)}</span>
@@ -790,7 +813,7 @@
 		</div>
 	</section>
 
-	<JsonLd data={faqGraph} />
+	<JsonLd data={jsonLdGraph} />
 
 	<ContactBand />
 	<SiteFooter />

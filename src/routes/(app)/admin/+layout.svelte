@@ -78,7 +78,7 @@
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="12" cy="6" r="2.5"/><path d="M2.5 15c0-2 1.6-3.5 3.5-3.5S9.5 13 9.5 15M8.5 15c0-2 1.6-3.5 3.5-3.5s3.5 1.5 3.5 3.5"/></svg>
 					Netzwerk
 				</a>
-				<a href="/admin/auftritte" class="admin-sidebar-link">
+				<a href="/admin/keynotes" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2a2.3 2.3 0 0 1 2.3 2.3v4a2.3 2.3 0 0 1-4.6 0v-4A2.3 2.3 0 0 1 9 2z"/><path d="M4.7 8.3a4.3 4.3 0 0 0 8.6 0M9 12.6V16M6.5 16h5"/></svg>
 					Keynotes
 				</a>

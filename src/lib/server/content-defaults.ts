@@ -17,7 +17,7 @@ import type {
 	PartnersContent,
 	ManifestContent,
 	ReferenceProjectsContent,
-	AuftritteContent,
+	KeynotesContent,
 	FaqContent,
 	Theme,
 	ThemeContent
@@ -305,7 +305,7 @@ export const defaultReferences: ReferencesContent = {
 
 // Bewusst leer: Die Bühnen-Section und der Ankündigungs-Streifen bleiben
 // verborgen, bis im Backoffice ein echter Auftritt erfasst wird.
-export const defaultAuftritte: AuftritteContent = {
+export const defaultKeynotes: KeynotesContent = {
 	items: []
 };
 

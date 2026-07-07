@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type { AuftritteContent } from '$lib/types/content';
+	import type { KeynotesContent } from '$lib/types/content';
 	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
 
 	let { data, form } = $props();
-	let content = $state<AuftritteContent>(structuredClone(data.content));
+	let content = $state<KeynotesContent>(structuredClone(data.content));
 	let saving = $state(false);
 	let showSuccess = $state(false);
 
 	function addAuftritt() {
 		content.items.push({
-			key: 'auftritt-' + (content.items.length + 1),
+			key: 'keynote-' + (content.items.length + 1),
 			title: '',
 			desc: '',
 			date: '',
@@ -143,7 +143,7 @@
 						<input id="atags-{i}" type="text" class="field-input" value={tagsText(i)} oninput={(e) => setTags(i, e.currentTarget.value)} placeholder="KI-Governance, Live-Simulation, Transformation" />
 					</div>
 
-					<ImageUpload bind:value={item.image} section="auftritt-{i}" label="Bild (optional)" />
+					<ImageUpload bind:value={item.image} section="keynote-{i}" label="Bild (optional)" />
 
 					<label class="checkbox-row">
 						<input type="checkbox" bind:checked={item.featured} />

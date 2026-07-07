@@ -63,7 +63,7 @@
 			icon: '⬡'
 		},
 		{
-			id: 'auftritte',
+			id: 'keynotes',
 			title: 'Keynotes',
 			description: 'Keynotes, Panels und Workshops — kommend prominent, vergangen im Rückblick',
 			icon: '◈'
