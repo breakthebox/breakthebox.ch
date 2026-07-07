@@ -15,6 +15,7 @@ import {
 	defaultTestimonials,
 	defaultMetrics,
 	defaultPartners,
+	defaultAuftritte,
 	defaultFaq
 } from '$lib/server/content-defaults';
 import type {
@@ -25,6 +26,7 @@ import type {
 	TestimonialsContent,
 	MetricsContent,
 	PartnersContent,
+	AuftritteContent,
 	FaqContent
 } from '$lib/types/content';
 
@@ -46,6 +48,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 		testimonials: { ...defaultTestimonials, ...((allContent.testimonials as Partial<TestimonialsContent>) ?? {}) },
 		metrics: { ...defaultMetrics, ...((allContent.metrics as Partial<MetricsContent>) ?? {}) },
 		partners: { ...defaultPartners, ...((allContent.partners as Partial<PartnersContent>) ?? {}) },
+		auftritte: { ...defaultAuftritte, ...((allContent.auftritte as Partial<AuftritteContent>) ?? {}) },
 		faq: { ...defaultFaq, ...((allContent.faq as Partial<FaqContent>) ?? {}) },
 		theme: parentData.theme,
 		latestPosts

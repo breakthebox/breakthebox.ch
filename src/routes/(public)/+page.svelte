@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import type { PillarsContent, AboutContent, ReferencesContent, BlogContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, FaqContent } from '$lib/types/content';
+	import type { PillarsContent, AboutContent, ReferencesContent, BlogContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, AuftritteContent, AuftrittItem, FaqContent } from '$lib/types/content';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
@@ -41,6 +41,100 @@
 	const partners: PartnersContent = data.partners;
 	const latestPosts: BlogPostRow[] = data.latestPosts ?? [];
 	const hasRealPosts = latestPosts.length > 0;
+
+	// ─── Bühne / Auftritte ───
+	const auftritte: AuftritteContent = data.auftritte;
+	const MONTHS_DE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+	const MONTHS_SHORT_DE = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez'];
+	const STRIP_WINDOW_DAYS = 42; // Streifen erscheint 6 Wochen vor dem Termin
+
+	function toDate(s: string | undefined): Date | null {
+		if (!s) return null;
+		const d = new Date(s);
+		return isNaN(d.getTime()) ? null : d;
+	}
+	function startOfToday(): Date {
+		const t = new Date();
+		t.setHours(0, 0, 0, 0);
+		return t;
+	}
+	// Ein Auftritt gilt als «kommend», solange sein (End-)Datum nicht vor heute liegt.
+	function isUpcoming(a: AuftrittItem): boolean {
+		const end = toDate(a.endDate) ?? toDate(a.date);
+		return end ? end >= startOfToday() : false;
+	}
+	function ts(s: string | undefined): number {
+		return toDate(s)?.getTime() ?? 0;
+	}
+	function fmtDay(s: string | undefined): string {
+		const d = toDate(s);
+		return d ? String(d.getDate()) : '';
+	}
+	function fmtMonthShort(s: string | undefined): string {
+		const d = toDate(s);
+		return d ? MONTHS_SHORT_DE[d.getMonth()] : '';
+	}
+	function fmtYear(s: string | undefined): string {
+		const d = toDate(s);
+		return d ? String(d.getFullYear()) : '';
+	}
+	function fmtRange(a: AuftrittItem): string {
+		const d1 = toDate(a.date);
+		if (!d1) return '';
+		const d2 = toDate(a.endDate);
+		if (!d2 || d2.getTime() === d1.getTime()) {
+			return `${d1.getDate()}. ${MONTHS_DE[d1.getMonth()]} ${d1.getFullYear()}`;
+		}
+		if (d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()) {
+			return `${d1.getDate()}.–${d2.getDate()}. ${MONTHS_DE[d1.getMonth()]} ${d1.getFullYear()}`;
+		}
+		if (d1.getFullYear() === d2.getFullYear()) {
+			return `${d1.getDate()}. ${MONTHS_DE[d1.getMonth()]} – ${d2.getDate()}. ${MONTHS_DE[d2.getMonth()]} ${d1.getFullYear()}`;
+		}
+		return `${d1.getDate()}. ${MONTHS_DE[d1.getMonth()]} ${d1.getFullYear()} – ${d2.getDate()}. ${MONTHS_DE[d2.getMonth()]} ${d2.getFullYear()}`;
+	}
+	function metaLine(a: AuftrittItem): string {
+		return [a.event, a.format].filter((x) => x?.trim()).join(' · ');
+	}
+
+	// Kommend: hervorgehobene zuerst, dann nach Startdatum aufsteigend. Vergangen: neuste zuerst.
+	const upcoming = auftritte.items.filter(isUpcoming).sort((a, b) => {
+		if (!!b.featured !== !!a.featured) return a.featured ? -1 : 1;
+		return ts(a.date) - ts(b.date);
+	});
+	const past = auftritte.items.filter((a) => !isUpcoming(a)).sort((a, b) => ts(b.date) - ts(a.date));
+	const hasBuehne = upcoming.length > 0 || past.length > 0;
+
+	// Ankündigungs-Streifen: nächster Termin nach Datum, sofern im Zeitfenster.
+	const stripCandidate = [...upcoming].sort((a, b) => ts(a.date) - ts(b.date))[0] ?? null;
+	const stripEligible =
+		!!stripCandidate &&
+		(ts(stripCandidate.date) - startOfToday().getTime()) / 86_400_000 <= STRIP_WINDOW_DAYS;
+
+	let stripVisible = $state(false);
+	function stripKey(a: AuftrittItem): string {
+		return 'buehne-strip:' + a.date + ':' + a.title;
+	}
+	// Erst im Browser entscheiden — vermeidet Hydration-Flackern und respektiert «weggeklickt».
+	$effect(() => {
+		if (!stripEligible || !stripCandidate) return;
+		try {
+			stripVisible = !localStorage.getItem(stripKey(stripCandidate));
+		} catch {
+			// localStorage kann im Privatmodus fehlen — dann Streifen einfach zeigen.
+			stripVisible = true;
+		}
+	});
+	function dismissStrip() {
+		stripVisible = false;
+		if (!stripCandidate) return;
+		try {
+			localStorage.setItem(stripKey(stripCandidate), '1');
+		} catch {
+			// Kein persistentes Wegklicken möglich — unkritisch, Streifen ist schon ausgeblendet.
+			stripVisible = false;
+		}
+	}
 
 	// YouTube-Link (watch / youtu.be / shorts / embed / reine ID) → nocookie-Embed-URL
 	function ytEmbed(url: string | undefined): string {
@@ -92,7 +186,7 @@
 	$effect(() => {
 		function onScroll() {
 			navScrolled = window.scrollY > 20;
-			const sectionIds = ['pillars', 'angebot', 'about', 'stimmen', 'impulse', 'kontakt'];
+			const sectionIds = ['pillars', 'about', 'angebot', 'stimmen', 'impulse', 'kontakt'];
 			let current = '';
 			for (const id of sectionIds) {
 				const el = document.getElementById(id);
@@ -165,6 +259,22 @@
 			<a class="btn solid" href="#kontakt">{m.h_nav_cta()}</a>
 		</div>
 	</nav>
+
+	<!-- ═══════ ANKÜNDIGUNGS-STREIFEN (nur bei nahem Termin) ═══════ -->
+	{#if stripVisible && stripCandidate}
+		<div class="astrip">
+			<span class="pulse" aria-hidden="true"></span>
+			<span class="live">{m.h_buehne_strip_live()}</span>
+			<span class="astrip-body">
+				<b>{stripCandidate.event || m.h_buehne_strip_fallback()}{stripCandidate.location ? ', ' + stripCandidate.location : ''}</b>
+				— {stripCandidate.title}. <span class="when">{fmtRange(stripCandidate)}</span>
+			</span>
+			{#if stripCandidate.url}
+				<a class="astrip-go" href={stripCandidate.url} target="_blank" rel="noopener noreferrer">{m.h_buehne_cta()} →</a>
+			{/if}
+			<button type="button" class="astrip-x" onclick={dismissStrip} aria-label={m.h_buehne_strip_dismiss()}>&times;</button>
+		</div>
+	{/if}
 
 	<!-- ═══════ HERO (hellblau, Beere) ═══════ -->
 	<header class="hero">
@@ -421,6 +531,96 @@
 			</div>
 		</div>
 	</section>
+
+	<!-- ═══════ BÜHNE / AUFTRITTE ═══════ -->
+	{#if hasBuehne}
+		{#snippet eventCard(a: AuftrittItem)}
+			<article class="ev-card">
+				<div class="ev-img">
+					{#if a.image}<img src={a.image} alt={a.title} loading="lazy" decoding="async" />{/if}
+					<div class="ev-datechip">
+						<span class="d">{fmtDay(a.date)}</span>
+						<span class="mo">{fmtMonthShort(a.date)}</span>
+					</div>
+				</div>
+				<div class="ev-body">
+					{#if metaLine(a)}<div class="ev-ev">{metaLine(a)}</div>{/if}
+					<h3>{a.title}</h3>
+					<div class="ev-meta">
+						<span class="ev-meta-i">
+							<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+							{fmtRange(a)}
+						</span>
+						{#if a.location}
+							<span class="ev-meta-i">
+								<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>
+								{a.location}
+							</span>
+						{/if}
+					</div>
+					{#if a.desc}<p class="ev-desc">{a.desc}</p>{/if}
+					{#if a.tags.length > 0}
+						<div class="ev-tags">
+							{#each a.tags.slice(0, 4) as tag}<span class="ptag">{tag}</span>{/each}
+						</div>
+					{/if}
+					{#if a.url}<a class="btn solid ev-cta" href={a.url} target="_blank" rel="noopener noreferrer">{m.h_buehne_cta()} →</a>{/if}
+				</div>
+			</article>
+		{/snippet}
+		{#snippet pastInner(a: AuftrittItem, withBlog: boolean)}
+			<div class="past-mini">
+				<span class="mo">{fmtMonthShort(a.date)}</span>
+				<span class="yr">{fmtYear(a.date)}</span>
+			</div>
+			<div class="past-txt">
+				{#if a.event}<div class="past-ev">{a.event}</div>{/if}
+				<div class="past-title">{a.title}</div>
+				{#if a.location || a.format}<div class="past-loc">{[a.location, a.format].filter((x) => x?.trim()).join(' · ')}</div>{/if}
+				{#if withBlog}<span class="past-more">{m.h_buehne_readmore()} →</span>{/if}
+			</div>
+		{/snippet}
+		<section class="sec" id="buehne">
+			<div class="wrap">
+				<div class="sechead reveal">
+					<div class="kick">{m.h_buehne_label()}</div>
+					<h2 class="serif">{m.h_buehne_title()}</h2>
+					<p class="sub">{m.h_buehne_sub()}</p>
+				</div>
+
+				<div class="buehne-group reveal">
+					<div class="grouplbl">{m.h_buehne_upcoming()}</div>
+					{#if upcoming.length > 0}
+						<div class="ev-list">
+							{#each upcoming as a}{@render eventCard(a)}{/each}
+						</div>
+					{:else}
+						<div class="ev-empty">
+							<p>{m.h_buehne_empty()}</p>
+							<a class="ev-empty-cta" href="#kontakt">{m.h_buehne_empty_cta()} →</a>
+						</div>
+					{/if}
+				</div>
+
+				{#if past.length > 0}
+					<div class="buehne-group reveal">
+						<div class="grouplbl">{m.h_buehne_past()}</div>
+						<div class="past-row">
+							{#each past as a}
+								{#if a.blogSlug}
+									<a class="past-card past-card-link" href={localizeHref(`/blog/${a.blogSlug}`)}>{@render pastInner(a, true)}</a>
+								{:else if a.url}
+									<a class="past-card past-card-link" href={a.url} target="_blank" rel="noopener noreferrer">{@render pastInner(a, false)}</a>
+								{:else}
+									<div class="past-card">{@render pastInner(a, false)}</div>
+								{/if}
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
+		</section>
+	{/if}
 
 	<!-- ═══════ NETZWERK / PARTNER ═══════ -->
 	{#if partners.items.length > 0}
@@ -1244,6 +1444,342 @@
 		font-size: clamp(20px, 2.6vw, 30px);
 		line-height: 1.25;
 		color: #fff;
+	}
+
+	/* ═══════ BÜHNE / AUFTRITTE ═══════ */
+	/* Ankündigungs-Streifen (direkt unter der Navigation) */
+	.astrip {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		background: var(--red);
+		color: #fff;
+		padding: 11px 34px;
+		font-size: 13.5px;
+	}
+	.astrip .pulse {
+		width: 9px;
+		height: 9px;
+		border-radius: 50%;
+		background: #fff;
+		flex-shrink: 0;
+		animation: astrip-pulse 2s infinite;
+	}
+	@keyframes astrip-pulse {
+		0% {
+			box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.55);
+		}
+		70% {
+			box-shadow: 0 0 0 9px rgba(255, 255, 255, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+		}
+	}
+	.astrip .live {
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 11px;
+		font-weight: 700;
+		color: #ffd9d4;
+		flex-shrink: 0;
+	}
+	.astrip-body {
+		flex: 1;
+		min-width: 0;
+	}
+	.astrip-body b {
+		font-weight: 600;
+	}
+	.astrip-body .when {
+		color: #ffd9d4;
+		white-space: nowrap;
+	}
+	.astrip-go {
+		white-space: nowrap;
+		font-weight: 600;
+		color: #fff;
+		border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+		padding-bottom: 1px;
+		flex-shrink: 0;
+		transition: border-color 0.2s;
+	}
+	.astrip-go:hover {
+		border-color: #fff;
+	}
+	.astrip-x {
+		background: none;
+		border: none;
+		color: #fff;
+		opacity: 0.7;
+		font-size: 20px;
+		line-height: 1;
+		cursor: pointer;
+		padding: 0 2px;
+		flex-shrink: 0;
+		transition: opacity 0.2s;
+	}
+	.astrip-x:hover {
+		opacity: 1;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.astrip .pulse {
+			animation: none;
+		}
+	}
+
+	/* Gruppen (Als Nächstes / Rückblick) */
+	.buehne-group + .buehne-group {
+		margin-top: 40px;
+	}
+	.grouplbl {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		font-size: 12px;
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-weight: 700;
+		color: var(--red);
+		margin-bottom: 20px;
+	}
+	.grouplbl::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: var(--line);
+	}
+
+	/* Event-Karten (kommend) */
+	.ev-list {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.ev-card {
+		display: grid;
+		grid-template-columns: 250px 1fr;
+		border: 1px solid var(--line);
+		border-radius: 14px;
+		overflow: hidden;
+		background: #fff;
+		box-shadow: 0 22px 46px -36px rgba(120, 20, 40, 0.34);
+		transition: transform 0.2s, box-shadow 0.2s;
+	}
+	.ev-card:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 30px 54px -34px rgba(120, 20, 40, 0.42);
+	}
+	.ev-img {
+		position: relative;
+		min-height: 220px;
+		background: radial-gradient(125% 120% at 72% 4%, #c2eafb 0%, #88d3ef 54%, #5bb8e6 115%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.ev-img img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.ev-datechip {
+		position: absolute;
+		top: 14px;
+		left: 14px;
+		background: #fff;
+		border-radius: 10px;
+		padding: 8px 13px;
+		text-align: center;
+		box-shadow: 0 8px 18px -12px rgba(16, 52, 74, 0.5);
+	}
+	.ev-datechip .d {
+		display: block;
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: 23px;
+		line-height: 1;
+		color: var(--ink);
+	}
+	.ev-datechip .mo {
+		display: block;
+		font-size: 10px;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--red);
+		font-weight: 700;
+		margin-top: 3px;
+	}
+	.ev-body {
+		padding: 26px 30px;
+	}
+	.ev-ev {
+		font-size: 11.5px;
+		text-transform: uppercase;
+		letter-spacing: 0.13em;
+		color: var(--red);
+		font-weight: 700;
+		margin-bottom: 9px;
+	}
+	.ev-body h3 {
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: 23px;
+		line-height: 1.14;
+		margin-bottom: 12px;
+	}
+	.ev-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 18px;
+		font-size: 13px;
+		color: var(--dim);
+		margin-bottom: 13px;
+	}
+	.ev-meta-i {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.ev-meta-i svg {
+		color: var(--red);
+		flex-shrink: 0;
+	}
+	.ev-desc {
+		font-size: 13.5px;
+		color: var(--dim);
+		line-height: 1.6;
+		margin-bottom: 16px;
+		max-width: 62ch;
+	}
+	.ev-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-bottom: 20px;
+	}
+	.ev-cta {
+		margin-top: 2px;
+	}
+
+	/* Vermerk, wenn kein kommender Auftritt ansteht */
+	.ev-empty {
+		border: 1px dashed var(--line);
+		border-radius: 14px;
+		background: #fdf7f4;
+		padding: 28px 30px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+	.ev-empty p {
+		font-size: 14.5px;
+		color: var(--dim);
+		line-height: 1.6;
+		max-width: 62ch;
+		margin: 0;
+	}
+	.ev-empty-cta {
+		font-family: var(--hand);
+		font-size: 20px;
+		color: var(--red);
+		transition: color 0.2s, gap 0.2s;
+	}
+	.ev-empty-cta:hover {
+		color: var(--redd);
+	}
+
+	/* Rückblick (vergangen) */
+	.past-row {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 16px;
+	}
+	.past-card {
+		display: flex;
+		gap: 14px;
+		align-items: center;
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 16px 18px;
+		background: #fdf7f4;
+		color: inherit;
+		text-decoration: none;
+		transition: border-color 0.2s, transform 0.2s;
+	}
+	.past-card-link:hover {
+		border-color: var(--red);
+		transform: translateY(-2px);
+	}
+	.past-mini {
+		width: 54px;
+		height: 54px;
+		border-radius: 10px;
+		flex-shrink: 0;
+		background: radial-gradient(125% 120% at 72% 4%, #c2eafb 0%, #88d3ef 54%, #5bb8e6 115%);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		color: #0e3a4c;
+	}
+	.past-mini .mo {
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: 14px;
+		line-height: 1;
+	}
+	.past-mini .yr {
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		margin-top: 2px;
+	}
+	.past-txt {
+		min-width: 0;
+	}
+	.past-ev {
+		font-size: 10.5px;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--red);
+		font-weight: 700;
+	}
+	.past-title {
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: 15.5px;
+		line-height: 1.2;
+		margin: 3px 0;
+	}
+	.past-loc {
+		font-size: 12.5px;
+		color: var(--dim);
+	}
+	.past-more {
+		display: inline-block;
+		margin-top: 6px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--red);
+	}
+	.past-card-link:hover .past-more {
+		color: var(--redd);
+	}
+
+	@media (max-width: 640px) {
+		.ev-card {
+			grid-template-columns: 1fr;
+		}
+		.ev-img {
+			min-height: 150px;
+		}
+		.astrip {
+			flex-wrap: wrap;
+			padding: 10px 20px;
+			gap: 10px;
+		}
 	}
 
 	/* ═══════ ÜBER MICH ═══════ */
