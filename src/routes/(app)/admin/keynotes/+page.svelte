@@ -121,7 +121,11 @@
 
 					<div class="field"><label class="field-label" for="al-{i}">Ort / Venue</label><input id="al-{i}" type="text" class="field-input" bind:value={item.location} placeholder="z.B. Thun" /></div>
 
-					<div class="field"><label class="field-label" for="adesc-{i}">Kurzbeschreibung</label><textarea id="adesc-{i}" class="field-input field-textarea" rows="3" bind:value={item.desc} placeholder="Worum geht es? Ein bis zwei Sätze."></textarea></div>
+					<div class="field">
+						<label class="field-label" for="adesc-{i}">Kurzbeschreibung</label>
+						<textarea id="adesc-{i}" class="field-input field-textarea" rows="4" bind:value={item.desc} placeholder="Worum geht es? Ein bis zwei Sätze."></textarea>
+						<span class="field-hint">Markdown möglich: <code>**fett**</code>, <code>*kursiv*</code>, <code>- Aufzählung</code>, Leerzeile = neuer Absatz.</span>
+					</div>
 
 					<div class="field"><label class="field-label" for="au-{i}">Link (Programm / Anmeldung)</label><input id="au-{i}" type="url" class="field-input" bind:value={item.url} placeholder="https://…" /></div>
 
@@ -330,6 +334,14 @@
 	.field-hint {
 		font-size: 0.78rem;
 		color: var(--text-muted);
+	}
+	.field-hint code {
+		font-family: var(--ff-mono, ui-monospace, monospace);
+		font-size: 0.72rem;
+		background: var(--btb-steel-subtle);
+		color: var(--btb-steel);
+		padding: 1px 5px;
+		border-radius: 4px;
 	}
 	.field-textarea {
 		resize: vertical;

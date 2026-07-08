@@ -6,7 +6,7 @@
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 	import type { BlogPostRow } from '$lib/server/db/queries/blog';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
 	import { env } from '$env/dynamic/public';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import { buildFaqPage, buildEvent, buildGraph } from '$lib/utils/schema';
@@ -186,6 +186,22 @@
 		if (!u) return undefined;
 		return /^https?:\/\//.test(u) ? u : SITE_URL + (u.startsWith('/') ? '' : '/') + u;
 	}
+	// Markdown zu Klartext für die JSON-LD-Beschreibung (keine Syntax/Tags in Structured Data).
+	function mdToPlain(md: string | undefined): string | undefined {
+		if (!md?.trim()) return undefined;
+		const text = renderMarkdownBlock(md)
+			.replace(/<li>/g, '• ')
+			.replace(/<\/(p|li|h[1-6])>/g, ' ')
+			.replace(/<[^>]+>/g, '')
+			.replace(/&amp;/g, '&')
+			.replace(/&lt;/g, '<')
+			.replace(/&gt;/g, '>')
+			.replace(/&quot;/g, '"')
+			.replace(/&#39;/g, "'")
+			.replace(/\s+/g, ' ')
+			.trim();
+		return text || undefined;
+	}
 	// Event-Structured-Data für jeden Auftritt mit gültigem Datum (E-E-A-T / Google-Events).
 	const keynoteEvents = keynotes.items
 		.filter((k) => k.date?.trim())
@@ -196,7 +212,7 @@
 				name: k.title,
 				startDate: k.date,
 				endDate: k.endDate?.trim() || undefined,
-				description: k.desc?.trim() || undefined,
+				description: mdToPlain(k.desc),
 				image: absUrl(k.image),
 				url: absUrl(k.url),
 				location: k.location?.trim() || undefined,
@@ -581,7 +597,7 @@
 							</span>
 						{/if}
 					</div>
-					{#if a.desc}<p class="ev-desc">{a.desc}</p>{/if}
+					{#if a.desc}<div class="ev-desc">{@html renderMarkdownBlock(a.desc)}</div>{/if}
 					{#if a.tags.length > 0}
 						<div class="ev-tags">
 							{#each a.tags.slice(0, 4) as tag}<span class="ptag">{tag}</span>{/each}
@@ -1674,6 +1690,35 @@
 		line-height: 1.6;
 		margin-bottom: 16px;
 		max-width: 62ch;
+	}
+	.ev-desc :global(p) {
+		margin: 0 0 10px;
+	}
+	.ev-desc :global(p:last-child) {
+		margin-bottom: 0;
+	}
+	.ev-desc :global(strong) {
+		color: var(--ink);
+		font-weight: 600;
+	}
+	.ev-desc :global(em) {
+		font-style: italic;
+	}
+	.ev-desc :global(a) {
+		color: var(--red);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+	.ev-desc :global(ul),
+	.ev-desc :global(ol) {
+		margin: 8px 0 10px;
+		padding-left: 20px;
+	}
+	.ev-desc :global(li) {
+		margin: 3px 0;
+	}
+	.ev-desc :global(li)::marker {
+		color: var(--red);
 	}
 	.ev-tags {
 		display: flex;
