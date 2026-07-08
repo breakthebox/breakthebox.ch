@@ -1689,7 +1689,6 @@
 		color: var(--dim);
 		line-height: 1.6;
 		margin-bottom: 16px;
-		max-width: 62ch;
 	}
 	.ev-desc :global(p) {
 		margin: 0 0 10px;

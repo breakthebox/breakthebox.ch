@@ -1,23 +1,39 @@
 <script lang="ts">
 	import type { ExperimentsContent } from '$lib/types/content';
 	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
+	import AdminAccordionItem from '$lib/components/ui/AdminAccordionItem.svelte';
 
 	let { data, form } = $props();
 	let content = $state<ExperimentsContent>(structuredClone(data.content));
 	let saving = $state(false);
 	let showSuccess = $state(false);
+	let expandedPlatform = $state<number | null>(0);
+	let expandedProject = $state<number | null>(0);
+
+	function togglePlatform(i: number) {
+		expandedPlatform = expandedPlatform === i ? null : i;
+	}
+	function toggleProject(i: number) {
+		expandedProject = expandedProject === i ? null : i;
+	}
 
 	function addPlatform() {
 		content.platforms.push({ key: 'platform-' + (content.platforms.length + 1), name: '', sketch: '', desc: [''], url: '', image: '' });
+		expandedPlatform = content.platforms.length - 1;
 	}
 	function removePlatform(i: number) {
 		if (!confirm('Diese Plattform wirklich löschen?')) return;
 		content.platforms.splice(i, 1);
+		if (expandedPlatform !== null && expandedPlatform >= content.platforms.length) {
+			expandedPlatform = content.platforms.length - 1 >= 0 ? content.platforms.length - 1 : null;
+		}
 	}
 	function movePlatform(i: number, dir: -1 | 1) {
 		const t = i + dir;
 		if (t < 0 || t >= content.platforms.length) return;
 		[content.platforms[i], content.platforms[t]] = [content.platforms[t], content.platforms[i]];
+		if (expandedPlatform === i) expandedPlatform = t;
+		else if (expandedPlatform === t) expandedPlatform = i;
 	}
 	function addParagraph(pi: number) {
 		content.platforms[pi].desc.push('');
@@ -28,15 +44,21 @@
 
 	function addProject() {
 		content.projects.push({ key: 'project-' + (content.projects.length + 1), name: '', sketch: '', desc: '', status: '', url: '', image: '' });
+		expandedProject = content.projects.length - 1;
 	}
 	function removeProject(i: number) {
 		if (!confirm('Dieses Projekt wirklich löschen?')) return;
 		content.projects.splice(i, 1);
+		if (expandedProject !== null && expandedProject >= content.projects.length) {
+			expandedProject = content.projects.length - 1 >= 0 ? content.projects.length - 1 : null;
+		}
 	}
 	function moveProject(i: number, dir: -1 | 1) {
 		const t = i + dir;
 		if (t < 0 || t >= content.projects.length) return;
 		[content.projects[i], content.projects[t]] = [content.projects[t], content.projects[i]];
+		if (expandedProject === i) expandedProject = t;
+		else if (expandedProject === t) expandedProject = i;
 	}
 
 	// Projekt (Work in Progress) → Plattform verschieben (desc-String → Abschnitte-Array)
@@ -51,6 +73,10 @@
 			image: p.image ?? ''
 		});
 		content.projects.splice(i, 1);
+		expandedPlatform = content.platforms.length - 1;
+		if (expandedProject !== null && expandedProject >= content.projects.length) {
+			expandedProject = content.projects.length - 1 >= 0 ? content.projects.length - 1 : null;
+		}
 	}
 	// Plattform → Projekt (Work in Progress) verschieben (Abschnitte → desc-String)
 	function platformToProject(i: number) {
@@ -65,6 +91,10 @@
 			image: p.image ?? ''
 		});
 		content.platforms.splice(i, 1);
+		expandedProject = content.projects.length - 1;
+		if (expandedPlatform !== null && expandedPlatform >= content.platforms.length) {
+			expandedPlatform = content.platforms.length - 1 >= 0 ? content.platforms.length - 1 : null;
+		}
 	}
 
 	$effect(() => {
@@ -100,38 +130,40 @@
 		<h2 class="group-title">Plattformen</h2>
 		<div class="items">
 			{#each content.platforms as p, i}
-				<div class="item-card">
-					<div class="item-head">
-						<span class="item-num">{i + 1}</span>
-						<span class="item-title">{p.name || 'Neue Plattform'}</span>
-						<div class="item-actions">
-							<button type="button" class="icon-btn" onclick={() => movePlatform(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
-							<button type="button" class="icon-btn" onclick={() => movePlatform(i, 1)} disabled={i === content.platforms.length - 1} aria-label="Nach unten">↓</button>
-							<button type="button" class="icon-btn icon-btn-move" onclick={() => platformToProject(i)} title="Zu «Projekte in Arbeit» verschieben" aria-label="Zu Projekten verschieben">⇄</button>
-							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removePlatform(i)} aria-label="Löschen">&times;</button>
-						</div>
-					</div>
+				<AdminAccordionItem
+					index={i}
+					total={content.platforms.length}
+					title={p.name || 'Neue Plattform'}
+					subtitle={p.key || undefined}
+					expanded={expandedPlatform === i}
+					removeLabel="Plattform löschen"
+					ontoggle={() => togglePlatform(i)}
+					onmoveup={() => movePlatform(i, -1)}
+					onmovedown={() => movePlatform(i, 1)}
+					onremove={() => removePlatform(i)}
+				>
 					<div class="field-row">
 						<div class="field"><label class="field-label" for="pn-{i}">Name</label><input id="pn-{i}" type="text" class="field-input" bind:value={p.name} /></div>
 						<div class="field"><label class="field-label" for="ps-{i}">Sketch-Notiz</label><input id="ps-{i}" type="text" class="field-input" bind:value={p.sketch} /></div>
 					</div>
 					<div class="field">
-							<label class="field-label">Beschreibung <span class="field-hint">ein oder mehrere Abschnitte</span></label>
-							{#each p.desc as _para, j}
-								<div class="para-row">
-									<textarea class="field-textarea" bind:value={p.desc[j]} rows="2" placeholder="Abschnitt {j + 1}…"></textarea>
-									{#if p.desc.length > 1}
-										<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeParagraph(i, j)} aria-label="Abschnitt löschen">&times;</button>
-									{/if}
-								</div>
-							{/each}
-							<button type="button" class="btn-add-sm" onclick={() => addParagraph(i)}>+ Abschnitt</button>
-						</div>
+						<label class="field-label">Beschreibung <span class="field-hint">ein oder mehrere Abschnitte</span></label>
+						{#each p.desc as _para, j}
+							<div class="para-row">
+								<textarea class="field-textarea" bind:value={p.desc[j]} rows="2" placeholder="Abschnitt {j + 1}…"></textarea>
+								{#if p.desc.length > 1}
+									<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeParagraph(i, j)} aria-label="Abschnitt löschen">&times;</button>
+								{/if}
+							</div>
+						{/each}
+						<button type="button" class="btn-add-sm" onclick={() => addParagraph(i)}>+ Abschnitt</button>
+					</div>
 					<div class="field-row">
 						<div class="field"><label class="field-label" for="pu-{i}">Link</label><input id="pu-{i}" type="text" class="field-input" bind:value={p.url} placeholder="https://…" /></div>
 						<div class="field field-full"><ImageUpload bind:value={p.image} section="platform-logo-{i}" label="Logo / Bild" /></div>
 					</div>
-				</div>
+					<button type="button" class="btn-move-list" onclick={() => platformToProject(i)}>⇄ Zu «Projekte in Arbeit» verschieben</button>
+				</AdminAccordionItem>
 			{/each}
 		</div>
 		<button type="button" class="btn-add" onclick={addPlatform}>+ Plattform hinzufügen</button>
@@ -139,17 +171,18 @@
 		<h2 class="group-title">Projekte in Arbeit</h2>
 		<div class="items">
 			{#each content.projects as p, i}
-				<div class="item-card">
-					<div class="item-head">
-						<span class="item-num">{i + 1}</span>
-						<span class="item-title">{p.name || 'Neues Projekt'}</span>
-						<div class="item-actions">
-							<button type="button" class="icon-btn" onclick={() => moveProject(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
-							<button type="button" class="icon-btn" onclick={() => moveProject(i, 1)} disabled={i === content.projects.length - 1} aria-label="Nach unten">↓</button>
-							<button type="button" class="icon-btn icon-btn-move" onclick={() => projectToPlatform(i)} title="Zu «Plattformen» verschieben" aria-label="Zu Plattformen verschieben">⇄</button>
-							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeProject(i)} aria-label="Löschen">&times;</button>
-						</div>
-					</div>
+				<AdminAccordionItem
+					index={i}
+					total={content.projects.length}
+					title={p.name || 'Neues Projekt'}
+					subtitle={p.key || undefined}
+					expanded={expandedProject === i}
+					removeLabel="Projekt löschen"
+					ontoggle={() => toggleProject(i)}
+					onmoveup={() => moveProject(i, -1)}
+					onmovedown={() => moveProject(i, 1)}
+					onremove={() => removeProject(i)}
+				>
 					<div class="field-row">
 						<div class="field"><label class="field-label" for="jn-{i}">Name</label><input id="jn-{i}" type="text" class="field-input" bind:value={p.name} /></div>
 						<div class="field"><label class="field-label" for="jst-{i}">Status</label><input id="jst-{i}" type="text" class="field-input" bind:value={p.status} placeholder="z.B. Laufend" /></div>
@@ -160,7 +193,8 @@
 						<div class="field"><label class="field-label" for="ju-{i}">Link</label><input id="ju-{i}" type="text" class="field-input" bind:value={p.url} placeholder="https://…" /></div>
 						<div class="field field-full"><ImageUpload bind:value={p.image} section="project-image-{i}" label="Bild (optional)" /></div>
 					</div>
-				</div>
+					<button type="button" class="btn-move-list" onclick={() => projectToPlatform(i)}>⇄ Zu «Plattformen» verschieben</button>
+				</AdminAccordionItem>
 			{/each}
 		</div>
 		<button type="button" class="btn-add" onclick={addProject}>+ Projekt hinzufügen</button>
@@ -228,45 +262,8 @@
 	.items {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 8px;
 		margin-bottom: var(--space-md);
-	}
-	.item-card {
-		background: var(--bg-surface);
-		border: 1.5px solid var(--border);
-		border-radius: var(--radius-card);
-		padding: 20px 24px;
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-	}
-	.item-head {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-	.item-num {
-		width: 28px;
-		height: 28px;
-		border-radius: 8px;
-		background: var(--btb-steel-subtle);
-		color: var(--btb-steel);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.82rem;
-		font-weight: 700;
-		flex-shrink: 0;
-	}
-	.item-title {
-		flex: 1;
-		font-weight: 700;
-		font-size: 0.95rem;
-		color: var(--text-heading);
-	}
-	.item-actions {
-		display: flex;
-		gap: 4px;
 	}
 	.icon-btn {
 		width: 30px;
@@ -293,13 +290,6 @@
 	.icon-btn-danger:hover:not(:disabled) {
 		border-color: var(--color-error);
 		color: var(--color-error);
-	}
-	.icon-btn-move {
-		font-size: 1.05rem;
-	}
-	.icon-btn-move:hover:not(:disabled) {
-		border-color: var(--btb-teal);
-		color: var(--btb-teal);
 	}
 	.field {
 		display: flex;
@@ -351,6 +341,21 @@
 	}
 	.btn-add-sm:hover {
 		background: var(--btb-steel-subtle);
+	}
+	.btn-move-list {
+		align-self: flex-start;
+		padding: 6px 12px;
+		border: 1px solid var(--btb-teal);
+		border-radius: var(--radius-sm);
+		background: none;
+		color: var(--btb-teal);
+		font-size: 0.8rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.15s;
+	}
+	.btn-move-list:hover {
+		background: var(--btb-teal-subtle);
 	}
 	.field-input,
 	.field-textarea {

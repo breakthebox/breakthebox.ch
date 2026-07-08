@@ -1,22 +1,33 @@
 <script lang="ts">
 	import type { ManifestContent } from '$lib/types/content';
+	import AdminAccordionItem from '$lib/components/ui/AdminAccordionItem.svelte';
 
 	let { data, form } = $props();
 	let content = $state<ManifestContent>(structuredClone(data.content));
 	let saving = $state(false);
 	let showSuccess = $state(false);
+	let expanded = $state<number | null>(0);
 
+	function toggle(i: number) {
+		expanded = expanded === i ? null : i;
+	}
 	function addThesis() {
 		content.theses.push({ text: '', note: '' });
+		expanded = content.theses.length - 1;
 	}
 	function removeThesis(i: number) {
 		if (!confirm('Diese These wirklich löschen?')) return;
 		content.theses.splice(i, 1);
+		if (expanded !== null && expanded >= content.theses.length) {
+			expanded = content.theses.length - 1 >= 0 ? content.theses.length - 1 : null;
+		}
 	}
 	function move(i: number, dir: -1 | 1) {
 		const t = i + dir;
 		if (t < 0 || t >= content.theses.length) return;
 		[content.theses[i], content.theses[t]] = [content.theses[t], content.theses[i]];
+		if (expanded === i) expanded = t;
+		else if (expanded === t) expanded = i;
 	}
 
 	$effect(() => {
@@ -68,25 +79,26 @@
 		<h2 class="group-title">Thesen</h2>
 		<div class="items">
 			{#each content.theses as thesis, i}
-				<div class="item-card">
-					<div class="item-head">
-						<span class="item-num">{i + 1}</span>
-						<span class="item-title">{thesis.text ? thesis.text.replace(/\*\*/g, '').split('\n')[0] : 'Neue These'}</span>
-						<div class="item-actions">
-							<button type="button" class="icon-btn" onclick={() => move(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
-							<button type="button" class="icon-btn" onclick={() => move(i, 1)} disabled={i === content.theses.length - 1} aria-label="Nach unten">↓</button>
-							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeThesis(i)} aria-label="Löschen">&times;</button>
-						</div>
+				<AdminAccordionItem
+					index={i}
+					total={content.theses.length}
+					title={thesis.text ? thesis.text.replace(/\*\*/g, '').split('\n')[0].slice(0, 60) : 'Neue These'}
+					expanded={expanded === i}
+					removeLabel="These löschen"
+					ontoggle={() => toggle(i)}
+					onmoveup={() => move(i, -1)}
+					onmovedown={() => move(i, 1)}
+					onremove={() => removeThesis(i)}
+				>
+					<div class="field">
+						<label class="field-label" for="thesis-{i}">These (gross)</label>
+						<textarea id="thesis-{i}" class="field-textarea" bind:value={thesis.text} rows="2" placeholder="z.B. IT ist keine Kostenstelle.&#10;Sie ist eine **Wirkungsfrage**."></textarea>
 					</div>
 					<div class="field">
-						<label class="field-label">These (gross)</label>
-						<textarea class="field-textarea" bind:value={thesis.text} rows="2" placeholder="z.B. IT ist keine Kostenstelle.&#10;Sie ist eine **Wirkungsfrage**."></textarea>
+						<label class="field-label" for="note-{i}">Positionierung (optional)</label>
+						<textarea id="note-{i}" class="field-textarea" bind:value={thesis.note} rows="3" placeholder="Erläuternder Absatz…"></textarea>
 					</div>
-					<div class="field">
-						<label class="field-label">Positionierung (optional)</label>
-						<textarea class="field-textarea" bind:value={thesis.note} rows="3" placeholder="Erläuternder Absatz…"></textarea>
-					</div>
-				</div>
+				</AdminAccordionItem>
 			{/each}
 		</div>
 		<button type="button" class="btn-add" onclick={addThesis}>+ These hinzufügen</button>
@@ -185,74 +197,8 @@
 	.items {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 8px;
 		margin-bottom: var(--space-md);
-	}
-	.item-card {
-		background: var(--bg-surface);
-		border: 1.5px solid var(--border);
-		border-radius: var(--radius-card);
-		padding: 20px 24px;
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-	}
-	.item-head {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-	.item-num {
-		width: 28px;
-		height: 28px;
-		border-radius: 8px;
-		background: var(--btb-steel-subtle);
-		color: var(--btb-steel);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.82rem;
-		font-weight: 700;
-		flex-shrink: 0;
-	}
-	.item-title {
-		flex: 1;
-		font-weight: 700;
-		font-size: 0.95rem;
-		color: var(--text-heading);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	.item-actions {
-		display: flex;
-		gap: 4px;
-	}
-	.icon-btn {
-		width: 30px;
-		height: 30px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid var(--border);
-		background: var(--bg-surface);
-		border-radius: var(--radius-sm);
-		color: var(--text-secondary);
-		font-size: 0.95rem;
-		cursor: pointer;
-		transition: all 0.15s;
-	}
-	.icon-btn:hover:not(:disabled) {
-		border-color: var(--btb-steel);
-		color: var(--btb-steel);
-	}
-	.icon-btn:disabled {
-		opacity: 0.35;
-		cursor: not-allowed;
-	}
-	.icon-btn-danger:hover:not(:disabled) {
-		border-color: var(--color-error);
-		color: var(--color-error);
 	}
 	.field {
 		display: flex;
