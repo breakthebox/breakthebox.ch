@@ -1,12 +1,17 @@
 <script lang="ts">
 	import type { KeynotesContent } from '$lib/types/content';
 	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
+	import AdminAccordionItem from '$lib/components/ui/AdminAccordionItem.svelte';
 
 	let { data, form } = $props();
 	let content = $state<KeynotesContent>(structuredClone(data.content));
 	let saving = $state(false);
 	let showSuccess = $state(false);
+	let expanded = $state<number | null>(0);
 
+	function toggle(i: number) {
+		expanded = expanded === i ? null : i;
+	}
 	function addAuftritt() {
 		content.items.push({
 			key: 'keynote-' + (content.items.length + 1),
@@ -23,15 +28,21 @@
 			featured: false,
 			blogSlug: ''
 		});
+		expanded = content.items.length - 1;
 	}
 	function removeAuftritt(i: number) {
 		if (!confirm('Diesen Auftritt wirklich löschen?')) return;
 		content.items.splice(i, 1);
+		if (expanded !== null && expanded >= content.items.length) {
+			expanded = content.items.length - 1 >= 0 ? content.items.length - 1 : null;
+		}
 	}
 	function moveAuftritt(i: number, dir: -1 | 1) {
 		const t = i + dir;
 		if (t < 0 || t >= content.items.length) return;
 		[content.items[i], content.items[t]] = [content.items[t], content.items[i]];
+		if (expanded === i) expanded = t;
+		else if (expanded === t) expanded = i;
 	}
 
 	// Tags werden als kommagetrennte Zeile bearbeitet und zurück in ein Array gespiegelt.
@@ -91,22 +102,20 @@
 
 		<div class="items">
 			{#each content.items as item, i}
-				<div class="item-card">
-					<div class="item-head">
-						<span class="item-num">{i + 1}</span>
-						<span class="item-title">{item.title || 'Neuer Auftritt'}</span>
-						{#if item.date}
-							<span class="badge" class:badge-up={isUpcoming(item.date, item.endDate)}>
-								{isUpcoming(item.date, item.endDate) ? 'Kommend' : 'Rückblick'}
-							</span>
-						{/if}
-						<div class="item-actions">
-							<button type="button" class="icon-btn" onclick={() => moveAuftritt(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
-							<button type="button" class="icon-btn" onclick={() => moveAuftritt(i, 1)} disabled={i === content.items.length - 1} aria-label="Nach unten">↓</button>
-							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeAuftritt(i)} aria-label="Löschen">&times;</button>
-						</div>
-					</div>
-
+				<AdminAccordionItem
+					index={i}
+					total={content.items.length}
+					title={item.title || 'Neue Keynote'}
+					subtitle={[item.event, item.location].filter((x) => x?.trim()).join(' · ') || undefined}
+					badge={item.date ? (isUpcoming(item.date, item.endDate) ? 'Kommend' : 'Rückblick') : undefined}
+					badgeActive={item.date ? isUpcoming(item.date, item.endDate) : false}
+					expanded={expanded === i}
+					removeLabel="Keynote löschen"
+					ontoggle={() => toggle(i)}
+					onmoveup={() => moveAuftritt(i, -1)}
+					onmovedown={() => moveAuftritt(i, 1)}
+					onremove={() => removeAuftritt(i)}
+				>
 					<div class="field"><label class="field-label" for="at-{i}">Titel</label><input id="at-{i}" type="text" class="field-input" bind:value={item.title} placeholder="z.B. KI-Governance: Aus Lose-lose wird Win-win" /></div>
 
 					<div class="field-row">
@@ -153,7 +162,7 @@
 						<input type="checkbox" bind:checked={item.featured} />
 						<span>Hervorheben (wird zuerst gezeigt)</span>
 					</label>
-				</div>
+				</AdminAccordionItem>
 			{/each}
 		</div>
 
@@ -218,87 +227,8 @@
 	.items {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 8px;
 		margin-bottom: var(--space-lg);
-	}
-	.item-card {
-		background: var(--bg-surface);
-		border: 1.5px solid var(--border);
-		border-radius: var(--radius-card);
-		padding: 20px 24px;
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-	}
-	.item-head {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-	.item-num {
-		width: 28px;
-		height: 28px;
-		border-radius: 8px;
-		background: var(--btb-steel-subtle);
-		color: var(--btb-steel);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.82rem;
-		font-weight: 700;
-		flex-shrink: 0;
-	}
-	.item-title {
-		flex: 1;
-		font-weight: 700;
-		font-size: 0.95rem;
-		color: var(--text-heading);
-	}
-	.badge {
-		font-size: 0.72rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		padding: 3px 9px;
-		border-radius: 20px;
-		background: var(--btb-steel-subtle);
-		color: var(--text-muted);
-		flex-shrink: 0;
-	}
-	.badge-up {
-		background: var(--btb-teal-subtle);
-		color: var(--btb-teal-dark);
-	}
-	.item-actions {
-		display: flex;
-		gap: 4px;
-	}
-	.icon-btn {
-		width: 30px;
-		height: 30px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid var(--border);
-		background: var(--bg-surface);
-		border-radius: var(--radius-sm);
-		color: var(--text-secondary);
-		font-size: 0.95rem;
-		cursor: pointer;
-		transition: all 0.15s;
-		flex-shrink: 0;
-	}
-	.icon-btn:hover:not(:disabled) {
-		border-color: var(--btb-steel);
-		color: var(--btb-steel);
-	}
-	.icon-btn:disabled {
-		opacity: 0.35;
-		cursor: not-allowed;
-	}
-	.icon-btn-danger:hover:not(:disabled) {
-		border-color: var(--color-error);
-		color: var(--color-error);
 	}
 	.field {
 		display: flex;
