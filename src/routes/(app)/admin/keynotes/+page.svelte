@@ -67,6 +67,24 @@
 		return d >= today;
 	}
 
+	// Kompaktes Datum für die zugeklappte Ansicht (z.B. «4.–5. Sept 2026»).
+	const MONTHS_SHORT = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez'];
+	function parseYmd(s?: string): { y: number; m: number; d: number } | null {
+		if (!s?.trim()) return null;
+		const p = s.split('-').map(Number);
+		if (p.length < 3 || p.some(isNaN)) return null;
+		return { y: p[0], m: p[1], d: p[2] };
+	}
+	function fmtDate(dateStr: string, endStr?: string): string {
+		const a = parseYmd(dateStr);
+		if (!a) return '';
+		const b = parseYmd(endStr);
+		if (!b || (b.y === a.y && b.m === a.m && b.d === a.d)) return `${a.d}. ${MONTHS_SHORT[a.m - 1]} ${a.y}`;
+		if (a.y === b.y && a.m === b.m) return `${a.d}.–${b.d}. ${MONTHS_SHORT[a.m - 1]} ${a.y}`;
+		if (a.y === b.y) return `${a.d}. ${MONTHS_SHORT[a.m - 1]} – ${b.d}. ${MONTHS_SHORT[b.m - 1]} ${a.y}`;
+		return `${a.d}. ${MONTHS_SHORT[a.m - 1]} ${a.y} – ${b.d}. ${MONTHS_SHORT[b.m - 1]} ${b.y}`;
+	}
+
 	$effect(() => {
 		if (form?.success) {
 			showSuccess = true;
@@ -106,7 +124,7 @@
 					index={i}
 					total={content.items.length}
 					title={item.title || 'Neue Keynote'}
-					subtitle={[item.event, item.location].filter((x) => x?.trim()).join(' · ') || undefined}
+					subtitle={[item.date ? fmtDate(item.date, item.endDate) : '', item.event, item.location].filter((x) => x?.trim()).join(' · ') || undefined}
 					badge={item.date ? (isUpcoming(item.date, item.endDate) ? 'Kommend' : 'Rückblick') : undefined}
 					badgeActive={item.date ? isUpcoming(item.date, item.endDate) : false}
 					expanded={expanded === i}
