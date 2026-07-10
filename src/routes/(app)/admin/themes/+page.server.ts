@@ -1,13 +1,14 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getSectionContent, saveSectionContent } from '$lib/server/db/queries/content';
-import { defaultTheme, defaultPillars } from '$lib/server/content-defaults';
-import type { ThemeContent, PillarsContent } from '$lib/types/content';
+import { defaultTheme, defaultPillars, normalizeHero } from '$lib/server/content-defaults';
+import type { ThemeContent, PillarsContent, HeroContent } from '$lib/types/content';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
-	const [theme, pillars] = await Promise.all([
+	const [theme, pillars, hero] = await Promise.all([
 		getSectionContent<ThemeContent>('theme'),
-		getSectionContent<PillarsContent>('pillars')
+		getSectionContent<PillarsContent>('pillars'),
+		getSectionContent<HeroContent>('hero')
 	]);
 
 	// Pillars nur für die Bild-Zuweisung (Key + Titel).
@@ -16,9 +17,17 @@ export const load: PageServerLoad = async () => {
 		title: p.title
 	}));
 
+	// Hero-Presets nur für die Auswahl (id + Name + Variante).
+	const heroPresets = normalizeHero(hero).presets.map((p) => ({
+		id: p.id,
+		name: p.name,
+		variant: p.variant
+	}));
+
 	return {
 		content: theme ?? defaultTheme,
-		pillarSlots
+		pillarSlots,
+		heroPresets
 	};
 };
 

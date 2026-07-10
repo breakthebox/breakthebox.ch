@@ -3,6 +3,12 @@
 
 	const sections = [
 		{
+			id: 'hero',
+			title: 'Hero',
+			description: 'Startseiten-Hero — Variante (klassisch oder Zwei-Welten-Slider) und Texte',
+			icon: '◒'
+		},
+		{
 			id: 'pillars',
 			title: 'Pillars',
 			description: 'Pillar-Karten — Anzahl, Reihenfolge und Inhalte frei anpassbar',

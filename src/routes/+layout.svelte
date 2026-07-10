@@ -6,6 +6,7 @@
 	import { buildSiteIdentity } from '$lib/config/site-identity';
 	import { buildPerson, buildOrganization, buildWebSite, buildGraph } from '$lib/utils/schema';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { safeColor, mixHex, softFromPrimary } from '$lib/utils/color';
 	import * as m from '$lib/paraglide/messages.js';
 	import type { PageMeta } from '$lib/types/seo';
 	import type { LayoutData } from './$types';
@@ -15,9 +16,6 @@
 
 	// ─── Aktives Theme → globale CSS-Variablen (site-wide) ───
 	// Farbwerte werden sanitisiert (nur Hex), damit @html keine CSS-Injection erlaubt.
-	function safeColor(value: string | undefined, fallback: string): string {
-		return value && /^#[0-9a-fA-F]{3,8}$/.test(value.trim()) ? value.trim() : fallback;
-	}
 	function hexToRgb(hex: string): string {
 		const h = hex.replace('#', '');
 		const full = h.length === 3 ? h.split('').map((ch) => ch + ch).join('') : h;
@@ -30,13 +28,19 @@
 	let primaryDark = $derived(safeColor(tc?.primaryDark, '#8e1622'));
 	let ink = $derived(safeColor(tc?.ink, '#2b1a1c'));
 	let cream = $derived(safeColor(tc?.cream, '#fbf1ec'));
+	let soft = $derived(safeColor(tc?.soft, softFromPrimary(primary)));
 	let primaryRgb = $derived(hexToRgb(primary));
 	let themeCss = $derived(
 		`:root:root:root{` +
 			`--btb-steel:${primary};--btb-steel-hover:${primaryDark};` +
+			`--btb-steel-light:${mixHex(primary, '#ffffff', 0.85)};` +
 			`--btb-teal:${primary};--btb-teal-dark:${primaryDark};--color-info:${primary};` +
+			`--btb-teal-light:${soft};` +
 			`--btb-steel-subtle:rgba(${primaryRgb},0.12);--btb-teal-subtle:rgba(${primaryRgb},0.1);` +
 			`--cat-steel:rgba(${primaryRgb},0.14);--cat-teal:rgba(${primaryRgb},0.1);` +
+			`--bg-section-alt:${mixHex(cream, soft, 0.5)};--bg-elevated:${mixHex(cream, soft, 0.5)};` +
+			`--border:${mixHex(soft, ink, 0.92)};` +
+			`--text-secondary:${mixHex(ink, cream, 0.55)};--text-muted:${mixHex(ink, cream, 0.32)};` +
 			`--bg-page:${cream};--text-heading:${ink};--text-primary:${ink};}`
 	);
 

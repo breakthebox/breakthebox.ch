@@ -1,29 +1,33 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import type { PillarsContent, AboutContent, ReferencesContent, BlogContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent } from '$lib/types/content';
+	import type { PillarsContent, AboutContent, ReferencesContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent, HeroPreset } from '$lib/types/content';
+	import HeroSlider from '$lib/components/ui/HeroSlider.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
-	import type { BlogPostRow } from '$lib/server/db/queries/blog';
 	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
 	import { env } from '$env/dynamic/public';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import { buildFaqPage, buildEvent, buildGraph } from '$lib/utils/schema';
+	import { safeColor, mixHex, softFromPrimary } from '$lib/utils/color';
 
 	let { data } = $props();
 
 	// ─── Aktives Theme (Farben + Bilder) ───
 	const theme = data.theme;
-	function safeColor(value: string | undefined, fallback: string): string {
-		return value && /^#[0-9a-fA-F]{3,8}$/.test(value.trim()) ? value.trim() : fallback;
-	}
 	// Homepage-Tokens (.hbb) inline überschreiben — schlägt scoped Defaults.
+	// Abgeleitete Töne (Flächen, Linien, Sekundärtext) werden aus den
+	// Theme-Farben gemischt, damit kein Rosé-Rest übrig bleibt.
+	const cPrimary = safeColor(theme?.colors?.primary, '#b11e2c');
+	const cPrimaryDark = safeColor(theme?.colors?.primaryDark, '#8e1622');
+	const cInk = safeColor(theme?.colors?.ink, '#2b1a1c');
+	const cCream = safeColor(theme?.colors?.cream, '#fbf1ec');
+	const cSoft = safeColor(theme?.colors?.soft, softFromPrimary(cPrimary));
 	const hbbStyle =
-		`--red:${safeColor(theme?.colors?.primary, '#b11e2c')};` +
-		`--redd:${safeColor(theme?.colors?.primaryDark, '#8e1622')};` +
-		`--ink:${safeColor(theme?.colors?.ink, '#2b1a1c')};` +
-		`--cream:${safeColor(theme?.colors?.cream, '#fbf1ec')};`;
+		`--red:${cPrimary};--redd:${cPrimaryDark};--ink:${cInk};--cream:${cCream};` +
+		`--pink:${cSoft};--cream2:${mixHex(cCream, cSoft, 0.5)};` +
+		`--line:${mixHex(cSoft, cInk, 0.92)};--dim:${mixHex(cInk, cCream, 0.55)};`;
 	const heroImage = theme?.heroImage || '/fruits/hero.png';
 	// Theme-Bild ist die Basis; ein im Pillar gesetztes Bild überschreibt es.
 	function pillarImage(p: PillarsContent['pillars'][number]): string | undefined {
@@ -31,16 +35,15 @@
 	}
 
 	// Content from DB (with fallback to defaults in server load)
+	const hero: HeroPreset = data.hero;
+	const heroClassic = hero.classic;
 	const pillars: PillarsContent = data.pillars;
 	const about: AboutContent = data.about;
 	const references: ReferencesContent = data.references;
-	const blog: BlogContent = data.blog;
 	const angebot: AngebotContent = data.angebot;
 	const testimonials: TestimonialsContent = data.testimonials;
 	const metrics: MetricsContent = data.metrics;
 	const partners: PartnersContent = data.partners;
-	const latestPosts: BlogPostRow[] = data.latestPosts ?? [];
-	const hasRealPosts = latestPosts.length > 0;
 
 	// ─── Bühne / Auftritte ───
 	const keynotes: KeynotesContent = data.keynotes;
@@ -294,6 +297,7 @@
 			<div class="nav-links">
 				<a href="#angebot" class:active={activeSection === 'angebot'}>{m.nav_services()}</a>
 				<a href="#about" class:active={activeSection === 'about'}>{m.nav_about()}</a>
+				<a href={localizeHref('/blog')}>{m.nav_blog()}</a>
 			</div>
 			<a class="btn solid" href="#kontakt">{m.h_nav_cta()}</a>
 		</div>
@@ -315,40 +319,44 @@
 		</div>
 	{/if}
 
-	<!-- ═══════ HERO (hellblau, Beere) ═══════ -->
-	<header class="hero">
-		<div class="wrap">
-			<div class="heroGrid">
-				<div class="heroText">
-					<h1 class="hero-h1">{m.h_hero_l1()}<br />{m.h_hero_l2_pre()}<span class="red">{m.h_hero_l2_em()}</span>.</h1>
-					<div class="hero-ln"></div>
-					<p class="hero-sub">{m.h_hero_sub()}</p>
-					<p class="hero-acc">{m.h_hero_acc()}</p>
-					<div class="hero-sig">Brigitte Hulliger</div>
-					<a class="btn solid" href="#kontakt">{m.h_hero_cta()} →</a>
-				</div>
-				<div class="berryWrap">
-					<div class="berryFrame">
-						<div class="berryStage">
-							<div class="berryShadow" aria-hidden="true"></div>
-							<img class="berryimg" src={heroImage} alt="Frucht-Fusion" fetchpriority="high" decoding="async" width="470" height="470" />
-						</div>
-						<div class="annos">
-							<div class="anno a1">{m.h_anno1()}<small>{m.h_anno1_sub()}</small>
-								<svg class="anno-ar" viewBox="0 0 56 56" aria-hidden="true"><path d="M5 8 C 27 10 43 21 48 43" /><path d="M39 39 L49 46 L37 49" /></svg>
+	<!-- ═══════ HERO (Variante aus Admin: klassisch oder Zwei-Welten-Slider) ═══════ -->
+	{#if hero.variant === 'slider'}
+		<HeroSlider content={hero.slider} />
+	{:else}
+		<header class="hero">
+			<div class="wrap">
+				<div class="heroGrid">
+					<div class="heroText">
+						<h1 class="hero-h1">{heroClassic.titleLine1}<br />{heroClassic.titleLine2Pre}<span class="red">{heroClassic.titleLine2Em}</span>.</h1>
+						<div class="hero-ln"></div>
+						<p class="hero-sub">{heroClassic.sub}</p>
+						<p class="hero-acc">{heroClassic.accent}</p>
+						<div class="hero-sig">{heroClassic.signature}</div>
+						<a class="btn solid" href="#kontakt">{heroClassic.ctaLabel} →</a>
+					</div>
+					<div class="berryWrap">
+						<div class="berryFrame">
+							<div class="berryStage">
+								<div class="berryShadow" aria-hidden="true"></div>
+								<img class="berryimg" src={heroImage} alt="Frucht-Fusion" fetchpriority="high" decoding="async" width="470" height="470" />
 							</div>
-							<div class="anno a2">{m.h_anno3()}<small>{m.h_anno3_sub()}</small>
-								<svg class="anno-ar" viewBox="0 0 56 56" aria-hidden="true"><path d="M51 15 C 31 13 15 20 8 37" /><path d="M17 29 L6 38 L19 40" /></svg>
-							</div>
-							<div class="anno a3">{m.h_anno2()}<small>{m.h_anno2_sub()}</small>
-								<svg class="anno-ar" viewBox="0 0 56 56" aria-hidden="true"><path d="M6 49 C 22 49 42 43 49 13" /><path d="M41 19 L50 8 L53 22" /></svg>
+							<div class="annos">
+								<div class="anno a1">{heroClassic.annotations[0].title}<small>{heroClassic.annotations[0].sub}</small>
+									<svg class="anno-ar" viewBox="0 0 56 56" aria-hidden="true"><path d="M5 8 C 27 10 43 21 48 43" /><path d="M39 39 L49 46 L37 49" /></svg>
+								</div>
+								<div class="anno a2">{heroClassic.annotations[1].title}<small>{heroClassic.annotations[1].sub}</small>
+									<svg class="anno-ar" viewBox="0 0 56 56" aria-hidden="true"><path d="M51 15 C 31 13 15 20 8 37" /><path d="M17 29 L6 38 L19 40" /></svg>
+								</div>
+								<div class="anno a3">{heroClassic.annotations[2].title}<small>{heroClassic.annotations[2].sub}</small>
+									<svg class="anno-ar" viewBox="0 0 56 56" aria-hidden="true"><path d="M6 49 C 22 49 42 43 49 13" /><path d="M41 19 L50 8 L53 22" /></svg>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</header>
+		</header>
+	{/if}
 
 	<!-- ═══════ ANGEBOT / PILLARS ═══════ -->
 	<section class="afterhero" id="pillars">
@@ -762,52 +770,6 @@
 		</div>
 	</section>
 
-	<!-- ═══════ BLOG ═══════ -->
-	<section class="sec" id="blog">
-		<div class="wrap">
-			<div class="sechead reveal">
-				<div class="kick">{m.section_blog_label()}</div>
-				<h2 class="serif">{m.section_blog_title()}</h2>
-			</div>
-			<div class="blog-grid reveal">
-				{#if hasRealPosts}
-					{#each latestPosts as post, i}
-						<a href={localizeHref(`/blog/${post.slug}`)} class="blog-card">
-							{#if post.headerImage}
-								<img src={post.headerImage} alt={post.title} class="blog-card-img" loading="lazy" decoding="async" />
-							{:else}
-								<div class="blog-card-img blog-card-img-{(i % 3) + 1}"></div>
-							{/if}
-							<div class="blog-card-body">
-								{#if post.tags.length > 0}
-									<span class="blog-card-tag">{post.tags.join(' · ')}</span>
-								{/if}
-								<h3 class="blog-card-title">{post.title}</h3>
-								{#if post.excerpt}
-									<p class="blog-card-excerpt">{post.excerpt}</p>
-								{/if}
-							</div>
-						</a>
-					{/each}
-				{:else}
-					{#each blog.posts as post, i}
-						<div class="blog-card">
-							<div class="blog-card-img blog-card-img-{(i % 3) + 1}"></div>
-							<div class="blog-card-body">
-								<span class="blog-card-tag">{post.tag}</span>
-								<h3 class="blog-card-title">{post.title}</h3>
-								<p class="blog-card-excerpt">{post.excerpt}</p>
-							</div>
-						</div>
-					{/each}
-				{/if}
-			</div>
-			<div class="blog-all-link">
-				<a href={localizeHref('/blog')}>{m.blog_all_posts()} →</a>
-			</div>
-		</div>
-	</section>
-
 	<!-- ═══════ FAQ ═══════ -->
 	<section class="sec" id="faq">
 		<div class="wrap faq-container">
@@ -884,7 +846,7 @@
 		margin-bottom: 16px;
 	}
 	.kick-light {
-		color: #ffd9d4;
+		color: var(--pink);
 	}
 
 	/* ═══════ BUTTONS ═══════ */
@@ -915,7 +877,7 @@
 		position: sticky;
 		top: 0;
 		z-index: var(--z-sticky);
-		background: rgba(251, 241, 236, 0.9);
+		background: color-mix(in srgb, var(--cream) 90%, transparent);
 		backdrop-filter: blur(8px);
 		border-bottom: 1px solid var(--line);
 		transition: box-shadow 0.3s ease;
@@ -1465,7 +1427,7 @@
 	.tension .rt p {
 		font-size: 16px;
 		line-height: 1.65;
-		color: #ffe6e3;
+		color: color-mix(in srgb, var(--pink) 55%, #fff);
 	}
 	.tension .rt .lg {
 		font-family: var(--serif);
@@ -1520,7 +1482,7 @@
 		letter-spacing: 0.16em;
 		font-size: 11px;
 		font-weight: 700;
-		color: #ffd9d4;
+		color: var(--pink);
 		flex-shrink: 0;
 	}
 	.astrip-body {
@@ -1531,7 +1493,7 @@
 		font-weight: 600;
 	}
 	.astrip-body .when {
-		color: #ffd9d4;
+		color: var(--pink);
 		white-space: nowrap;
 	}
 	.astrip-go {
@@ -1733,7 +1695,7 @@
 	.ev-empty {
 		border: 1px dashed var(--line);
 		border-radius: 14px;
-		background: #fdf7f4;
+		background: color-mix(in srgb, var(--cream) 55%, #fff);
 		padding: 28px 30px;
 		display: flex;
 		flex-direction: column;
@@ -1770,7 +1732,7 @@
 		border: 1px solid var(--line);
 		border-radius: 12px;
 		padding: 16px 18px;
-		background: #fdf7f4;
+		background: color-mix(in srgb, var(--cream) 55%, #fff);
 		color: inherit;
 		text-decoration: none;
 		transition: border-color 0.2s, transform 0.2s;
@@ -2267,7 +2229,7 @@
 	}
 	.qt-video:hover {
 		border-color: var(--red);
-		background: rgba(177, 30, 44, 0.05);
+		background: color-mix(in srgb, var(--red) 5%, transparent);
 	}
 
 	/* ═══════ ABOUT VIDEO ═══════ */
@@ -2298,77 +2260,6 @@
 		width: 100%;
 		height: 100%;
 		border: none;
-	}
-
-	/* ═══════ BLOG ═══════ */
-	.blog-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 22px;
-	}
-	.blog-card {
-		background: #fff;
-		border: 1px solid var(--line);
-		border-radius: 12px;
-		overflow: hidden;
-		box-shadow: 0 18px 40px -34px rgba(120, 20, 40, 0.26);
-		transition: transform 0.2s, box-shadow 0.2s;
-		display: block;
-	}
-	.blog-card:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 26px 48px -30px rgba(120, 20, 40, 0.4);
-	}
-	.blog-card-img {
-		width: 100%;
-		aspect-ratio: 16 / 9;
-		object-fit: cover;
-		display: block;
-	}
-	.blog-card-img-1 {
-		background: linear-gradient(135deg, var(--pink), #fff);
-	}
-	.blog-card-img-2 {
-		background: linear-gradient(135deg, #c2eafb, #fff);
-	}
-	.blog-card-img-3 {
-		background: linear-gradient(135deg, var(--cream2), #fff);
-	}
-	.blog-card-body {
-		padding: 22px 24px 24px;
-	}
-	.blog-card-tag {
-		display: block;
-		font-family: var(--hand);
-		font-size: 17px;
-		color: var(--red);
-		margin-bottom: 6px;
-	}
-	.blog-card-title {
-		font-family: var(--serif);
-		font-size: 18px;
-		line-height: 1.25;
-		margin-bottom: 8px;
-		font-weight: 600;
-		color: var(--ink);
-	}
-	.blog-card-excerpt {
-		font-size: 13.5px;
-		color: var(--dim);
-		line-height: 1.55;
-	}
-	.blog-all-link {
-		text-align: center;
-		margin-top: 34px;
-	}
-	.blog-all-link a {
-		font-size: 14px;
-		font-weight: 600;
-		color: var(--red);
-		transition: color 0.2s;
-	}
-	.blog-all-link a:hover {
-		color: var(--redd);
 	}
 
 	/* ═══════ FAQ ═══════ */
@@ -2439,8 +2330,7 @@
 		.pillars,
 		.quotes,
 		.angebot-grid,
-		.partners,
-		.blog-grid {
+		.partners {
 			grid-template-columns: 1fr;
 		}
 		.ang {

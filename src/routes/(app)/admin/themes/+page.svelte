@@ -1,17 +1,19 @@
 <script lang="ts">
 	import type { ThemeContent, ThemeColors, ThemeImageAsset } from '$lib/types/content';
 	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
+	import { softFromPrimary } from '$lib/utils/color';
 
 	let { data, form } = $props();
 
-	const FALLBACK = { primary: '#b11e2c', primaryDark: '#8e1622', ink: '#2b1a1c', cream: '#fbf1ec' };
+	const FALLBACK = { primary: '#b11e2c', primaryDark: '#8e1622', ink: '#2b1a1c', cream: '#fbf1ec', soft: '#f6d9d5' };
 
 	// Arbeits-Typen: heroImage/pillarImages sind hier immer gesetzt (nach normalize()).
 	interface WTheme {
 		id: string;
 		name: string;
-		colors: ThemeColors;
+		colors: Required<ThemeColors>;
 		heroImage: string;
+		heroPresetId: string; // '' = erstes Preset
 		pillarImages: Record<string, string>;
 	}
 	interface WContent {
@@ -27,13 +29,16 @@
 				primary: t.colors?.primary ?? FALLBACK.primary,
 				primaryDark: t.colors?.primaryDark ?? FALLBACK.primaryDark,
 				ink: t.colors?.ink ?? FALLBACK.ink,
-				cream: t.colors?.cream ?? FALLBACK.cream
+				cream: t.colors?.cream ?? FALLBACK.cream,
+				// Bestehende Themes ohne «soft»: helle Fläche aus Primär ableiten.
+				soft: t.colors?.soft ?? softFromPrimary(t.colors?.primary ?? FALLBACK.primary)
 			},
 			heroImage: t.heroImage ?? '',
+			heroPresetId: t.heroPresetId ?? '',
 			pillarImages: t.pillarImages ?? {}
 		}));
 		if (themes.length === 0) {
-			themes.push({ id: 'standard', name: 'Standard', colors: { ...FALLBACK }, heroImage: '', pillarImages: {} });
+			themes.push({ id: 'standard', name: 'Standard', colors: { ...FALLBACK }, heroImage: '', heroPresetId: '', pillarImages: {} });
 		}
 		const activeId = themes.some((t) => t.id === c.activeId) ? c.activeId : themes[0].id;
 		return { activeId, library: Array.isArray(c.library) ? c.library : [], themes };
@@ -65,7 +70,7 @@
 	});
 
 	function addTheme() {
-		const t: WTheme = { id: genId(), name: 'Neues Theme', colors: { ...FALLBACK }, heroImage: '', pillarImages: {} };
+		const t: WTheme = { id: genId(), name: 'Neues Theme', colors: { ...FALLBACK }, heroImage: '', heroPresetId: '', pillarImages: {} };
 		content.themes.push(t);
 		selectedId = t.id;
 	}
@@ -156,6 +161,7 @@
 						<button type="button" class="theme-name-btn" onclick={() => (selectedId = t.id)}>
 							<span class="swatches" aria-hidden="true">
 								<span style="background:{t.colors.primary}"></span>
+								<span style="background:{t.colors.soft}"></span>
 								<span style="background:{t.colors.ink}"></span>
 								<span style="background:{t.colors.cream}"></span>
 							</span>
@@ -205,7 +211,7 @@
 
 				<h3 class="sub">Farben</h3>
 				<div class="colors">
-					{#each [ ['primary','Primär (Rot)'], ['primaryDark','Primär dunkel'], ['ink','Text / Überschrift'], ['cream','Hintergrund'] ] as [key, label]}
+					{#each [ ['primary','Primär (Buttons, Akzente)'], ['primaryDark','Primär dunkel (Hover)'], ['ink','Text / Überschrift'], ['cream','Hintergrund'], ['soft','Akzent hell (Badges, Tags, Flächen)'] ] as [key, label]}
 						<div class="color-field">
 							<span>{label}</span>
 							<div class="color-row">
@@ -214,6 +220,22 @@
 							</div>
 						</div>
 					{/each}
+				</div>
+
+				<h3 class="sub">Hero</h3>
+				<div class="slot">
+					<div class="slot-label">
+						<strong>Hero der Startseite</strong>
+						<span class="muted">Variante und Inhalte unter <a href="/admin/hero">Hero</a> pflegen</span>
+					</div>
+					<div class="slot-pick">
+						<select bind:value={selected.heroPresetId} aria-label="Hero wählen">
+							<option value="">— Erster Hero ({data.heroPresets[0]?.name ?? 'Standard'}) —</option>
+							{#each data.heroPresets as hp (hp.id)}
+								<option value={hp.id}>{hp.name} ({hp.variant === 'slider' ? 'Zwei Welten' : 'Klassisch'})</option>
+							{/each}
+						</select>
+					</div>
 				</div>
 
 				<h3 class="sub">Bilder</h3>
@@ -325,6 +347,7 @@
 	.head-actions { display: flex; gap: 8px; }
 	.hint { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 14px; }
 	.muted { font-size: 0.78rem; color: var(--text-muted); }
+	.muted a { color: var(--btb-steel); }
 	.badge {
 		font-size: 0.7rem;
 		text-transform: uppercase;

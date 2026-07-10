@@ -12,6 +12,8 @@
 	let uploading = $state(false);
 	let error = $state('');
 	let dragover = $state(false);
+	// Referenz statt ID: mehrere Instanzen mit gleicher section dürfen nicht kollidieren.
+	let fileInput: HTMLInputElement | undefined = $state();
 
 	async function uploadFile(file: File) {
 		uploading = true;
@@ -75,7 +77,7 @@
 		<div class="image-preview">
 			<img src={value} alt="Header-Bild Vorschau" />
 			<div class="image-preview-actions">
-				<button type="button" class="btn-change" onclick={() => document.getElementById(`file-${section}`)?.click()}>
+				<button type="button" class="btn-change" onclick={() => fileInput?.click()}>
 					Ändern
 				</button>
 				<button type="button" class="btn-remove-img" onclick={removeImage}>
@@ -91,7 +93,7 @@
 			ondrop={handleDrop}
 			ondragover={handleDragOver}
 			ondragleave={handleDragLeave}
-			onclick={() => document.getElementById(`file-${section}`)?.click()}
+			onclick={() => fileInput?.click()}
 		>
 			{#if uploading}
 				<div class="dropzone-content">
@@ -114,7 +116,7 @@
 	{/if}
 
 	<input
-		id="file-{section}"
+		bind:this={fileInput}
 		type="file"
 		accept="image/jpeg,image/png,image/webp,image/svg+xml,image/gif"
 		class="file-input-hidden"

@@ -19,6 +19,8 @@ import type {
 	ReferenceProjectsContent,
 	KeynotesContent,
 	FaqContent,
+	HeroContent,
+	HeroPreset,
 	Theme,
 	ThemeContent
 } from '$lib/types/content';
@@ -436,6 +438,94 @@ export function normalizeExperiments(raw: unknown): ExperimentsContent {
 	};
 }
 
+// ─── Hero ───
+// Defaults = bisherige Texte aus messages/de.json (der Look ändert sich nicht,
+// bis im Admin etwas angepasst wird). Heros sind benannte Presets; welches
+// Preset lädt, bestimmt das aktive Theme (heroPresetId).
+export const defaultHero: HeroContent = {
+	presets: [
+		{
+			id: 'standard',
+			name: 'Standard',
+			variant: 'classic',
+			classic: {
+				titleLine1: 'Gibt es',
+				titleLine2Pre: 'nur ',
+				titleLine2Em: 'selten',
+				sub: 'Wenn Neugier, Urteilskraft und Umsetzungsstärke wirklich zusammenkommen, entsteht etwas, das man nicht oft sieht.',
+				accent: 'Eine Mischung, die trägt.',
+				signature: 'Brigitte Hulliger',
+				ctaLabel: 'Lass uns sprechen',
+				annotations: [
+					{ title: 'Neugier', sub: 'stellt Fragen' },
+					{ title: 'Umsetzungsstärke', sub: 'macht es echt' },
+					{ title: 'Urteilskraft', sub: 'ordnet ein' }
+				]
+			},
+			slider: {
+				titleLine1: 'KI ist überall.',
+				titleAccent: 'Urteilskraft ist selten.',
+				sub: 'Digitale Urteilskraft für Verwaltungsräte und Geschäftsleitungen — mehr als IT: Substanz statt Hype, erprobt statt nachgelesen.',
+				left: {
+					kicker: 'Im Gremium',
+					title: 'Die Frage, die im Raum fehlt.',
+					text: 'Betriebswirtschaft auf GL-Niveau, Governance, digitale Urteilskraft. Kein Ja-Sager.',
+					image: ''
+				},
+				right: {
+					kicker: 'Im Maschinenraum',
+					title: 'Selbst erprobt, nicht nachgelesen.',
+					text: 'Eigene KI-Systeme, self-hosted, im täglichen Einsatz. Sieht hinter die Fassade.',
+					image: ''
+				},
+				caption: 'Beide Welten.',
+				captionAccent: 'Dieselbe Person.',
+				hint: 'zum Entdecken ziehen'
+			}
+		}
+	]
+};
+
+// Einzelnes Preset robust mit Defaults mergen (verschachtelte Teile einzeln).
+function normalizeHeroPreset(raw: Partial<HeroPreset> | undefined, fallbackId: string): HeroPreset {
+	const d = defaultHero.presets[0];
+	const annotations = Array.isArray(raw?.classic?.annotations)
+		? d.classic.annotations.map((a, i) => ({ ...a, ...raw!.classic!.annotations[i] }))
+		: d.classic.annotations;
+	return {
+		id: raw?.id || fallbackId,
+		name: raw?.name?.trim() || 'Hero',
+		variant: raw?.variant === 'slider' ? 'slider' : 'classic',
+		classic: { ...d.classic, ...(raw?.classic ?? {}), annotations },
+		slider: {
+			...d.slider,
+			...(raw?.slider ?? {}),
+			left: { ...d.slider.left, ...(raw?.slider?.left ?? {}) },
+			right: { ...d.slider.right, ...(raw?.slider?.right ?? {}) }
+		}
+	};
+}
+
+// Hero robust auflösen. Legacy-Form (einzelner Hero ohne presets-Liste)
+// wird als Preset «Standard» übernommen.
+export function normalizeHero(raw: unknown): HeroContent {
+	const c = raw as ({ presets?: unknown } & Partial<HeroPreset>) | null | undefined;
+	if (!c) return structuredClone(defaultHero);
+	if (!Array.isArray(c.presets)) {
+		if (c.classic || c.slider || c.variant) {
+			return { presets: [normalizeHeroPreset({ ...c, id: 'standard', name: 'Standard' }, 'standard')] };
+		}
+		return structuredClone(defaultHero);
+	}
+	const presets = (c.presets as Partial<HeroPreset>[]).map((p, i) => normalizeHeroPreset(p, `hero-${i}`));
+	return presets.length > 0 ? { presets } : structuredClone(defaultHero);
+}
+
+// Aktives Preset auflösen: Referenz aus dem Theme, sonst das erste.
+export function resolveActiveHero(content: HeroContent, presetId?: string): HeroPreset {
+	return content.presets.find((p) => p.id === presetId) ?? content.presets[0];
+}
+
 // ─── Theme ───
 export const DEFAULT_HERO_IMAGE = '/fruits/hero.png';
 
@@ -451,7 +541,8 @@ export const defaultTheme: ThemeContent = {
 				primary: '#b11e2c',
 				primaryDark: '#8e1622',
 				ink: '#2b1a1c',
-				cream: '#fbf1ec'
+				cream: '#fbf1ec',
+				soft: '#f6d9d5'
 			},
 			heroImage: DEFAULT_HERO_IMAGE,
 			pillarImages: {}

@@ -320,12 +320,65 @@ export interface SeoOptimizationResult {
 	changes: string[];
 }
 
+// ─── Hero ───
+/** Handschrift-Notiz am Frucht-Bild (klassischer Hero). */
+export interface HeroAnnotation {
+	title: string;
+	sub: string;
+}
+
+/** Klassischer Hero: Headline, Subline, Signatur + drei Notizen am Bild. */
+export interface HeroClassic {
+	titleLine1: string; // «Gibt es»
+	titleLine2Pre: string; // «nur »
+	titleLine2Em: string; // «selten» (Akzentfarbe)
+	sub: string;
+	accent: string; // kursive Zeile («Eine Mischung, die trägt.»)
+	signature: string; // Handschrift-Signatur
+	ctaLabel: string;
+	annotations: HeroAnnotation[]; // genau 3 Positionen am Bild
+}
+
+/** Eine der zwei Welten im Slider-Hero. */
+export interface HeroWorld {
+	kicker: string; // «Im Gremium»
+	title: string;
+	text: string;
+	image?: string; // leer = Standard-Verlauf
+}
+
+/** Slider-Hero: asymmetrischer Kopf (Headline links, Tagline+CTA rechts) + Zwei-Welten-Panel in voller Breite. */
+export interface HeroSlider {
+	titleLine1: string; // «KI ist überall.»
+	titleAccent: string; // Akzentzeile («Urteilskraft ist selten.»)
+	sub: string; // Tagline / Positionierungszeile (rechte Spalte)
+	left: HeroWorld; // dunkle Welt
+	right: HeroWorld; // Akzent-Welt
+	caption: string; // «Beide Welten.»
+	captionAccent: string; // «Dieselbe Person.»
+	hint: string; // «zum Entdecken ziehen»
+}
+
+/** Ein benannter Hero (Variante + Inhalte). Themes referenzieren Presets per id. */
+export interface HeroPreset {
+	id: string;
+	name: string;
+	variant: 'classic' | 'slider';
+	classic: HeroClassic;
+	slider: HeroSlider;
+}
+
+export interface HeroContent {
+	presets: HeroPreset[];
+}
+
 // ─── Theme ───
 export interface ThemeColors {
-	primary: string; // Hauptfarbe (Rot) — Buttons, Links, Akzente
+	primary: string; // Hauptfarbe — Buttons, Links, Akzente
 	primaryDark: string; // Hover / dunkle Variante
 	ink: string; // Überschriften & Fliesstext
 	cream: string; // Seitenhintergrund
+	soft?: string; // Helle Akzentfläche — Badges, Tags, Banner (leer = aus Primär abgeleitet)
 }
 
 /** Ein hochgeladenes Bild in der gemeinsamen Bibliothek. */
@@ -340,6 +393,7 @@ export interface Theme {
 	name: string;
 	colors: ThemeColors;
 	heroImage?: string; // URL aus der Bibliothek; leer = Standard-Hero
+	heroPresetId?: string; // Hero-Preset für dieses Theme; leer = erstes Preset
 	pillarImages?: Record<string, string>; // pillarKey → Bild-URL
 }
 
@@ -365,6 +419,7 @@ export type SectionKey =
 	| 'referenzprojekte'
 	| 'keynotes'
 	| 'faq'
+	| 'hero'
 	| 'theme';
 
 export type SectionContent =
@@ -382,4 +437,5 @@ export type SectionContent =
 	| ReferenceProjectsContent
 	| KeynotesContent
 	| FaqContent
+	| HeroContent
 	| ThemeContent;
