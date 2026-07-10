@@ -7,7 +7,13 @@ const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/,
 
 const STATIC_ROUTES: Array<{ path: string; changefreq: string; priority: string }> = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },
-	{ path: '/blog', changefreq: 'weekly', priority: '0.8' },
+	{ path: '/transformation', changefreq: 'monthly', priority: '0.8' },
+	{ path: '/vr', changefreq: 'monthly', priority: '0.8' },
+	{ path: '/keynotes', changefreq: 'weekly', priority: '0.8' },
+	{ path: '/manifest', changefreq: 'monthly', priority: '0.7' },
+	{ path: '/experimentierraum', changefreq: 'monthly', priority: '0.7' },
+	{ path: '/impulse', changefreq: 'weekly', priority: '0.8' },
+	{ path: '/kontakt', changefreq: 'yearly', priority: '0.6' },
 	{ path: '/impressum', changefreq: 'yearly', priority: '0.3' },
 	{ path: '/datenschutz', changefreq: 'yearly', priority: '0.3' },
 	{ path: '/agb', changefreq: 'yearly', priority: '0.3' }
@@ -58,7 +64,7 @@ export const GET: RequestHandler = async () => {
 		const lastmod = lastmodDate ? new Date(lastmodDate).toISOString() : undefined;
 		entries.push(
 			buildUrlEntry({
-				path: `/blog/${post.slug}`,
+				path: `/impulse/${post.slug}`,
 				lastmod,
 				changefreq: 'monthly',
 				priority: '0.7'

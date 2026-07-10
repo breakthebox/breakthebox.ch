@@ -38,7 +38,7 @@
 			}),
 			buildBreadcrumb([
 				{ name: m.blog_breadcrumb_home(), url: SITE_URL + '/' },
-				{ name: m.blog_breadcrumb_blog(), url: SITE_URL + '/blog' },
+				{ name: m.blog_breadcrumb_blog(), url: SITE_URL + '/impulse' },
 				{ name: post.title }
 			])
 		])
@@ -57,7 +57,7 @@
 		if (browser && window.history.length > 1) {
 			window.history.back();
 		} else {
-			window.location.href = localizeHref('/blog');
+			window.location.href = localizeHref('/impulse');
 		}
 	}
 

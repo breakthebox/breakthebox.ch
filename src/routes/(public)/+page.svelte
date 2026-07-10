@@ -297,7 +297,7 @@
 			<div class="nav-links">
 				<a href="#angebot" class:active={activeSection === 'angebot'}>{m.nav_services()}</a>
 				<a href="#about" class:active={activeSection === 'about'}>{m.nav_about()}</a>
-				<a href={localizeHref('/blog')}>{m.nav_blog()}</a>
+				<a href={localizeHref('/impulse')}>{m.nav_blog()}</a>
 			</div>
 			<a class="btn solid" href="#kontakt">{m.h_nav_cta()}</a>
 		</div>
@@ -655,7 +655,7 @@
 						<div class="past-row">
 							{#each past as a}
 								{#if a.blogSlug}
-									<a class="past-card past-card-link" href={localizeHref(`/blog/${a.blogSlug}`)}>{@render pastInner(a, true)}</a>
+									<a class="past-card past-card-link" href={localizeHref(`/impulse/${a.blogSlug}`)}>{@render pastInner(a, true)}</a>
 								{:else if a.url}
 									<a class="past-card past-card-link" href={a.url} target="_blank" rel="noopener noreferrer">{@render pastInner(a, false)}</a>
 								{:else}

@@ -1,13 +1,6 @@
-import type { PageServerLoad } from './$types';
-import { getPublishedBlogPosts } from '$lib/server/db/queries/blog';
-import * as m from '$lib/paraglide/messages.js';
-import type { PageMeta } from '$lib/types/seo';
+// Alte Blog-Route: dauerhaft auf /impulse umgeleitet (SEO-Redirect).
+import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async () => {
-	const posts = await getPublishedBlogPosts();
-	const meta: PageMeta = {
-		title: m.blog_page_title(),
-		description: m.blog_page_subtitle()
-	};
-	return { posts, meta };
+export const load = () => {
+	throw redirect(301, '/impulse');
 };

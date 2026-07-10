@@ -46,7 +46,7 @@
 	{:else}
 		<div class="blog-grid">
 			{#each posts as post}
-				<a href={localizeHref(`/blog/${post.slug}`)} class="blog-card">
+				<a href={localizeHref(`/impulse/${post.slug}`)} class="blog-card">
 					{#if post.headerImage}
 						<img src={post.headerImage} alt={post.title} class="blog-card-img" loading="lazy" decoding="async" />
 					{:else}
