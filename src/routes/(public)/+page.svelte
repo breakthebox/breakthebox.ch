@@ -188,6 +188,7 @@
 	}
 
 	let navScrolled = $state(false);
+	let menuOpen = $state(false);
 	let activeSection = $state('');
 
 	const faq: FaqContent = data.faq;
@@ -308,8 +309,30 @@
 				<a href="#about" class:active={activeSection === 'about'}>{m.nav_about()}</a>
 				<a href={localizeHref('/impulse')}>{m.nav_blog()}</a>
 			</div>
-			<a class="btn solid" href="#kontakt">{m.h_nav_cta()}</a>
+			<a class="btn solid nav-cta" href="#kontakt">{m.h_nav_cta()}</a>
+			<button
+				type="button"
+				class="nav-burger"
+				aria-label={menuOpen ? 'Menü schliessen' : 'Menü öffnen'}
+				aria-expanded={menuOpen}
+				aria-controls="mobile-menu"
+				onclick={() => (menuOpen = !menuOpen)}
+			>
+				{#if menuOpen}
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+				{:else}
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+				{/if}
+			</button>
 		</div>
+		{#if menuOpen}
+			<div class="nav-mobile" id="mobile-menu">
+				<a href="#angebot" onclick={() => (menuOpen = false)}>{m.nav_services()}</a>
+				<a href="#about" onclick={() => (menuOpen = false)}>{m.nav_about()}</a>
+				<a href={localizeHref('/impulse')} onclick={() => (menuOpen = false)}>{m.nav_blog()}</a>
+				<a class="btn solid" href="#kontakt" onclick={() => (menuOpen = false)}>{m.h_nav_cta()}</a>
+			</div>
+		{/if}
 	</nav>
 
 	<!-- ═══════ ANKÜNDIGUNGS-STREIFEN (nur bei nahem Termin) ═══════ -->
@@ -1030,6 +1053,44 @@
 	.nav-links a.active {
 		opacity: 1;
 		color: var(--red);
+	}
+	/* Burger + Mobile-Menü (Desktop: versteckt) */
+	.nav-burger {
+		display: none;
+		width: 42px;
+		height: 42px;
+		align-items: center;
+		justify-content: center;
+		background: none;
+		border: none;
+		color: var(--ink);
+		cursor: pointer;
+		padding: 0;
+	}
+	.nav-burger svg {
+		width: 26px;
+		height: 26px;
+	}
+	.nav-mobile {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+		padding: 6px 22px 20px;
+		border-top: 1px solid var(--line);
+	}
+	.nav-mobile a {
+		display: block;
+		padding: 12px 0;
+		font-size: 15px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--ink);
+	}
+	.nav-mobile a.btn {
+		margin-top: 8px;
+		padding: 14px 26px;
 	}
 
 	/* ═══════ HERO ═══════ */
@@ -2480,6 +2541,12 @@
 		.nav-links {
 			display: none;
 		}
+		.nav-burger {
+			display: flex;
+		}
+		.nav-cta {
+			margin-left: auto;
+		}
 		.heroGrid {
 			min-height: 480px;
 		}
@@ -2515,6 +2582,35 @@
 		}
 	}
 	@media (max-width: 720px) {
+		/* Ankündigungs-Streifen stapelt: Kopfzeile, dann Text, dann CTA */
+		.astrip {
+			flex-wrap: wrap;
+			padding: 12px 18px 14px;
+			row-gap: 4px;
+			font-size: 13px;
+		}
+		.astrip .pulse {
+			order: 0;
+		}
+		.astrip .live {
+			order: 1;
+		}
+		.astrip-x {
+			order: 2;
+			margin-left: auto;
+		}
+		.astrip-body {
+			order: 3;
+			flex: 1 1 100%;
+			min-width: 0;
+		}
+		.astrip-body .when {
+			white-space: normal;
+		}
+		.astrip-go {
+			order: 4;
+			margin-top: 2px;
+		}
 		/* Hero stapelt: Text oben, Frucht mit Callout-Zeile darunter */
 		.heroGrid {
 			grid-template-columns: 1fr;
