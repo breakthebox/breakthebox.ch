@@ -32,3 +32,6 @@ coverage/
 
 # Uploads (root-level only, not src/routes/api/uploads/)
 /uploads/
+
+# Content-Migrations-Bundle (scripts/content-migrate.js)
+/content-bundle/
