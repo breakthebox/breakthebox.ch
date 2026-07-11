@@ -51,7 +51,8 @@
 
 	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
 	const SITE_NAME = 'Break the Box';
-	const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+	// ?v= bustet die Vorschau-Caches der Messenger/Social-Scraper bei Neugestaltung
+	const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg?v=2`;
 
 	const identity = buildSiteIdentity(SITE_URL);
 	const baseGraph = buildGraph([

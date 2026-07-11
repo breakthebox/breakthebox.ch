@@ -175,8 +175,8 @@
 				<h2 class="card-title">Headline</h2>
 				<div class="field-row">
 					<div class="field">
-						<label class="field-label" for="s-l1">Headline Zeile 1</label>
-						<input id="s-l1" type="text" class="field-input" bind:value={sel.slider.titleLine1} />
+						<label class="field-label" for="s-l1">Headline (Zeilenumbrüche werden übernommen)</label>
+						<textarea id="s-l1" class="field-textarea" rows="2" bind:value={sel.slider.titleLine1}></textarea>
 					</div>
 					<div class="field">
 						<label class="field-label" for="s-l2">Headline Akzentzeile</label>

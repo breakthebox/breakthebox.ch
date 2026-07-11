@@ -48,7 +48,7 @@
 	<!-- ─── Lead: asymmetrisch — Headline links, Tagline + CTA rechts ─── -->
 	<div class="lead">
 		<h1 class="whero-h1">
-			{content.titleLine1}<br />
+			<span class="h1-line">{content.titleLine1}</span><br />
 			<span class="em">{content.titleAccent}</span>
 		</h1>
 		<div class="lead-side">
@@ -144,10 +144,12 @@
 	}
 
 	/* ─── Lead (asymmetrisch: 2 Spalten) ─── */
+	/* 2/3 Headline, 1/3 Tagline — die kurze Tagline braucht wenig Platz,
+	   die Headline soll möglichst nicht umbrechen. */
 	.lead {
 		display: grid;
-		grid-template-columns: 1.3fr 1fr;
-		gap: 48px;
+		grid-template-columns: 2fr 1fr;
+		gap: 44px;
 		align-items: center;
 		max-width: 1180px;
 		margin: 0 auto;
@@ -161,6 +163,10 @@
 		letter-spacing: -0.01em;
 		color: var(--ink);
 		margin: 0;
+	}
+	/* Zeilenumbrüche aus dem Admin (Textarea) werden übernommen */
+	.h1-line {
+		white-space: pre-line;
 	}
 	.em {
 		color: var(--red);
