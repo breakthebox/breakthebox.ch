@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { ThemeContent, ThemeColors, ThemeImageAsset } from '$lib/types/content';
-	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
+	import type { ThemeContent, ThemeColors, ThemeFontSelection } from '$lib/types/content';
 	import { softFromPrimary } from '$lib/utils/color';
+	import { HEADING_FONTS, BODY_FONTS, HAND_FONTS, DEFAULT_FONTS } from '$lib/config/fonts';
 
 	let { data, form } = $props();
 
@@ -12,13 +12,13 @@
 		id: string;
 		name: string;
 		colors: Required<ThemeColors>;
+		fonts: ThemeFontSelection;
 		heroImage: string;
 		heroPresetId: string; // '' = erstes Preset
 		pillarImages: Record<string, string>;
 	}
 	interface WContent {
 		activeId: string;
-		library: ThemeImageAsset[];
 		themes: WTheme[];
 	}
 
@@ -33,44 +33,38 @@
 				// Bestehende Themes ohne «soft»: helle Fläche aus Primär ableiten.
 				soft: t.colors?.soft ?? softFromPrimary(t.colors?.primary ?? FALLBACK.primary)
 			},
+			fonts: {
+				heading: t.fonts?.heading ?? DEFAULT_FONTS.heading,
+				body: t.fonts?.body ?? DEFAULT_FONTS.body,
+				hand: t.fonts?.hand ?? DEFAULT_FONTS.hand
+			},
 			heroImage: t.heroImage ?? '',
 			heroPresetId: t.heroPresetId ?? '',
 			pillarImages: t.pillarImages ?? {}
 		}));
 		if (themes.length === 0) {
-			themes.push({ id: 'standard', name: 'Standard', colors: { ...FALLBACK }, heroImage: '', heroPresetId: '', pillarImages: {} });
+			themes.push({ id: 'standard', name: 'Standard', colors: { ...FALLBACK }, fonts: { ...DEFAULT_FONTS }, heroImage: '', heroPresetId: '', pillarImages: {} });
 		}
 		const activeId = themes.some((t) => t.id === c.activeId) ? c.activeId : themes[0].id;
-		return { activeId, library: Array.isArray(c.library) ? c.library : [], themes };
+		return { activeId, themes };
 	}
 
 	let content = $state<WContent>(normalize(structuredClone(data.content)));
 	const pillarSlots = data.pillarSlots;
+	// Bilder für die Slot-Auswahl kommen aus der Mediathek.
+	const library = data.library;
 
 	let selectedId = $state(content.activeId);
 	let selected = $derived(content.themes.find((t) => t.id === selectedId) ?? content.themes[0]);
 
 	let saving = $state(false);
 	let showSuccess = $state(false);
-	let uploadValue = $state<string | undefined>('');
-
 	function genId() {
 		return crypto.randomUUID();
 	}
-	function fileName(url: string): string {
-		return decodeURIComponent(url.split('/').pop() ?? 'Bild').replace(/\.[a-z0-9]+$/i, '');
-	}
-
-	// Neu hochgeladenes Bild in die Bibliothek übernehmen.
-	$effect(() => {
-		const url = uploadValue;
-		if (!url) return;
-		uploadValue = '';
-		content.library = [...content.library, { id: genId(), url, name: fileName(url) }];
-	});
 
 	function addTheme() {
-		const t: WTheme = { id: genId(), name: 'Neues Theme', colors: { ...FALLBACK }, heroImage: '', heroPresetId: '', pillarImages: {} };
+		const t: WTheme = { id: genId(), name: 'Neues Theme', colors: { ...FALLBACK }, fonts: { ...DEFAULT_FONTS }, heroImage: '', heroPresetId: '', pillarImages: {} };
 		content.themes.push(t);
 		selectedId = t.id;
 	}
@@ -94,18 +88,6 @@
 		if (content.activeId === id) content.activeId = content.themes[0].id;
 		if (selectedId === id) selectedId = content.themes[0].id;
 	}
-	function removeLibraryImage(id: string, url: string) {
-		if (!confirm('Bild aus der Bibliothek entfernen? Zuweisungen werden gelöst.')) return;
-		content.library = content.library.filter((img) => img.id !== id);
-		// Referenzen in allen Themes lösen.
-		for (const t of content.themes) {
-			if (t.heroImage === url) t.heroImage = '';
-			for (const key of Object.keys(t.pillarImages ?? {})) {
-				if (t.pillarImages![key] === url) t.pillarImages![key] = '';
-			}
-		}
-	}
-
 	let activeName = $derived(content.themes.find((t) => t.id === content.activeId)?.name ?? '—');
 
 	$effect(() => {
@@ -173,29 +155,6 @@
 			</div>
 		</section>
 
-		<!-- ─── Bild-Bibliothek ─── -->
-		<section class="card">
-			<div class="card-head">
-				<h2>Bild-Bibliothek</h2>
-				<span class="muted">{content.library.length} Bild(er)</span>
-			</div>
-			<p class="hint">Bilder hochladen und unten den Slots (Hero, Pillars) zuweisen. Bilder sind über alle Themes hinweg wiederverwendbar.</p>
-			<div class="lib-upload">
-				<ImageUpload bind:value={uploadValue} section="theme-lib" label="Bild hinzufügen" />
-			</div>
-			{#if content.library.length > 0}
-				<div class="lib-grid">
-					{#each content.library as img (img.id)}
-						<div class="lib-item">
-							<img src={img.url} alt={img.name} />
-							<input class="lib-name" type="text" bind:value={img.name} aria-label="Bildname" />
-							<button type="button" class="icon-btn danger" onclick={() => removeLibraryImage(img.id, img.url)} title="Entfernen" aria-label="Bild entfernen">✕</button>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		</section>
-
 		<!-- ─── Ausgewähltes Theme bearbeiten ─── -->
 		{#if selected}
 			<section class="card">
@@ -222,6 +181,20 @@
 					{/each}
 				</div>
 
+				<h3 class="sub">Schriften</h3>
+				<div class="fonts">
+					{#each [ { label: 'Überschriften', field: 'heading', options: HEADING_FONTS }, { label: 'Fliesstext & UI', field: 'body', options: BODY_FONTS }, { label: 'Handschrift / Akzent', field: 'hand', options: HAND_FONTS } ] as slot (slot.field)}
+						<div class="font-field">
+							<span>{slot.label}</span>
+							<select bind:value={selected.fonts[slot.field as keyof ThemeFontSelection]} aria-label={slot.label}>
+								{#each slot.options as f (f.key)}
+									<option value={f.key}>{f.label}</option>
+								{/each}
+							</select>
+						</div>
+					{/each}
+				</div>
+
 				<h3 class="sub">Hero</h3>
 				<div class="slot">
 					<div class="slot-label">
@@ -239,6 +212,7 @@
 				</div>
 
 				<h3 class="sub">Bilder</h3>
+				<p class="hint">Bilder hochladen und verwalten in der <a href="/admin/mediathek">Mediathek</a>.</p>
 				<div class="slot">
 					<div class="slot-label">
 						<strong>Hero-Bild</strong>
@@ -250,7 +224,7 @@
 						</div>
 						<select bind:value={selected.heroImage} aria-label="Hero-Bild wählen">
 							<option value="">— Standard —</option>
-							{#each content.library as img (img.id)}
+							{#each library as img (img.id)}
 								<option value={img.url}>{img.name}</option>
 							{/each}
 						</select>
@@ -260,8 +234,8 @@
 				{#each pillarSlots as slot}
 					<div class="slot">
 						<div class="slot-label">
-							<strong>{slot.title || slot.key}</strong>
-							<span class="muted">Pillar «{slot.key}»</span>
+							<strong>{slot.title || 'Pillar'}</strong>
+							<span class="muted">Pillar-Bild</span>
 						</div>
 						<div class="slot-pick">
 							<div class="slot-thumb">
@@ -269,7 +243,7 @@
 							</div>
 							<select bind:value={selected.pillarImages[slot.key]} aria-label="Bild für {slot.title}">
 								<option value="">— kein Bild —</option>
-								{#each content.library as img (img.id)}
+								{#each library as img (img.id)}
 									<option value={img.url}>{img.name}</option>
 								{/each}
 							</select>
@@ -346,6 +320,7 @@
 	}
 	.head-actions { display: flex; gap: 8px; }
 	.hint { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 14px; }
+	.hint a { color: var(--btb-steel); }
 	.muted { font-size: 0.78rem; color: var(--text-muted); }
 	.muted a { color: var(--btb-steel); }
 	.badge {
@@ -402,37 +377,6 @@
 		border: 1px solid var(--border);
 	}
 
-	/* Bibliothek */
-	.lib-upload { max-width: 420px; margin-bottom: 16px; }
-	.lib-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-		gap: 12px;
-	}
-	.lib-item {
-		border: 1px solid var(--border);
-		border-radius: var(--radius-md);
-		overflow: hidden;
-		background: var(--bg-page);
-		display: flex;
-		flex-direction: column;
-	}
-	.lib-item img {
-		width: 100%;
-		height: 90px;
-		object-fit: contain;
-		background: repeating-conic-gradient(var(--bg-elevated) 0% 25%, var(--bg-surface) 0% 50%) 50% / 16px 16px;
-	}
-	.lib-name {
-		border: none;
-		border-top: 1px solid var(--border);
-		padding: 6px 8px;
-		font-size: 0.76rem;
-		background: var(--bg-surface);
-		color: var(--text-primary);
-		min-width: 0;
-	}
-	.lib-item .icon-btn { align-self: flex-end; }
 
 	/* Felder */
 	.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
@@ -459,6 +403,20 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 		gap: 12px;
+	}
+	.fonts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 12px;
+	}
+	.font-field {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.font-field > span {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
 	}
 	.color-field { display: flex; flex-direction: column; gap: 6px; }
 	.color-field > span { font-size: 0.8rem; color: var(--text-secondary); }

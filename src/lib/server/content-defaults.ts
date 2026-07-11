@@ -21,6 +21,10 @@ import type {
 	FaqContent,
 	HeroContent,
 	HeroPreset,
+	SectionSetting,
+	SectionsContent,
+	MediaContent,
+	ThemeImageAsset,
 	Theme,
 	ThemeContent
 } from '$lib/types/content';
@@ -28,55 +32,31 @@ import type {
 export const defaultPillars: PillarsContent = {
 	pillars: [
 		{
-			key: 'strategy',
-			title: 'Strategieberatung & IT-Beratung',
-			note: 'mein Kerngeschäft seit über 10 Jahren',
-			desc: 'Ich begleite Geschäftsleitungen von KMU bei strategischen IT- und Digitalfragen — von der IT-Gesamtstrategie über Digitalisierungs-Roadmaps bis hin zu KI-Readiness. Dazu gehören Evaluationen, Machbarkeitsstudien, Architektur-Reviews und die Begleitung bei der Umsetzung.',
-			tags: ['IT-Strategie', 'Digitalisierung', 'KI-Strategie', 'Evaluationen', 'Security', 'Machbarkeitsstudien'],
-			examples: [
-				{ label: 'IT-Strategie', desc: 'Standortbestimmung und Roadmap für Treuhand-Unternehmen' },
-				{ label: 'CRM-Evaluation', desc: 'Variantenstudie und Anforderungskatalog für Medizinaltechnik' },
-				{ label: 'Digitalisierung', desc: 'Digitale Transformation für Industriegruppe' },
-				{ label: 'KI-Bewertung', desc: 'AI-Proposal-Evaluation für Fachgesellschaft' },
-				{ label: 'IT-Security', desc: 'Netzwerk-Segmentierung und Security-Strategie' }
-			]
+			key: 'transformation',
+			title: 'Transformation',
+			note: 'über Monate, nicht als Kurzeinsatz',
+			desc: 'Ich begleite Organisationen durch die digitale Transformation — von Standortbestimmung über Strategie bis zur Umsetzung. Als Katalysatorin auf Zeit, mit klarem Exit.',
+			tags: ['IT-Strategie', 'Digitalisierung', 'KI-Readiness', 'Umsetzung'],
+			examples: [],
+			subpageUrl: '/transformation'
 		},
 		{
 			key: 'governance',
-			title: 'Governance & Verwaltungsrat',
+			title: 'Verwaltungsrat',
 			note: 'Digitalkompetenz, wo es zählt',
-			desc: 'Drei aktive VR-Mandate, CAS Verwaltungsrat abgeschlossen. Brückenfunktion zwischen Aufsichtsgremium und operativer IT — IT-Governance, Budget-Benchmarking und strategische Digital-Aufsicht.',
-			tags: ['VR-Mandate', 'IT-Governance', 'Digital-Aufsicht', 'CAS Verwaltungsrat'],
-			examples: [
-				{ label: 'IT-Governance', desc: 'Aufbau IT-Governance-Framework für Versicherung' },
-				{ label: 'Digital-Aufsicht', desc: 'Digitalkompetenz-Assessment für VR-Gremium' },
-				{ label: 'Budget-Review', desc: 'IT-Budget-Benchmarking für Industrieunternehmen' }
-			]
+			desc: 'Digitale Urteilskraft dauerhaft im Gremium: Ich stelle die unbequemen Fragen, gehe in Vorleistung und bewahre vor teuren Fehlentscheiden. Verantwortung nach OR 716a.',
+			tags: ['VR-Mandate', 'IT-Governance', 'OR 716a', 'Digital-Aufsicht'],
+			examples: [],
+			subpageUrl: '/vr'
 		},
 		{
-			key: 'teaching',
-			title: 'Lehre & Thought Leadership',
-			note: 'Praxis lehren, nicht Theorie',
-			desc: 'Projektmanagement, Innovation und digitale Transformation praxisnah lehren — an der BFH und der Feusi. Keynotes und Workshops zu Themen wie Shadow AI Governance, systemisches Denken und Strategieentwicklung.',
-			tags: ['BFH', 'Feusi', 'Keynotes', 'Workshops', 'Shadow AI'],
-			examples: [
-				{ label: 'PM-Ausbildung', desc: 'Praxismodul Projektmanagement an der BFH' },
-				{ label: 'Keynote', desc: 'Shadow AI Governance an der Swiss IT Conference' },
-				{ label: 'Workshop', desc: 'Systemisches Denken für Führungskräfte' }
-			]
-		},
-		{
-			key: 'innovation',
-			title: 'Walk the Talk',
-			note: 'Technologie aus erster Hand kennen',
-			desc: 'Was mich von anderen Beraterinnen unterscheidet: Ich baue selbst. Eigene KI-Plattformen und ein AI-Agent-Ökosystem sind mein tägliches Arbeitsinstrument — und die Grundlage für fundierte Empfehlungen.',
-			tags: ['KI-Plattformen', 'AI Agents', 'SvelteKit', 'Claude Code'],
-			examples: [
-				{ label: 'Ductivo', desc: 'KI-Tutor für PM-Ausbildung an Hochschulen' },
-				{ label: 'Ent.Orakel', desc: 'Interaktives Systemik-Werkzeug mit KI' },
-				{ label: 'Miss Bizzy', desc: 'AI-Agent-Ökosystem im täglichen Einsatz' }
-			],
-			subpageUrl: '/experimentierraum'
+			key: 'keynotes',
+			title: 'Keynotes',
+			note: 'gefunden werden statt suchen',
+			desc: 'Keynotes, Panels und Workshops zu KI, Governance und digitaler Urteilskraft — praxisnah, weil ich baue und verantworte, worüber ich spreche. Dozentin an zwei Hochschulen.',
+			tags: ['Keynotes', 'Workshops', 'Lehre', 'Shadow AI'],
+			examples: [],
+			subpageUrl: '/keynotes'
 		}
 	]
 };
@@ -116,13 +96,13 @@ export function normalizeAbout(raw: unknown): AboutContent {
 	};
 }
 
+// Aufsteigende Beweis-Kette: Erfahrung → Umsetzung → Vertrauen → Verantwortung.
 export const defaultMetrics: MetricsContent = {
 	items: [
-		{ value: '10', label: 'Jahre', caption: 'Erfahrung' },
+		{ value: '10+', label: 'Jahre', caption: 'Erfahrung' },
+		{ value: '80+', label: 'Projekte', caption: 'begleitet & umgesetzt' },
 		{ value: '50+', label: 'Kunden', caption: 'Wirtschaft & öffentliche Hand' },
-		{ value: '3', label: 'VR-Mandate', caption: 'aktuell aktiv' },
-		{ value: '2', label: 'Hochschulen', caption: 'Lehre & Forschung' },
-		{ value: '80+', label: 'Projekte', caption: 'begleitet & umgesetzt' }
+		{ value: '3', label: 'VR-Mandate', caption: 'aktuell aktiv' }
 	]
 };
 
@@ -230,11 +210,6 @@ export const defaultAngebot: AngebotContent = {
 			key: 'keynotes',
 			title: 'Keynotes & Lehre',
 			desc: 'KI und digitale Transformation praxisnah und greifbar — Hype auf Substanz heruntergebrochen. Dozentin an zwei Hochschulen.'
-		},
-		{
-			key: 'walkthetalk',
-			title: 'Walk the Talk',
-			desc: 'Eigene Plattformen und ein KI-Agenten-Ökosystem im täglichen Einsatz: Miss Bizzy, Ent.Orakel, Ductivo. Technologie aus erster Hand.'
 		}
 	]
 };
@@ -438,6 +413,81 @@ export function normalizeExperiments(raw: unknown): ExperimentsContent {
 	};
 }
 
+// ─── Sektionen der Landing ───
+// Feste Keys in der Standard-Reihenfolge. Hero ist fix zuoberst (eigenes
+// System), der Footer fix zuunterst — beide sind hier bewusst nicht dabei.
+export const LANDING_SECTION_KEYS = [
+	'angebot',
+	'logos',
+	'pillars',
+	'tension',
+	'about',
+	'haltung',
+	'buehne',
+	'netzwerk',
+	'stimmen',
+	'impulse',
+	'faq',
+	'kontakt'
+] as const;
+
+// Sektionen, die standardmässig ausgeblendet sind (z.B. die alten Pillars).
+const DEFAULT_HIDDEN_KEYS: readonly string[] = ['pillars'];
+
+export const defaultSections: SectionsContent = {
+	sections: LANDING_SECTION_KEYS.map((key) => ({
+		key,
+		visible: !DEFAULT_HIDDEN_KEYS.includes(key),
+		kicker: '',
+		title: '',
+		subtitle: ''
+	}))
+};
+
+// Robust auflösen: gespeicherte Reihenfolge übernehmen, unbekannte Keys
+// verwerfen, fehlende (z.B. später hinzugekommene) Sektionen hinten anfügen.
+export function normalizeSections(raw: unknown): SectionsContent {
+	const saved = Array.isArray((raw as Partial<SectionsContent>)?.sections)
+		? ((raw as SectionsContent).sections as Partial<SectionSetting>[])
+		: [];
+	const out: SectionSetting[] = [];
+	for (const s of saved) {
+		if (!s?.key) continue;
+		if (!(LANDING_SECTION_KEYS as readonly string[]).includes(s.key)) continue;
+		if (out.some((o) => o.key === s.key)) continue;
+		out.push({
+			key: s.key,
+			visible: s.visible !== false,
+			kicker: s.kicker ?? '',
+			title: s.title ?? '',
+			subtitle: s.subtitle ?? ''
+		});
+	}
+	for (const key of LANDING_SECTION_KEYS) {
+		if (out.some((o) => o.key === key)) continue;
+		const entry: SectionSetting = {
+			key,
+			visible: !DEFAULT_HIDDEN_KEYS.includes(key),
+			kicker: '',
+			title: '',
+			subtitle: ''
+		};
+		// An der Standard-Position einfügen: nach der nächsten vorangehenden
+		// Sektion (gemäss Default-Reihenfolge), die bereits in der Liste steht.
+		const defaultIdx = LANDING_SECTION_KEYS.indexOf(key);
+		let insertAt = 0;
+		for (let i = defaultIdx - 1; i >= 0; i--) {
+			const prevIdx = out.findIndex((o) => o.key === LANDING_SECTION_KEYS[i]);
+			if (prevIdx >= 0) {
+				insertAt = prevIdx + 1;
+				break;
+			}
+		}
+		out.splice(insertAt, 0, entry);
+	}
+	return { sections: out };
+}
+
 // ─── Hero ───
 // Defaults = bisherige Texte aus messages/de.json (der Look ändert sich nicht,
 // bis im Admin etwas angepasst wird). Heros sind benannte Presets; welches
@@ -526,6 +576,20 @@ export function resolveActiveHero(content: HeroContent, presetId?: string): Hero
 	return content.presets.find((p) => p.id === presetId) ?? content.presets[0];
 }
 
+// ─── Mediathek ───
+export const defaultMedia: MediaContent = { library: [] };
+
+// Mediathek robust auflösen. Solange die Mediathek noch nie gespeichert wurde,
+// dient die Legacy-Bibliothek aus dem Theme-Content als Quelle (Migration).
+export function normalizeMedia(raw: unknown, legacyTheme?: ThemeContent | null): MediaContent {
+	const lib = Array.isArray((raw as Partial<MediaContent>)?.library)
+		? ((raw as MediaContent).library as ThemeImageAsset[])
+		: null;
+	if (lib) return { library: lib.filter((i) => i?.url) };
+	const legacy = Array.isArray(legacyTheme?.library) ? legacyTheme.library : [];
+	return { library: legacy.filter((i) => i?.url) };
+}
+
 // ─── Theme ───
 export const DEFAULT_HERO_IMAGE = '/fruits/hero.png';
 
@@ -544,6 +608,7 @@ export const defaultTheme: ThemeContent = {
 				cream: '#fbf1ec',
 				soft: '#f6d9d5'
 			},
+			fonts: { heading: 'fraunces', body: 'inter', hand: 'shadows' },
 			heroImage: DEFAULT_HERO_IMAGE,
 			pillarImages: {}
 		}

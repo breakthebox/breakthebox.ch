@@ -1,14 +1,15 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getSectionContent, saveSectionContent } from '$lib/server/db/queries/content';
-import { defaultTheme, defaultPillars, normalizeHero } from '$lib/server/content-defaults';
-import type { ThemeContent, PillarsContent, HeroContent } from '$lib/types/content';
+import { defaultTheme, defaultPillars, normalizeHero, normalizeMedia } from '$lib/server/content-defaults';
+import type { ThemeContent, PillarsContent, HeroContent, MediaContent } from '$lib/types/content';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
-	const [theme, pillars, hero] = await Promise.all([
+	const [theme, pillars, hero, media] = await Promise.all([
 		getSectionContent<ThemeContent>('theme'),
 		getSectionContent<PillarsContent>('pillars'),
-		getSectionContent<HeroContent>('hero')
+		getSectionContent<HeroContent>('hero'),
+		getSectionContent<MediaContent>('media')
 	]);
 
 	// Pillars nur für die Bild-Zuweisung (Key + Titel).
@@ -27,7 +28,9 @@ export const load: PageServerLoad = async () => {
 	return {
 		content: theme ?? defaultTheme,
 		pillarSlots,
-		heroPresets
+		heroPresets,
+		// Bilder kommen aus der Mediathek (Admin → Mediathek).
+		library: normalizeMedia(media, theme).library
 	};
 };
 
@@ -55,7 +58,10 @@ export const actions: Actions = {
 			if (!content.themes.some((t) => t.id === content.activeId)) {
 				content.activeId = content.themes[0].id;
 			}
-			if (!Array.isArray(content.library)) content.library = [];
+			// Legacy-Bibliothek unangetastet lassen (Quelle ist heute die Mediathek;
+			// solange sie dort nie gespeichert wurde, dient dieses Feld als Fallback).
+			const existing = await getSectionContent<ThemeContent>('theme');
+			content.library = existing?.library ?? [];
 
 			await saveSectionContent('theme', content, locals.user?.id);
 			return { success: true };

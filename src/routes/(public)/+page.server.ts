@@ -16,7 +16,8 @@ import {
 	defaultKeynotes,
 	defaultFaq,
 	normalizeHero,
-	resolveActiveHero
+	resolveActiveHero,
+	normalizeSections
 } from '$lib/server/content-defaults';
 import type {
 	PillarsContent,
@@ -37,6 +38,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 	return {
 		// Welcher Hero lädt, bestimmt das aktive Theme (heroPresetId).
 		hero: resolveActiveHero(normalizeHero(allContent.hero), parentData.theme?.heroPresetId),
+		sections: normalizeSections(allContent.sections),
 		pillars: { ...defaultPillars, ...((allContent.pillars as Partial<PillarsContent>) ?? {}) },
 		about: normalizeAbout(allContent.about),
 		references: { ...defaultReferences, ...((allContent.references as Partial<ReferencesContent>) ?? {}) },

@@ -320,6 +320,19 @@ export interface SeoOptimizationResult {
 	changes: string[];
 }
 
+// ─── Sektionen der Landing (Reihenfolge, Sichtbarkeit, Kopftexte) ───
+export interface SectionSetting {
+	key: string; // fester Sektions-Key der Landing (z.B. 'angebot', 'faq')
+	visible: boolean;
+	kicker: string; // '' = Standardtext
+	title: string; // '' = Standardtext
+	subtitle: string; // '' = Standardtext
+}
+
+export interface SectionsContent {
+	sections: SectionSetting[];
+}
+
 // ─── Hero ───
 /** Handschrift-Notiz am Frucht-Bild (klassischer Hero). */
 export interface HeroAnnotation {
@@ -388,10 +401,23 @@ export interface ThemeImageAsset {
 	name: string;
 }
 
+/** Mediathek: gemeinsame Bild-Bibliothek (eigener Admin-Bereich). */
+export interface MediaContent {
+	library: ThemeImageAsset[];
+}
+
+/** Gewählte Schriften (Keys aus der Font-Registry in $lib/config/fonts). */
+export interface ThemeFontSelection {
+	heading: string;
+	body: string;
+	hand: string;
+}
+
 export interface Theme {
 	id: string;
 	name: string;
 	colors: ThemeColors;
+	fonts?: ThemeFontSelection; // fehlt = Standard-Fonts (Fraunces/Inter/Shadows)
 	heroImage?: string; // URL aus der Bibliothek; leer = Standard-Hero
 	heroPresetId?: string; // Hero-Preset für dieses Theme; leer = erstes Preset
 	pillarImages?: Record<string, string>; // pillarKey → Bild-URL
@@ -399,7 +425,7 @@ export interface Theme {
 
 export interface ThemeContent {
 	activeId: string;
-	library: ThemeImageAsset[]; // gemeinsamer Pool hochgeladener Bilder
+	library?: ThemeImageAsset[]; // Legacy — die Bibliothek lebt heute in der Mediathek ('media')
 	themes: Theme[];
 }
 
@@ -420,6 +446,8 @@ export type SectionKey =
 	| 'keynotes'
 	| 'faq'
 	| 'hero'
+	| 'sections'
+	| 'media'
 	| 'theme';
 
 export type SectionContent =
@@ -438,4 +466,6 @@ export type SectionContent =
 	| KeynotesContent
 	| FaqContent
 	| HeroContent
+	| SectionsContent
+	| MediaContent
 	| ThemeContent;

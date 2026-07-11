@@ -1,13 +1,16 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+
+	// Optionale Overrides aus der Sektions-Konfiguration (leer = Standardtexte).
+	let { title, text }: { title?: string; text?: string } = $props();
 </script>
 
 <section class="contactband" id="kontakt">
 	<div class="cb-in">
 		<div>
-			<h2 class="cb-title">{m.h_contact_title()}</h2>
+			<h2 class="cb-title">{title || m.h_contact_title()}</h2>
 			<div class="cb-ci">
-				{m.h_contact_text()}
+				{text || m.h_contact_text()}
 				<a href="mailto:info@breakthebox.ch">info@breakthebox.ch</a> ·
 				<a href="tel:+41763092088">+41 76 309 20 88</a>
 			</div>

@@ -123,7 +123,6 @@
 							<span class="pillar-number">{i + 1}</span>
 							<div>
 								<span class="pillar-title">{pillar.title || 'Neuer Pillar'}</span>
-								<span class="pillar-key">{pillar.key}</span>
 							</div>
 						</button>
 						<div class="accordion-actions">
@@ -457,12 +456,6 @@
 		color: var(--text-heading);
 		display: block;
 	}
-	.pillar-key {
-		font-size: 0.75rem;
-		color: var(--text-muted);
-		font-family: var(--ff-mono);
-	}
-
 	.chevron {
 		color: var(--text-muted);
 		transition: transform 0.2s;

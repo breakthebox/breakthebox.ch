@@ -7,6 +7,7 @@
 	import { buildPerson, buildOrganization, buildWebSite, buildGraph } from '$lib/utils/schema';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import { safeColor, mixHex, softFromPrimary } from '$lib/utils/color';
+	import { resolveFonts, googleFontsUrl } from '$lib/config/fonts';
 	import * as m from '$lib/paraglide/messages.js';
 	import type { PageMeta } from '$lib/types/seo';
 	import type { LayoutData } from './$types';
@@ -30,6 +31,9 @@
 	let cream = $derived(safeColor(tc?.cream, '#fbf1ec'));
 	let soft = $derived(safeColor(tc?.soft, softFromPrimary(primary)));
 	let primaryRgb = $derived(hexToRgb(primary));
+	// Schriften des aktiven Themes (Keys → Registry; unbekannt = Standard).
+	let fonts = $derived(resolveFonts(data.theme?.fonts));
+	let fontsHref = $derived(googleFontsUrl(data.theme?.fonts));
 	let themeCss = $derived(
 		`:root:root:root{` +
 			`--btb-steel:${primary};--btb-steel-hover:${primaryDark};` +
@@ -41,6 +45,7 @@
 			`--bg-section-alt:${mixHex(cream, soft, 0.5)};--bg-elevated:${mixHex(cream, soft, 0.5)};` +
 			`--border:${mixHex(soft, ink, 0.92)};` +
 			`--text-secondary:${mixHex(ink, cream, 0.55)};--text-muted:${mixHex(ink, cream, 0.32)};` +
+			`--ff-serif:${fonts.heading.family};--ff-ui:${fonts.body.family};--ff-sketch:${fonts.hand.family};` +
 			`--bg-page:${cream};--text-heading:${ink};--text-primary:${ink};}`
 	);
 
@@ -89,8 +94,11 @@
 </script>
 
 <svelte:head>
-	<!-- Aktives Theme: globale Farb-Variablen (überschreibt app.css :root) -->
+	<!-- Aktives Theme: globale Farb- und Font-Variablen (überschreibt app.css :root) -->
 	{@html `<style id="btb-theme">${themeCss}</style>`}
+	{#if fontsHref}
+		<link rel="stylesheet" href={fontsHref} />
+	{/if}
 	<link rel="canonical" href={canonical} />
 	{#each alternates as alt}
 		<link rel="alternate" hreflang={alt.hreflang} href={alt.href} />

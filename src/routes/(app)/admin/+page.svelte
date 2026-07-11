@@ -3,10 +3,22 @@
 
 	const sections = [
 		{
+			id: 'sections',
+			title: 'Sektionen',
+			description: 'Reihenfolge, Sichtbarkeit und Kopftexte der Startseiten-Sektionen',
+			icon: '☰'
+		},
+		{
 			id: 'hero',
 			title: 'Hero',
 			description: 'Startseiten-Hero — Variante (klassisch oder Zwei-Welten-Slider) und Texte',
 			icon: '◒'
+		},
+		{
+			id: 'mediathek',
+			title: 'Mediathek',
+			description: 'Gemeinsame Bild-Bibliothek für alle Bild-Slots',
+			icon: '▣'
 		},
 		{
 			id: 'pillars',

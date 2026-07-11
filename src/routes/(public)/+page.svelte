@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import type { PillarsContent, AboutContent, ReferencesContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent, HeroPreset } from '$lib/types/content';
+	import type { PillarsContent, AboutContent, ReferencesContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent, HeroPreset, SectionSetting } from '$lib/types/content';
 	import HeroSlider from '$lib/components/ui/HeroSlider.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
@@ -11,6 +11,7 @@
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import { buildFaqPage, buildEvent, buildGraph } from '$lib/utils/schema';
 	import { safeColor, mixHex, softFromPrimary } from '$lib/utils/color';
+	import { resolveFonts } from '$lib/config/fonts';
 
 	let { data } = $props();
 
@@ -24,15 +25,14 @@
 	const cInk = safeColor(theme?.colors?.ink, '#2b1a1c');
 	const cCream = safeColor(theme?.colors?.cream, '#fbf1ec');
 	const cSoft = safeColor(theme?.colors?.soft, softFromPrimary(cPrimary));
+	const themeFonts = resolveFonts(theme?.fonts);
 	const hbbStyle =
 		`--red:${cPrimary};--redd:${cPrimaryDark};--ink:${cInk};--cream:${cCream};` +
 		`--pink:${cSoft};--cream2:${mixHex(cCream, cSoft, 0.5)};` +
-		`--line:${mixHex(cSoft, cInk, 0.92)};--dim:${mixHex(cInk, cCream, 0.55)};`;
+		`--line:${mixHex(cSoft, cInk, 0.92)};--dim:${mixHex(cInk, cCream, 0.55)};` +
+		`--serif:${themeFonts.heading.family};--sans:${themeFonts.body.family};--hand:${themeFonts.hand.family};`;
 	const heroImage = theme?.heroImage || '/fruits/hero.png';
 	// Theme-Bild ist die Basis; ein im Pillar gesetztes Bild überschreibt es.
-	function pillarImage(p: PillarsContent['pillars'][number]): string | undefined {
-		return p.image || theme?.pillarImages?.[p.key];
-	}
 
 	// Content from DB (with fallback to defaults in server load)
 	const hero: HeroPreset = data.hero;
@@ -44,6 +44,12 @@
 	const testimonials: TestimonialsContent = data.testimonials;
 	const metrics: MetricsContent = data.metrics;
 	const partners: PartnersContent = data.partners;
+
+	// Sektions-Konfiguration: Reihenfolge, Sichtbarkeit und Kopftext-Overrides
+	// (Admin → Sektionen). Leere Override-Felder = Standardtext.
+	const sectionCfg: SectionSetting[] = data.sections.sections;
+	const cfg = Object.fromEntries(sectionCfg.map((s) => [s.key, s])) as Record<string, SectionSetting>;
+	const visibleSections = sectionCfg.filter((s) => s.visible);
 
 	// ─── Bühne / Auftritte ───
 	const keynotes: KeynotesContent = data.keynotes;
@@ -155,6 +161,9 @@
 	const refRow2 = references.clients.slice(refHalf);
 
 	// Pillar-Karten: Flip (Beispiele) oder Absprung (Subseite)
+	function pillarImage(p: PillarsContent['pillars'][number]): string | undefined {
+		return p.image || theme?.pillarImages?.[p.key];
+	}
 	type PillarMode = 'flip' | 'link' | 'plain';
 	function validExamples(p: PillarsContent['pillars'][number]) {
 		return (p.examples ?? []).filter((e) => e.label?.trim() || e.desc?.trim());
@@ -228,7 +237,7 @@
 	$effect(() => {
 		function onScroll() {
 			navScrolled = window.scrollY > 20;
-			const sectionIds = ['pillars', 'about', 'angebot', 'stimmen', 'impulse', 'kontakt'];
+			const sectionIds = ['angebot', 'about', 'haltung', 'stimmen', 'impulse', 'kontakt'];
 			let current = '';
 			for (const id of sectionIds) {
 				const el = document.getElementById(id);
@@ -358,13 +367,105 @@
 		</header>
 	{/if}
 
-	<!-- ═══════ ANGEBOT / PILLARS ═══════ -->
-	<section class="afterhero" id="pillars">
+	<!-- ═══════ ANGEBOT (an der ehemaligen Pillars-Position) ═══════ -->
+	{#snippet sec_angebot()}
+	<section class="afterhero" id="angebot">
 		<div class="wrap">
 			<div class="sechead reveal">
-				<div class="kick">{m.h_pillars_label()}</div>
-				<h2 class="serif">{m.h_pillars_title()}</h2>
-				<p class="sub">{m.h_pillars_sub()}</p>
+				<div class="kick">{cfg.angebot.kicker || m.h_angebot_label()}</div>
+				<h2 class="serif">{cfg.angebot.title || m.h_angebot_title()}</h2>
+				<p class="sub">{cfg.angebot.subtitle || m.h_angebot_sub()}</p>
+			</div>
+			{#snippet angebotInner(item: typeof angebot.items[number])}
+				{#if item.image}
+					<div class="acard-img"><img src={item.image} alt="" loading="lazy" decoding="async" /></div>
+				{/if}
+				<div class="acard-body">
+					<h3>{item.title}</h3>
+					<p>{item.desc}</p>
+					{#if item.url}<span class="acard-link">{m.h_angebot_more()} →</span>{/if}
+				</div>
+			{/snippet}
+			<div class="ang angebot-grid reveal-stagger">
+				{#each angebot.items as item, ai}
+					{#if item.url}
+						<a class="acard acard-clickable reveal" class:acard-has-img={item.image} style="--stagger: {ai}" href={item.url}>
+							{@render angebotInner(item)}
+						</a>
+					{:else}
+						<div class="acard reveal" class:acard-has-img={item.image} style="--stagger: {ai}">
+							{@render angebotInner(item)}
+						</div>
+					{/if}
+				{/each}
+			</div>
+		</div>
+	</section>
+	{/snippet}
+
+	{#snippet sec_logos()}
+	<!-- ═══════ KUNDENLOGOS (Marquee) ═══════ -->
+	<section class="logos-sec" id="logos">
+		<div class="wrap">
+			{#if cfg.logos.title || cfg.logos.subtitle}
+				<div class="sechead reveal">
+					<h2 class="serif">{cfg.logos.title}</h2>
+					{#if cfg.logos.subtitle}<p class="sub">{cfg.logos.subtitle}</p>{/if}
+				</div>
+			{/if}
+			{#snippet logo(client: typeof references.clients[number])}
+				{#if client.logoUrl}
+					{#if client.websiteUrl}
+						<a class="logo-item" href={client.websiteUrl} target="_blank" rel="noopener noreferrer"><img src={client.logoUrl} alt={client.name} loading="lazy" /></a>
+					{:else}
+						<span class="logo-item"><img src={client.logoUrl} alt={client.name} loading="lazy" /></span>
+					{/if}
+				{:else}
+					<span class="logo-item logo-text">{client.name}</span>
+				{/if}
+			{/snippet}
+			<div class="strip reveal">
+				<div class="sl">{cfg.logos.kicker || m.h_strip()}</div>
+				<div class="marquee">
+					<div class="marquee-track left">
+						{#each [0, 1] as dup}
+							<div class="marquee-row" aria-hidden={dup === 1}>
+								{#each refRow1 as client}{@render logo(client)}{/each}
+							</div>
+						{/each}
+					</div>
+					<div class="marquee-track right">
+						{#each [0, 1] as dup}
+							<div class="marquee-row" aria-hidden={dup === 1}>
+								{#each refRow2 as client}{@render logo(client)}{/each}
+							</div>
+						{/each}
+					</div>
+				</div>
+			</div>
+			<!-- Kennzahlen: stille Beleg-Zeile — Zahlen und Logos erzählen dasselbe -->
+			{#if metrics.items.length > 0}
+				<div class="metrics-row reveal">
+					{#each metrics.items as metric}
+						<div class="metric">
+							<span class="metric-value serif">{metric.value}</span>
+							<span class="metric-label">{metric.label}</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
+	</section>
+	{/snippet}
+
+	{#snippet sec_pillars()}
+	<!-- ═══════ PILLARS (Säulen) — standardmässig ausgeblendet ═══════ -->
+	<section class="sec" id="pillars">
+		<div class="wrap">
+			<div class="sechead reveal">
+				<div class="kick">{cfg.pillars.kicker || m.h_pillars_label()}</div>
+				<h2 class="serif">{cfg.pillars.title || m.h_pillars_title()}</h2>
+				<p class="sub">{cfg.pillars.subtitle || m.h_pillars_sub()}</p>
 			</div>
 			{#snippet pillarFront(pillar: PillarsContent['pillars'][number], showArrow: boolean)}
 				{#if pillarImage(pillar)}
@@ -431,66 +532,28 @@
 					{/if}
 				{/each}
 			</div>
-			{#snippet logo(client: typeof references.clients[number])}
-				{#if client.logoUrl}
-					{#if client.websiteUrl}
-						<a class="logo-item" href={client.websiteUrl} target="_blank" rel="noopener noreferrer"><img src={client.logoUrl} alt={client.name} loading="lazy" /></a>
-					{:else}
-						<span class="logo-item"><img src={client.logoUrl} alt={client.name} loading="lazy" /></span>
-					{/if}
-				{:else}
-					<span class="logo-item logo-text">{client.name}</span>
-				{/if}
-			{/snippet}
-			<div class="strip reveal">
-				<div class="sl">{m.h_strip()}</div>
-				<div class="marquee">
-					<div class="marquee-track left">
-						{#each [0, 1] as dup}
-							<div class="marquee-row" aria-hidden={dup === 1}>
-								{#each refRow1 as client}{@render logo(client)}{/each}
-							</div>
-						{/each}
-					</div>
-					<div class="marquee-track right">
-						{#each [0, 1] as dup}
-							<div class="marquee-row" aria-hidden={dup === 1}>
-								{#each refRow2 as client}{@render logo(client)}{/each}
-							</div>
-						{/each}
-					</div>
-				</div>
-			</div>
 		</div>
 	</section>
-
-	<!-- ═══════ KENNZAHLEN ═══════ -->
-	<section class="metrics">
-		<div class="wrap">
-			<div class="metrics-grid reveal">
-				{#each metrics.items as metric}
-					<div class="metric">
-						<span class="metric-value serif">{metric.value}</span>
-						<span class="metric-label">{metric.label}</span>
-						<span class="metric-caption">{metric.caption}</span>
-					</div>
-				{/each}
-			</div>
-		</div>
-	</section>
+	{/snippet}
 
 	<!-- ═══════ TENSION (rotes Band) ═══════ -->
+	{#snippet sec_tension()}
 	<section class="tension">
 		<div class="tensionin reveal">
-			<h2 class="serif">{m.h_tension_title()}</h2>
+			<div>
+				{#if cfg.tension.kicker}<div class="kick kick-light">{cfg.tension.kicker}</div>{/if}
+				<h2 class="serif">{cfg.tension.title || m.h_tension_title()}</h2>
+			</div>
 			<div class="rt">
-				<p>{m.h_tension_p()}</p>
+				<p>{cfg.tension.subtitle || m.h_tension_p()}</p>
 				<p class="lg">{m.h_tension_lg()}</p>
 			</div>
 		</div>
 	</section>
+	{/snippet}
 
 	<!-- ═══════ ÜBER MICH ═══════ -->
+	{#snippet sec_about()}
 	<section class="sec" id="about">
 		<div class="wrap aboutgrid">
 			<div class="aboutcol reveal">
@@ -513,8 +576,9 @@
 				{/if}
 			</div>
 			<div class="reveal">
-				<div class="kick">{m.section_about_label()}</div>
-				<h2 class="serif about-h2">{about.title}</h2>
+				<div class="kick">{cfg.about.kicker || m.section_about_label()}</div>
+				<h2 class="serif about-h2">{cfg.about.title || about.title}</h2>
+				{#if cfg.about.subtitle}<p class="sub">{cfg.about.subtitle}</p>{/if}
 				{#each about.texts as text}
 					<p class="about-text">{text}</p>
 				{/each}
@@ -540,46 +604,40 @@
 						{/each}
 					</div>
 				{/if}
-				<a class="manifest-link" href={localizeHref('/manifest')}>{m.h_about_manifest_cta()} →</a>
 			</div>
 		</div>
 	</section>
+	{/snippet}
 
-	<!-- ═══════ ANGEBOT ═══════ -->
-	<section class="sec" id="angebot">
+	<!-- ═══════ ABSPRUNG: HALTUNG (MANIFEST) & BEWEIS (EXPERIMENTIERRAUM) ═══════ -->
+	{#snippet sec_haltung()}
+	<section class="sec" id="haltung">
 		<div class="wrap">
 			<div class="sechead reveal">
-				<div class="kick">{m.h_angebot_label()}</div>
-				<h2 class="serif">{m.h_angebot_title()}</h2>
-				<p class="sub">{m.h_angebot_sub()}</p>
+				<div class="kick">{cfg.haltung.kicker || m.h_leap_label()}</div>
+				<h2 class="serif">{cfg.haltung.title || m.h_leap_title()}</h2>
+				{#if cfg.haltung.subtitle}<p class="sub">{cfg.haltung.subtitle}</p>{/if}
 			</div>
-			{#snippet angebotInner(item: typeof angebot.items[number])}
-				{#if item.image}
-					<div class="acard-img"><img src={item.image} alt="" loading="lazy" decoding="async" /></div>
-				{/if}
-				<div class="acard-body">
-					<h3>{item.title}</h3>
-					<p>{item.desc}</p>
-					{#if item.url}<span class="acard-link">{m.h_angebot_more()} →</span>{/if}
-				</div>
-			{/snippet}
-			<div class="ang angebot-grid reveal-stagger">
-				{#each angebot.items as item, ai}
-					{#if item.url}
-						<a class="acard acard-clickable reveal" class:acard-has-img={item.image} style="--stagger: {ai}" href={item.url}>
-							{@render angebotInner(item)}
-						</a>
-					{:else}
-						<div class="acard reveal" class:acard-has-img={item.image} style="--stagger: {ai}">
-							{@render angebotInner(item)}
-						</div>
-					{/if}
-				{/each}
+			<div class="leap-grid reveal-stagger">
+				<a class="leap-card leap-dark reveal" style="--stagger: 0" href={localizeHref('/manifest')}>
+					<span class="leap-kick">{m.h_leap_manifest_kick()}</span>
+					<h3 class="serif">{m.h_leap_manifest_title()}</h3>
+					<p>{m.h_leap_manifest_text()}</p>
+					<span class="leap-cta">{m.h_leap_manifest_cta()} →</span>
+				</a>
+				<a class="leap-card leap-petrol reveal" style="--stagger: 1" href={localizeHref('/experimentierraum')}>
+					<span class="leap-kick">{m.h_leap_exp_kick()}</span>
+					<h3 class="serif">{m.h_leap_exp_title()}</h3>
+					<p>{m.h_leap_exp_text()}</p>
+					<span class="leap-cta">{m.h_leap_exp_cta()} →</span>
+				</a>
 			</div>
 		</div>
 	</section>
+	{/snippet}
 
 	<!-- ═══════ BÜHNE / AUFTRITTE ═══════ -->
+	{#snippet sec_buehne()}
 	{#if hasBuehne}
 		{#snippet eventCard(a: KeynoteItem)}
 			<article class="ev-card">
@@ -630,9 +688,9 @@
 		<section class="sec" id="buehne">
 			<div class="wrap">
 				<div class="sechead reveal">
-					<div class="kick">{m.h_buehne_label()}</div>
-					<h2 class="serif">{m.h_buehne_title()}</h2>
-					<p class="sub">{m.h_buehne_sub()}</p>
+					<div class="kick">{cfg.buehne.kicker || m.h_buehne_label()}</div>
+					<h2 class="serif">{cfg.buehne.title || m.h_buehne_title()}</h2>
+					<p class="sub">{cfg.buehne.subtitle || m.h_buehne_sub()}</p>
 				</div>
 
 				<div class="buehne-group reveal">
@@ -668,15 +726,17 @@
 			</div>
 		</section>
 	{/if}
+	{/snippet}
 
 	<!-- ═══════ NETZWERK / PARTNER ═══════ -->
+	{#snippet sec_netzwerk()}
 	{#if partners.items.length > 0}
 		<section class="sec" id="netzwerk">
 			<div class="wrap">
 				<div class="sechead reveal">
-					<div class="kick">{m.h_netzwerk_label()}</div>
-					<h2 class="serif">{m.h_netzwerk_title()}</h2>
-					<p class="sub">{m.h_netzwerk_sub()}</p>
+					<div class="kick">{cfg.netzwerk.kicker || m.h_netzwerk_label()}</div>
+					<h2 class="serif">{cfg.netzwerk.title || m.h_netzwerk_title()}</h2>
+					<p class="sub">{cfg.netzwerk.subtitle || m.h_netzwerk_sub()}</p>
 				</div>
 				<div class="partners reveal-stagger">
 					{#each partners.items as partner, pi}
@@ -721,14 +781,16 @@
 			</div>
 		</section>
 	{/if}
+	{/snippet}
 
 	<!-- ═══════ STIMMEN ═══════ -->
+	{#snippet sec_stimmen()}
 	<section class="sec" id="stimmen">
 		<div class="wrap">
 			<div class="sechead reveal">
-				<div class="kick">{m.h_stimmen_label()}</div>
-				<h2 class="serif">{m.h_stimmen_title()}</h2>
-				<p class="sub">{m.h_stimmen_sub()}</p>
+				<div class="kick">{cfg.stimmen.kicker || m.h_stimmen_label()}</div>
+				<h2 class="serif">{cfg.stimmen.title || m.h_stimmen_title()}</h2>
+				<p class="sub">{cfg.stimmen.subtitle || m.h_stimmen_sub()}</p>
 			</div>
 			<div class="quotes reveal-stagger">
 				{#each testimonials.items as quote, qi}
@@ -758,24 +820,33 @@
 			</div>
 		</div>
 	</section>
+	{/snippet}
 
 	<!-- ═══════ IMPULSE (rotes Band) ═══════ -->
+	{#snippet sec_impulse()}
 	<section class="tension" id="impulse">
 		<div class="tensionin impulse reveal">
 			<div>
-				<div class="kick kick-light">{m.h_impulse_label()}</div>
-				<h2 class="serif">{m.h_impulse_title()}</h2>
-				<p class="lg impulse-body">{m.h_impulse_l1()}<br />{m.h_impulse_l2()}<br />{m.h_impulse_l3()}</p>
+				<div class="kick kick-light">{cfg.impulse.kicker || m.h_impulse_label()}</div>
+				<h2 class="serif">{cfg.impulse.title || m.h_impulse_title()}</h2>
+				{#if cfg.impulse.subtitle}
+					<p class="lg impulse-body">{cfg.impulse.subtitle}</p>
+				{:else}
+					<p class="lg impulse-body">{m.h_impulse_l1()}<br />{m.h_impulse_l2()}<br />{m.h_impulse_l3()}</p>
+				{/if}
 			</div>
 		</div>
 	</section>
+	{/snippet}
 
 	<!-- ═══════ FAQ ═══════ -->
+	{#snippet sec_faq()}
 	<section class="sec" id="faq">
 		<div class="wrap faq-container">
 			<div class="sechead reveal">
-				<div class="kick">{m.section_faq_label()}</div>
-				<h2 class="serif">{m.section_faq_title()}</h2>
+				<div class="kick">{cfg.faq.kicker || m.section_faq_label()}</div>
+				<h2 class="serif">{cfg.faq.title || m.section_faq_title()}</h2>
+				{#if cfg.faq.subtitle}<p class="sub">{cfg.faq.subtitle}</p>{/if}
 			</div>
 			<div class="faq-list reveal">
 				{#each faq.items as item, i}
@@ -790,10 +861,27 @@
 			</div>
 		</div>
 	</section>
+	{/snippet}
+
+	<!-- ═══════ SEKTIONEN in konfigurierter Reihenfolge (Admin → Sektionen) ═══════ -->
+	{#each visibleSections as s (s.key)}
+		{#if s.key === 'angebot'}{@render sec_angebot()}
+		{:else if s.key === 'logos'}{@render sec_logos()}
+		{:else if s.key === 'pillars'}{@render sec_pillars()}
+		{:else if s.key === 'tension'}{@render sec_tension()}
+		{:else if s.key === 'about'}{@render sec_about()}
+		{:else if s.key === 'haltung'}{@render sec_haltung()}
+		{:else if s.key === 'buehne'}{@render sec_buehne()}
+		{:else if s.key === 'netzwerk'}{@render sec_netzwerk()}
+		{:else if s.key === 'stimmen'}{@render sec_stimmen()}
+		{:else if s.key === 'impulse'}{@render sec_impulse()}
+		{:else if s.key === 'faq'}{@render sec_faq()}
+		{:else if s.key === 'kontakt'}<ContactBand title={cfg.kontakt.title || undefined} text={cfg.kontakt.subtitle || undefined} />
+		{/if}
+	{/each}
 
 	<JsonLd data={jsonLdGraph} />
 
-	<ContactBand />
 	<SiteFooter />
 </div>
 
@@ -1099,9 +1187,12 @@
 	}
 
 	/* ═══════ SECTIONS ═══════ */
+	/* Sektionen sind frei sortierbar — einheitlicher Vertikal-Rhythmus,
+	   damit jede Nachbarschaft funktioniert. */
 	.afterhero {
 		background: var(--cream);
-		padding: 64px 0 0;
+		padding: 64px 0 76px;
+		border-bottom: 1px solid var(--line);
 	}
 	section.sec {
 		padding: 72px 0;
@@ -1239,7 +1330,7 @@
 		border-radius: 12px 12px 0 0;
 		overflow: hidden;
 		/* gleicher hellblauer Verlauf wie im Hero */
-		background: radial-gradient(125% 120% at 72% 4%, #c2eafb 0%, #88d3ef 54%, #5bb8e6 115%);
+		background: linear-gradient(135deg, var(--cream2), var(--pink));
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1291,6 +1382,13 @@
 		gap: 6px;
 		margin-top: 16px;
 	}
+	.pcard .ar {
+		margin-top: 16px;
+		color: var(--red);
+		font-size: 20px;
+	}
+
+	/* ═══════ ABSPRUNG: HALTUNG & BEWEIS ═══════ */
 	.ptag {
 		font-size: 11px;
 		font-weight: 500;
@@ -1299,15 +1397,84 @@
 		background: var(--cream2);
 		color: var(--redd);
 	}
-	.pcard .ar {
-		margin-top: 16px;
-		color: var(--red);
-		font-size: 20px;
+	.leap-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 22px;
+	}
+	.leap-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		border-radius: 18px;
+		padding: 44px 42px 38px;
+		min-height: 340px;
+		color: #fff;
+		text-decoration: none;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+		box-shadow: 0 26px 54px -36px rgba(10, 8, 8, 0.45);
+	}
+	.leap-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 34px 60px -34px rgba(10, 8, 8, 0.55);
+	}
+	.leap-dark {
+		background: radial-gradient(120% 130% at 18% 0%, color-mix(in srgb, var(--ink) 74%, #6b7280) 0%, var(--ink) 60%, #14090b 118%);
+	}
+	.leap-petrol {
+		background: radial-gradient(120% 130% at 82% 0%, color-mix(in srgb, var(--red) 68%, #d9f2f0) 0%, var(--red) 58%, var(--redd) 118%);
+	}
+	.leap-kick {
+		font-family: var(--sans);
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--pink);
+		margin-bottom: 16px;
+	}
+	/* Explizit weiss: «.hbb a { color: inherit }» ist spezifischer als .leap-card */
+	a.leap-card {
+		color: #fff;
+	}
+	.leap-card h3 {
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: clamp(24px, 2.6vw, 34px);
+		line-height: 1.12;
+		margin: 0 0 14px;
+		max-width: 18ch;
+		color: #fff;
+	}
+	.leap-card p {
+		font-size: 14.5px;
+		line-height: 1.6;
+		color: rgba(255, 255, 255, 0.78);
+		max-width: 46ch;
+		margin: 0;
+	}
+	.leap-cta {
+		margin-top: auto;
+		padding-top: 26px;
+		font-size: 12.5px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--pink);
+	}
+	.leap-card:hover .leap-cta {
+		text-decoration: underline;
+		text-underline-offset: 4px;
 	}
 
 	/* ═══════ LOGO STRIP ═══════ */
+	/* Eigenständige Logo-Sektion (ohne die grosse .sec-Padding) */
+	.logos-sec {
+		padding: 48px 0 56px;
+		border-bottom: 1px solid var(--line);
+	}
 	.strip {
-		padding: 54px 0 8px;
+		padding: 0 0 8px;
 		text-align: center;
 	}
 	.strip .sl {
@@ -1574,7 +1741,7 @@
 	.ev-img {
 		position: relative;
 		min-height: 220px;
-		background: radial-gradient(125% 120% at 72% 4%, #c2eafb 0%, #88d3ef 54%, #5bb8e6 115%);
+		background: linear-gradient(135deg, var(--cream2), var(--pink));
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1746,7 +1913,7 @@
 		height: 54px;
 		border-radius: 10px;
 		flex-shrink: 0;
-		background: radial-gradient(125% 120% at 72% 4%, #c2eafb 0%, #88d3ef 54%, #5bb8e6 115%);
+		background: linear-gradient(135deg, var(--cream2), var(--pink));
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -1903,66 +2070,79 @@
 
 	/* ═══════ ANGEBOT ═══════ */
 	.angebot-grid {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
+		gap: 20px;
+	}
+	/* Angebot-Kacheln im Pillar-Look: weisse Karte, Bild als Kopf in voller Breite */
+	.angebot-grid .acard {
+		background: #fff;
+		padding: 0;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		box-shadow: 0 20px 44px -34px rgba(10, 8, 8, 0.3);
 	}
 	.acard-clickable {
 		text-decoration: none;
 		color: inherit;
-		display: flex;
-		flex-direction: column;
 		transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 	}
 	.acard-clickable:hover {
 		transform: translateY(-3px);
 		border-color: var(--red);
-		box-shadow: 0 22px 44px -32px rgba(120, 20, 40, 0.38);
-	}
-	/* Bild pro Angebot: quadratisch links in der Karte */
-	.acard.acard-has-img {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		gap: 18px;
+		box-shadow: 0 22px 44px -32px rgba(10, 8, 8, 0.38);
 	}
 	.acard-img {
-		flex: 0 0 118px;
-		width: 118px;
-		height: 118px;
-		border-radius: 12px;
-		background: radial-gradient(125% 120% at 72% 4%, #c2eafb 0%, #88d3ef 54%, #5bb8e6 115%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		position: relative;
+		width: 100%;
+		height: 150px;
+		background: linear-gradient(135deg, var(--cream2), var(--pink));
+		flex-shrink: 0;
 		overflow: hidden;
 	}
+	/* «Grade leicht»: entsättigt + Hauch Theme-Primärfarbe via soft-light —
+	   beliebige Fotos wirken einheitlich und färben mit dem Theme mit. */
 	.acard-img img {
 		width: 100%;
 		height: 100%;
-		object-fit: contain;
-		padding: 9px;
-		filter: drop-shadow(0 10px 16px rgba(20, 60, 80, 0.25));
+		object-fit: cover;
+		filter: saturate(0.62) contrast(1.05) brightness(1.04);
+	}
+	.acard-img::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--red);
+		opacity: 0.1;
+		mix-blend-mode: soft-light;
+		pointer-events: none;
 	}
 	.acard-body {
 		flex: 1;
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
+		padding: 24px 26px 26px;
 	}
-
-	/* ═══════ MANIFEST-LINK ═══════ */
-	.manifest-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		margin-top: 26px;
-		font-family: var(--hand);
-		font-size: 20px;
-		color: var(--red);
-		transition: color 0.2s, gap 0.2s;
+	.angebot-grid .acard h3 {
+		font-size: 22px;
+		line-height: 1.12;
+		color: var(--ink);
 	}
-	.manifest-link:hover {
-		color: var(--redd);
-		gap: 12px;
+	.angebot-grid .acard h3::after {
+		content: '';
+		display: block;
+		width: 34px;
+		height: 2px;
+		background: var(--pink);
+		margin-top: 12px;
+	}
+	.angebot-grid .acard p {
+		margin-top: 12px;
+		flex: 1;
+	}
+	.angebot-grid .acard-link {
+		margin-top: 16px;
 	}
 
 	/* ═══════ ABOUT SOCIALS ═══════ */
@@ -1990,50 +2170,32 @@
 		transform: translateY(-2px);
 	}
 
-	/* ═══════ KENNZAHLEN ═══════ */
-	.metrics {
-		background: var(--cream);
-		padding: 32px 0 76px;
-	}
-	/* Haarlinien-Trenner via 1px-Gap auf --line-Hintergrund — sauber & wrap-fest */
-	.metrics-grid {
+	/* ═══════ KENNZAHLEN — stille Beleg-Zeile in der Logo-Sektion ═══════ */
+	.metrics-row {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1px;
-		background: var(--line);
-		border: 1px solid var(--line);
-		border-radius: 16px;
-		box-shadow: 0 20px 44px -34px rgba(120, 20, 40, 0.3);
-		overflow: hidden;
+		justify-content: center;
+		gap: 12px 56px;
+		margin-top: 44px;
 	}
 	.metric {
-		/* flex-grow verteilt die Karten über die volle Breite — egal wie viele */
-		flex: 1 1 150px;
-		background: #fff;
-		padding: 34px 24px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
 		text-align: center;
 	}
 	.metric-value {
+		display: block;
 		font-family: var(--serif);
 		font-weight: 600;
-		font-size: clamp(36px, 4.4vw, 56px);
-		line-height: 1;
+		font-size: clamp(22px, 2.4vw, 32px);
+		line-height: 1.1;
 		color: var(--ink);
 	}
 	.metric-label {
+		display: block;
 		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		font-size: 11.5px;
+		letter-spacing: 0.1em;
+		font-size: 11px;
 		font-weight: 700;
-		color: var(--red);
-		margin-top: 14px;
-	}
-	.metric-caption {
-		font-size: 13.5px;
-		color: var(--dim);
+		color: var(--redd);
 		margin-top: 4px;
 	}
 
@@ -2330,8 +2492,13 @@
 		.pillars,
 		.quotes,
 		.angebot-grid,
-		.partners {
+		.partners,
+		.leap-grid {
 			grid-template-columns: 1fr;
+		}
+		.leap-card {
+			min-height: 0;
+			padding: 32px 26px 30px;
 		}
 		.ang {
 			grid-template-columns: 1fr;

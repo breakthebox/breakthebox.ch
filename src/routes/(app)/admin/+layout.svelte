@@ -34,9 +34,17 @@
 					Dashboard
 				</a>
 				<span class="admin-sidebar-divider"></span>
+				<a href="/admin/sections" class="admin-sidebar-link">
+					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 4.5h12M3 9h12M3 13.5h12"/></svg>
+					Sektionen
+				</a>
 				<a href="/admin/hero" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="12" height="12" rx="2"/><path d="M3 11.5h12M6 6.5h3"/></svg>
 					Hero
+				</a>
+				<a href="/admin/mediathek" class="admin-sidebar-link">
+					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="12" height="12" rx="2"/><circle cx="6.8" cy="6.8" r="1.4"/><path d="M15 11l-3.5-3.5L4 15"/></svg>
+					Mediathek
 				</a>
 				<a href="/admin/themes" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="6.5"/><circle cx="6.3" cy="7" r="0.9" fill="currentColor" stroke="none"/><circle cx="9" cy="5.6" r="0.9" fill="currentColor" stroke="none"/><circle cx="11.7" cy="7" r="0.9" fill="currentColor" stroke="none"/><path d="M9 15.5c1.4 0 2-.9 2-1.8 0-1.2-1.4-1.2-1.4-2.2 0-.6.5-1 1.2-1"/></svg>
