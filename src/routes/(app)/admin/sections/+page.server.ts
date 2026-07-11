@@ -1,26 +1,23 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getSectionContent, saveSectionContent } from '$lib/server/db/queries/content';
-import { normalizeSections, normalizeAbout } from '$lib/server/content-defaults';
+import { normalizeSections } from '$lib/server/content-defaults';
 import type { SectionsContent } from '$lib/types/content';
 import * as m from '$lib/paraglide/messages.js';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
-	const [content, aboutRaw] = await Promise.all([
-		getSectionContent<SectionsContent>('sections'),
-		getSectionContent('about')
-	]);
+	const content = await getSectionContent<SectionsContent>('sections');
 	const normalized = normalizeSections(content);
 
 	// Aktuelle Standardtexte pro Sektion — leere Override-Felder werden damit
 	// vorbefüllt, sodass im Admin sichtbar ist, was heute auf der Seite steht.
-	const about = normalizeAbout(aboutRaw);
+	// Ausnahme: Der «Über mich»-Titel gehört dem About-Admin (kein Override).
 	const DEFAULT_TEXTS: Record<string, { kicker: string; title: string; subtitle: string }> = {
 		angebot: { kicker: m.h_angebot_label(), title: m.h_angebot_title(), subtitle: m.h_angebot_sub() },
 		logos: { kicker: m.h_strip(), title: '', subtitle: '' },
 		pillars: { kicker: m.h_pillars_label(), title: m.h_pillars_title(), subtitle: m.h_pillars_sub() },
 		tension: { kicker: '', title: m.h_tension_title(), subtitle: m.h_tension_p() },
-		about: { kicker: m.section_about_label(), title: about.title, subtitle: '' },
+		about: { kicker: m.section_about_label(), title: '', subtitle: '' },
 		haltung: { kicker: m.h_leap_label(), title: m.h_leap_title(), subtitle: '' },
 		buehne: { kicker: m.h_buehne_label(), title: m.h_buehne_title(), subtitle: m.h_buehne_sub() },
 		netzwerk: { kicker: m.h_netzwerk_label(), title: m.h_netzwerk_title(), subtitle: m.h_netzwerk_sub() },
@@ -61,6 +58,11 @@ export const actions: Actions = {
 		try {
 			// normalize stellt sicher: nur bekannte Keys, jede Sektion genau einmal.
 			const content = normalizeSections(JSON.parse(json));
+			// Gesperrte Felder bereinigen: der About-Titel lebt im About-Admin —
+			// alte Overrides (aus früherem Prefill) werden hier ausgeräumt.
+			for (const s of content.sections) {
+				if (s.key === 'about') s.title = '';
+			}
 			await saveSectionContent('sections', content, locals.user?.id);
 			return { success: true };
 		} catch {

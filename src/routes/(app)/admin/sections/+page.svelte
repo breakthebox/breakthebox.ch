@@ -7,12 +7,12 @@
 	let showSuccess = $state(false);
 
 	// Anzeige-Infos pro Sektions-Key (Reihenfolge kommt aus content.sections)
-	const META: Record<string, { label: string; desc: string }> = {
+	const META: Record<string, { label: string; desc: string; titleLockedHint?: string }> = {
 		angebot: { label: 'Angebot', desc: 'Angebots-Kacheln (direkt nach dem Hero)' },
 		logos: { label: 'Kundenlogos & Kennzahlen', desc: 'Logo-Marquee mit stiller Kennzahlen-Zeile — Inhalte unter «Kundenlogos» bzw. «Kennzahlen» pflegen' },
 		pillars: { label: 'Pillars (Säulen)', desc: 'Die früheren Säulen-Karten mit Flip/Beispielen — Inhalte unter «Pillars» pflegen' },
 		tension: { label: 'Klartext-Band', desc: 'Dunkles Band mit These und Text' },
-		about: { label: 'Über mich', desc: 'Porträt, Werdegang, Qualifikationen, Video-CV' },
+		about: { label: 'Über mich', desc: 'Porträt, Werdegang, Qualifikationen, Video-CV', titleLockedHint: 'Der Titel wird unter «Über mich» gepflegt.' },
 		haltung: { label: 'Haltung & Beweis', desc: 'Absprung-Karten zu Manifest und Experimentierraum' },
 		buehne: { label: 'Keynotes / Bühne', desc: 'Kommende Auftritte und Rückblick' },
 		netzwerk: { label: 'Netzwerk / Partner', desc: 'Partnerfirmen mit Personen' },
@@ -141,7 +141,11 @@
 							</div>
 							<div class="field">
 								<label class="field-label" for="title-{section.key}">Titel</label>
-								<input id="title-{section.key}" type="text" class="field-input" bind:value={section.title} placeholder="(kein Text)" />
+								{#if META[section.key]?.titleLockedHint}
+									<p class="field-note">{META[section.key].titleLockedHint}</p>
+								{:else}
+									<input id="title-{section.key}" type="text" class="field-input" bind:value={section.title} placeholder="(kein Text)" />
+								{/if}
 							</div>
 							<div class="field">
 								<label class="field-label" for="sub-{section.key}">Subtitel</label>
@@ -359,6 +363,12 @@
 		font-size: 0.82rem;
 		font-weight: 600;
 		color: var(--text-secondary);
+	}
+	.field-note {
+		font-size: 0.82rem;
+		color: var(--text-muted);
+		margin: 0;
+		padding: 10px 0 2px;
 	}
 	.field-input {
 		width: 100%;

@@ -600,7 +600,8 @@
 			</div>
 			<div class="reveal">
 				<div class="kick">{cfg.about.kicker || m.section_about_label()}</div>
-				<h2 class="serif about-h2">{cfg.about.title || about.title}</h2>
+				<!-- Titel gehört dem «Über mich»-Admin — kein Sektions-Override (Doppelbesitz) -->
+				<h2 class="serif about-h2">{about.title}</h2>
 				{#if cfg.about.subtitle}<p class="sub">{cfg.about.subtitle}</p>{/if}
 				{#each about.texts as text}
 					<p class="about-text">{text}</p>
