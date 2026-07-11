@@ -605,18 +605,20 @@
 				{#each about.texts as text}
 					<p class="about-text">{text}</p>
 				{/each}
-				<div class="about-quals">
-					{#each about.qualifications as qual}
-						<span class="qual">{qual}</span>
-					{/each}
-				</div>
-				<div class="ang">
+				<!-- Credentials als stille Beleg-Zeilen — gleiche Sprache wie die Kennzahlen -->
+				<div class="roles">
 					{#each about.roles as role}
-						<div class="acard">
-							<h3>{role.title}</h3>
-							<p>{role.org}</p>
+						<div class="role-line">
+							<span class="role-label">{role.title}</span>
+							<span class="role-orgs">{role.org}</span>
 						</div>
 					{/each}
+					{#if about.qualifications.length > 0}
+						<div class="role-line">
+							<span class="role-label">{m.h_about_quals_label()}</span>
+							<span class="role-orgs">{about.qualifications.join(' · ')}</span>
+						</div>
+					{/if}
 				</div>
 				{#if about.socials.length > 0}
 					<div class="about-socials">
@@ -2078,20 +2080,36 @@
 		line-height: 1.65;
 		margin-bottom: 14px;
 	}
-	.about-quals {
+	/* Credentials als kompakte Spec-Tabelle: Haarlinien + halbfette Werte
+	   heben den Block klar vom Fliesstext ab, ohne laut zu werden. */
+	.roles {
+		margin-top: 26px;
+		border-top: 1px solid var(--line);
 		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		margin: 20px 0 4px;
+		flex-direction: column;
 	}
-	.qual {
-		font-size: 12px;
-		font-weight: 500;
-		padding: 6px 14px;
-		border-radius: 20px;
-		background: var(--cream2);
+	.role-line {
+		display: flex;
+		align-items: baseline;
+		gap: 16px;
+		padding: 12px 0;
+		border-bottom: 1px solid var(--line);
+	}
+	.role-label {
+		flex: 0 0 150px;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		font-size: 11px;
+		font-weight: 700;
 		color: var(--redd);
-		border: 1px solid var(--line);
+	}
+	.role-orgs {
+		flex: 1;
+		min-width: 0;
+		font-size: 14px;
+		font-weight: 600;
+		line-height: 1.5;
+		color: var(--ink);
 	}
 	.ang {
 		display: grid;
@@ -2635,6 +2653,13 @@
 		}
 	}
 	@media (max-width: 560px) {
+		.role-line {
+			flex-direction: column;
+			gap: 2px;
+		}
+		.role-label {
+			flex-basis: auto;
+		}
 		.nav-inner {
 			padding: 13px 18px;
 		}
