@@ -10,7 +10,7 @@
 	import { env } from '$env/dynamic/public';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import { buildFaqPage, buildEvent, buildGraph } from '$lib/utils/schema';
-	import { safeColor, mixHex, softFromPrimary } from '$lib/utils/color';
+	import { safeColor, mixHex, softFromPrimary, isDarkColor } from '$lib/utils/color';
 	import { resolveFonts } from '$lib/config/fonts';
 
 	let { data } = $props();
@@ -25,11 +25,17 @@
 	const cInk = safeColor(theme?.colors?.ink, '#2b1a1c');
 	const cCream = safeColor(theme?.colors?.cream, '#fbf1ec');
 	const cSoft = safeColor(theme?.colors?.soft, softFromPrimary(cPrimary));
+	// Navbar-Fläche aus dem Theme; Textfarben nach Kontrast ableiten (dunkler Header → helle Schrift).
+	const cHeader = safeColor(theme?.colors?.header, cCream);
+	const headerDark = isDarkColor(cHeader);
 	const themeFonts = resolveFonts(theme?.fonts);
 	const hbbStyle =
 		`--red:${cPrimary};--redd:${cPrimaryDark};--ink:${cInk};--cream:${cCream};` +
 		`--pink:${cSoft};--cream2:${mixHex(cCream, cSoft, 0.5)};` +
 		`--line:${mixHex(cSoft, cInk, 0.92)};--dim:${mixHex(cInk, cCream, 0.55)};` +
+		`--navbg:${cHeader};--navtext:${headerDark ? '#ffffff' : cInk};` +
+		`--navaccent:${headerDark ? mixHex(cHeader, '#ffffff', 0.3) : cPrimary};` +
+		`--navline:${headerDark ? mixHex(cHeader, '#ffffff', 0.82) : mixHex(cSoft, cInk, 0.92)};` +
 		`--serif:${themeFonts.heading.family};--sans:${themeFonts.body.family};--hand:${themeFonts.hand.family};`;
 	const heroImage = theme?.heroImage || '/fruits/hero.png';
 	// Theme-Bild ist die Basis; ein im Pillar gesetztes Bild überschreibt es.
@@ -405,7 +411,15 @@
 				{/if}
 				<div class="acard-body">
 					<h3>{item.title}</h3>
+					{#if item.note}<span class="acard-note">{item.note}</span>{/if}
 					<p>{item.desc}</p>
+					{#if item.tags?.length}
+						<div class="acard-tags">
+							{#each item.tags.slice(0, 4) as tag}
+								<span class="ptag">{tag}</span>
+							{/each}
+						</div>
+					{/if}
 					{#if item.url}<span class="acard-link">{m.h_angebot_more()} →</span>{/if}
 				</div>
 			{/snippet}
@@ -930,7 +944,8 @@
 		color: var(--ink);
 		font-family: var(--sans);
 		line-height: 1.6;
-		overflow-x: hidden;
+		/* clip statt hidden: hidden macht .hbb zum Scroll-Container und bricht position:sticky der Nav */
+		overflow-x: clip;
 	}
 	.hbb :global(*) {
 		box-sizing: border-box;
@@ -991,9 +1006,10 @@
 		position: sticky;
 		top: 0;
 		z-index: var(--z-sticky);
-		background: color-mix(in srgb, var(--cream) 90%, transparent);
+		background: color-mix(in srgb, var(--navbg) 90%, transparent);
 		backdrop-filter: blur(8px);
-		border-bottom: 1px solid var(--line);
+		border-bottom: 1px solid var(--navline);
+		color: var(--navtext);
 		transition: box-shadow 0.3s ease;
 	}
 	.nav-scrolled {
@@ -1036,7 +1052,7 @@
 		font-size: 10px;
 		letter-spacing: 0.22em;
 		text-transform: uppercase;
-		color: var(--red);
+		color: var(--navaccent);
 		margin-top: 3px;
 	}
 	.nav-links {
@@ -1048,14 +1064,14 @@
 		letter-spacing: 0.08em;
 	}
 	.nav-links a {
-		color: var(--ink);
+		color: var(--navtext);
 		opacity: 0.7;
 		transition: opacity 0.2s, color 0.2s;
 	}
 	.nav-links a:hover,
 	.nav-links a.active {
 		opacity: 1;
-		color: var(--red);
+		color: var(--navaccent);
 	}
 	/* Burger + Mobile-Menü (Desktop: versteckt) */
 	.nav-burger {
@@ -1066,7 +1082,7 @@
 		justify-content: center;
 		background: none;
 		border: none;
-		color: var(--ink);
+		color: var(--navtext);
 		cursor: pointer;
 		padding: 0;
 	}
@@ -1080,7 +1096,7 @@
 		align-items: flex-start;
 		gap: 4px;
 		padding: 6px 22px 20px;
-		border-top: 1px solid var(--line);
+		border-top: 1px solid var(--navline);
 	}
 	.nav-mobile a {
 		display: block;
@@ -1089,7 +1105,7 @@
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
-		color: var(--ink);
+		color: var(--navtext);
 	}
 	.nav-mobile a.btn {
 		margin-top: 8px;
@@ -2217,9 +2233,22 @@
 		background: var(--pink);
 		margin-top: 12px;
 	}
+	.acard-note {
+		font-family: var(--hand);
+		font-size: 18px;
+		color: var(--red);
+		display: block;
+		margin-top: 10px;
+	}
 	.angebot-grid .acard p {
 		margin-top: 12px;
 		flex: 1;
+	}
+	.acard-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 14px;
 	}
 	.angebot-grid .acard-link {
 		margin-top: 16px;

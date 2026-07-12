@@ -33,3 +33,9 @@ export function mixHex(a: string, b: string, weightA: number): string {
 export function softFromPrimary(primary: string): string {
 	return mixHex(primary, '#ffffff', 0.16);
 }
+
+/** True, wenn die Farbe dunkel wirkt — steuert Textkontrast auf konfigurierbaren Flächen. */
+export function isDarkColor(hex: string): boolean {
+	const [r, g, b] = toRgb(hex);
+	return 0.299 * r + 0.587 * g + 0.114 * b < 140;
+}

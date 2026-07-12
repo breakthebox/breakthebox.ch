@@ -199,17 +199,23 @@ export const defaultAngebot: AngebotContent = {
 		{
 			key: 'digitalstrategie',
 			title: 'Digitalstrategie & IT-Beratung',
-			desc: 'Kerngeschäft seit über 10 Jahren: von der IT-Gesamtstrategie über Digitalisierungs-Roadmaps bis zur KI-Readiness — Analyse bis Umsetzung.'
+			note: 'mein Kerngeschäft seit über 10 Jahren',
+			desc: 'Kerngeschäft seit über 10 Jahren: von der IT-Gesamtstrategie über Digitalisierungs-Roadmaps bis zur KI-Readiness — Analyse bis Umsetzung.',
+			tags: ['IT-Strategie', 'Digitalisierung', 'KI-Readiness']
 		},
 		{
 			key: 'governance',
 			title: 'Governance & Verwaltungsrat',
-			desc: 'Digitale Urteilsfähigkeit ins Gremium: IT auf der Wirkungsseite beurteilen, nicht nur als Kosten. Verantwortung nach OR 716a.'
+			note: 'Digitalkompetenz, wo es zählt',
+			desc: 'Digitale Urteilsfähigkeit ins Gremium: IT auf der Wirkungsseite beurteilen, nicht nur als Kosten. Verantwortung nach OR 716a.',
+			tags: ['IT-Governance', 'OR 716a', 'VR-Mandate']
 		},
 		{
 			key: 'keynotes',
 			title: 'Keynotes & Lehre',
-			desc: 'KI und digitale Transformation praxisnah und greifbar — Hype auf Substanz heruntergebrochen. Dozentin an zwei Hochschulen.'
+			note: 'gefunden werden statt suchen',
+			desc: 'KI und digitale Transformation praxisnah und greifbar — Hype auf Substanz heruntergebrochen. Dozentin an zwei Hochschulen.',
+			tags: ['Keynotes', 'Workshops', 'Lehre']
 		}
 	]
 };

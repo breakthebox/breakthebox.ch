@@ -13,8 +13,17 @@
 		expanded = expanded === i ? null : i;
 	}
 	function addItem() {
-		content.items.push({ key: 'angebot-' + (content.items.length + 1), title: '', desc: '', url: '' });
+		content.items.push({ key: 'angebot-' + (content.items.length + 1), title: '', desc: '', note: '', tags: [], url: '' });
 		expanded = content.items.length - 1;
+	}
+	function tagsString(i: number): string {
+		return (content.items[i].tags ?? []).join(', ');
+	}
+	function updateTags(i: number, value: string) {
+		content.items[i].tags = value
+			.split(',')
+			.map((t) => t.trim())
+			.filter(Boolean);
 	}
 	function removeItem(index: number) {
 		if (!confirm('Dieses Angebot wirklich löschen?')) return;
@@ -67,7 +76,6 @@
 					index={i}
 					total={content.items.length}
 					title={item.title || 'Neues Angebot'}
-					subtitle={item.key || undefined}
 					expanded={expanded === i}
 					removeLabel="Angebot löschen"
 					ontoggle={() => toggle(i)}
@@ -80,14 +88,29 @@
 						<input id="title-{i}" type="text" class="field-input" bind:value={item.title} placeholder="z.B. Digitalstrategie & IT-Beratung" />
 					</div>
 					<div class="field">
+						<label class="field-label" for="note-{i}">Handschrift-Zeile (optional, unter dem Titel)</label>
+						<input id="note-{i}" type="text" class="field-input" bind:value={item.note} placeholder="z.B. mein Kerngeschäft seit über 10 Jahren" />
+					</div>
+					<div class="field">
 						<label class="field-label" for="desc-{i}">Beschreibung</label>
 						<textarea id="desc-{i}" class="field-textarea" bind:value={item.desc} rows="3"></textarea>
 					</div>
 					<div class="field">
-						<label class="field-label" for="url-{i}">Link (optional)</label>
-						<input id="url-{i}" type="text" class="field-input" bind:value={item.url} placeholder="z.B. /experimentierraum" />
+						<label class="field-label" for="tags-{i}">Tags (kommagetrennt, optional)</label>
+						<input
+							id="tags-{i}"
+							type="text"
+							class="field-input"
+							value={tagsString(i)}
+							oninput={(e) => updateTags(i, (e.target as HTMLInputElement).value)}
+							placeholder="z.B. IT-Strategie, Digitalisierung, KI-Readiness"
+						/>
 					</div>
-					<ImageUpload bind:value={item.image} section="angebot-{i}" label="Bild (optional, quadratisch links in der Karte)" />
+					<div class="field">
+						<label class="field-label" for="url-{i}">Link (optional)</label>
+						<input id="url-{i}" type="text" class="field-input" bind:value={item.url} placeholder="z.B. /transformation" />
+					</div>
+					<ImageUpload bind:value={item.image} section="angebot-{i}" label="Bild (optional, Kartenkopf in voller Breite — Querformat 2:1)" />
 				</AdminAccordionItem>
 			{/each}
 		</div>

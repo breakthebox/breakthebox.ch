@@ -133,8 +133,10 @@ export interface AngebotItem {
 	key?: string;
 	title: string;
 	desc: string;
+	note?: string; // optionale Handschrift-Zeile unter dem Titel (wie bei den Pillars)
+	tags?: string[]; // optionale Themen-Tags (wie bei den Pillars)
 	url?: string;
-	image?: string; // optionales Bild (transparent), quadratisch links in der Karte auf blauem Verlauf
+	image?: string; // optionales Bild als Kartenkopf in voller Breite
 }
 
 export interface AngebotContent {
@@ -392,6 +394,7 @@ export interface ThemeColors {
 	ink: string; // Überschriften & Fliesstext
 	cream: string; // Seitenhintergrund
 	soft?: string; // Helle Akzentfläche — Badges, Tags, Banner (leer = aus Primär abgeleitet)
+	header?: string; // Navbar-Hintergrund (leer = Seitenhintergrund); Textfarben werden nach Kontrast abgeleitet
 }
 
 /** Ein hochgeladenes Bild in der gemeinsamen Bibliothek. */

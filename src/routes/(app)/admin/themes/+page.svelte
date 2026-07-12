@@ -5,7 +5,7 @@
 
 	let { data, form } = $props();
 
-	const FALLBACK = { primary: '#b11e2c', primaryDark: '#8e1622', ink: '#2b1a1c', cream: '#fbf1ec', soft: '#f6d9d5' };
+	const FALLBACK = { primary: '#b11e2c', primaryDark: '#8e1622', ink: '#2b1a1c', cream: '#fbf1ec', soft: '#f6d9d5', header: '#fbf1ec' };
 
 	// Arbeits-Typen: heroImage/pillarImages sind hier immer gesetzt (nach normalize()).
 	interface WTheme {
@@ -31,7 +31,9 @@
 				ink: t.colors?.ink ?? FALLBACK.ink,
 				cream: t.colors?.cream ?? FALLBACK.cream,
 				// Bestehende Themes ohne «soft»: helle Fläche aus Primär ableiten.
-				soft: t.colors?.soft ?? softFromPrimary(t.colors?.primary ?? FALLBACK.primary)
+				soft: t.colors?.soft ?? softFromPrimary(t.colors?.primary ?? FALLBACK.primary),
+				// Bestehende Themes ohne «header»: Navbar nutzt den Seitenhintergrund.
+				header: t.colors?.header ?? t.colors?.cream ?? FALLBACK.cream
 			},
 			fonts: {
 				heading: t.fonts?.heading ?? DEFAULT_FONTS.heading,
@@ -170,7 +172,7 @@
 
 				<h3 class="sub">Farben</h3>
 				<div class="colors">
-					{#each [ ['primary','Primär (Buttons, Akzente)'], ['primaryDark','Primär dunkel (Hover)'], ['ink','Text / Überschrift'], ['cream','Hintergrund'], ['soft','Akzent hell (Badges, Tags, Flächen)'] ] as [key, label]}
+					{#each [ ['primary','Primär (Buttons, Akzente)'], ['primaryDark','Primär dunkel (Hover)'], ['ink','Text / Überschrift'], ['cream','Hintergrund'], ['header','Header (Navbar-Hintergrund)'], ['soft','Akzent hell (Badges, Tags, Flächen)'] ] as [key, label]}
 						<div class="color-field">
 							<span>{label}</span>
 							<div class="color-row">
