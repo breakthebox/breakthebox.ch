@@ -201,7 +201,12 @@
 
 			<h3>Blog-Statistiken</h3>
 			<p>
-				Für die Anzeige von Besucherzahlen auf Blogbeiträgen wird ein anonymisierter Hash (SHA-256) aus IP-Adresse, User-Agent und Tagesdatum erstellt. Dieser Hash lässt keinen Rückschluss auf einzelne Personen zu und wird nicht mit anderen Daten verknüpft. Es werden keine Tracking-Cookies gesetzt und kein Analyse-Tool von Drittanbietern eingesetzt.
+				Für die Anzeige von Besucherzahlen auf Blogbeiträgen wird ein anonymisierter Hash (SHA-256) aus IP-Adresse, User-Agent und Tagesdatum erstellt. Dieser Hash lässt keinen Rückschluss auf einzelne Personen zu und wird nicht mit anderen Daten verknüpft. Es werden dafür keine Tracking-Cookies gesetzt.
+				</p>
+
+				<h3>Web-Analyse (Umami)</h3>
+				<p>
+					Zur Messung der Reichweite unserer Webseite setzen wir Umami Cloud (EU-Region) ein, ein datenschutzfreundliches Analyse-Tool. Umami verwendet keine Cookies und speichert keine personenbezogenen Daten. Erhoben werden ausschliesslich aggregierte, anonyme Kennzahlen (beispielsweise Anzahl Seitenaufrufe, Herkunftsseiten, verwendete Geräte- und Browsertypen sowie die ungefähre Herkunft auf Länderebene). Eine Wiedererkennung einzelner Besucherinnen und Besucher oder eine Zusammenführung mit anderen Datenquellen findet nicht statt. Die Daten werden auf Servern innerhalb der EU verarbeitet. Rechtsgrundlage ist unser berechtigtes Interesse an einer statistischen Auswertung der Webseitennutzung; da keine Cookies gesetzt und keine personenbezogenen Daten verarbeitet werden, ist keine Einwilligung erforderlich.
 			</p>
 
 			<h3>Cookies</h3>
@@ -216,7 +221,7 @@
 				<li><strong>Spracheinstellung:</strong> Für das Speichern Ihrer Sprachpräferenz.</li>
 			</ul>
 			<p>
-				Wir verwenden keine Tracking-Cookies, keine Analyse-Tools von Drittanbietern und kein Remarketing. Sie können Cookies jederzeit in Ihrem Browser deaktivieren oder löschen. Bei Deaktivierung können möglicherweise nicht mehr alle Funktionen der Webseite vollumfänglich genutzt werden.
+				Wir verwenden keine Tracking-Cookies und kein Remarketing. Für die Reichweitenmessung setzen wir das cookielose Analyse-Tool Umami ein (siehe oben). Sie können Cookies jederzeit in Ihrem Browser deaktivieren oder löschen. Bei Deaktivierung können möglicherweise nicht mehr alle Funktionen der Webseite vollumfänglich genutzt werden.
 			</p>
 
 			<h3>Authentifizierung (Auth0)</h3>
