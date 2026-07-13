@@ -34,6 +34,11 @@
 	// Schriften des aktiven Themes (Keys → Registry; unbekannt = Standard).
 	let fonts = $derived(resolveFonts(data.theme?.fonts));
 	let fontsHref = $derived(googleFontsUrl(data.theme?.fonts));
+	// ─── Web-Analyse (Umami Cloud, cookielos) ───
+	// Nur aktiv, wenn PUBLIC_UMAMI_WEBSITE_ID gesetzt ist (in Production). Kein Consent nötig
+	// (keine Cookies, keine personenbezogenen Daten). In Dev bleibt die Variable leer → aus.
+	let umamiWebsiteId = $derived(env.PUBLIC_UMAMI_WEBSITE_ID);
+	let umamiSrc = $derived(env.PUBLIC_UMAMI_SRC || 'https://cloud.umami.is/script.js');
 	let themeCss = $derived(
 		`:root:root:root{` +
 			`--btb-steel:${primary};--btb-steel-hover:${primaryDark};` +
@@ -97,6 +102,9 @@
 <svelte:head>
 	<!-- Aktives Theme: globale Farb- und Font-Variablen (überschreibt app.css :root) -->
 	{@html `<style id="btb-theme">${themeCss}</style>`}
+	{#if umamiWebsiteId}
+		<script defer src={umamiSrc} data-website-id={umamiWebsiteId}></script>
+	{/if}
 	{#if fontsHref}
 		<link rel="stylesheet" href={fontsHref} />
 	{/if}
