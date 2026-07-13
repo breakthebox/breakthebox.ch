@@ -10,8 +10,15 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 const UPLOAD_DIR = process.env.UPLOAD_DIR ?? './uploads';
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB (Bilder + PDF-Dokumente)
+const ALLOWED_TYPES = [
+	'image/jpeg',
+	'image/png',
+	'image/webp',
+	'image/svg+xml',
+	'image/gif',
+	'application/pdf'
+];
 
 // Slug für Dateinamen: lowercase, Umlaute ausgeschrieben, nur [a-z0-9-].
 // Verhindert Leerzeichen/Sonderzeichen in Asset-URLs (Caching/CDN/Sharing).
@@ -41,11 +48,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	if (!ALLOWED_TYPES.includes(file.type)) {
-		throw error(400, 'Ungültiges Dateiformat. Erlaubt: JPG, PNG, WebP, SVG, GIF.');
+		throw error(400, 'Ungültiges Dateiformat. Erlaubt: JPG, PNG, WebP, SVG, GIF, PDF.');
 	}
 
 	if (file.size > MAX_FILE_SIZE) {
-		throw error(400, 'Datei ist zu gross (max. 5 MB).');
+		throw error(400, 'Datei ist zu gross (max. 10 MB).');
 	}
 
 	// Generate unique, URL-sicheren Dateinamen (keine Leerzeichen/Sonderzeichen)

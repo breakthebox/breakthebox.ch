@@ -8,7 +8,7 @@ const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/,
 const STATIC_ROUTES: Array<{ path: string; changefreq: string; priority: string }> = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },
 	{ path: '/transformation', changefreq: 'monthly', priority: '0.8' },
-	{ path: '/vr', changefreq: 'monthly', priority: '0.8' },
+	{ path: '/governance', changefreq: 'monthly', priority: '0.8' },
 	{ path: '/keynotes', changefreq: 'weekly', priority: '0.8' },
 	{ path: '/manifest', changefreq: 'monthly', priority: '0.7' },
 	{ path: '/experimentierraum', changefreq: 'monthly', priority: '0.7' },
