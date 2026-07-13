@@ -62,7 +62,7 @@ Regeln:
 
 	const userMessage = `Titel: ${title}\n\nInhalt:\n${plainText.slice(0, 2000)}`;
 
-	return callClaude(systemPrompt, userMessage, { maxTokens: 256, temperature: 0.6 });
+	return callClaude(systemPrompt, userMessage, { maxTokens: 256 });
 }
 
 /**
@@ -113,8 +113,7 @@ Inhalt (Auszug):
 ${plainText.slice(0, 3000)}`;
 
 	const result = await callClaudeJson<SeoScoreResult>(systemPrompt, userMessage, {
-		maxTokens: 1024,
-		temperature: 0.3
+		maxTokens: 1024
 	});
 
 	return result;
@@ -152,7 +151,6 @@ Antworte als JSON:
 }`;
 
 	return callClaudeJson<SeoOptimizationResult>(systemPrompt, `Text:\n${text}`, {
-		maxTokens: 2048,
-		temperature: 0.5
+		maxTokens: 2048
 	});
 }

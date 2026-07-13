@@ -22,22 +22,23 @@ function getClient(): Anthropic | null {
 export async function callClaude(
 	systemPrompt: string,
 	userMessage: string,
-	options?: { maxTokens?: number; temperature?: number }
+	options?: { maxTokens?: number }
 ): Promise<string | null> {
 	const anthropic = getClient();
 	if (!anthropic) return null;
 
 	try {
 		const response = await anthropic.messages.create({
-			model: 'claude-sonnet-4-20250514',
+			model: 'claude-sonnet-5',
 			max_tokens: options?.maxTokens ?? 1024,
-			temperature: options?.temperature ?? 0.7,
+			// Denken aus: deterministische SEO-Hilfstasks, kein Verbrauch des Token-Budgets.
+			thinking: { type: 'disabled' },
 			system: systemPrompt,
 			messages: [{ role: 'user', content: userMessage }]
 		});
 
 		const textBlock = response.content.find((b) => b.type === 'text');
-		return textBlock ? textBlock.text : null;
+		return textBlock?.type === 'text' ? textBlock.text : null;
 	} catch (error) {
 		console.error('Claude API error:', error);
 		return null;
@@ -50,7 +51,7 @@ export async function callClaude(
 export async function callClaudeJson<T>(
 	systemPrompt: string,
 	userMessage: string,
-	options?: { maxTokens?: number; temperature?: number }
+	options?: { maxTokens?: number }
 ): Promise<T | null> {
 	const text = await callClaude(systemPrompt, userMessage, options);
 	if (!text) return null;
