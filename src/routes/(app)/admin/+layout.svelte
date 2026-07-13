@@ -96,7 +96,11 @@
 				</a>
 				<a href="/admin/keynotes" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2a2.3 2.3 0 0 1 2.3 2.3v4a2.3 2.3 0 0 1-4.6 0v-4A2.3 2.3 0 0 1 9 2z"/><path d="M4.7 8.3a4.3 4.3 0 0 0 8.6 0M9 12.6V16M6.5 16h5"/></svg>
-					Keynotes
+					Keynotes / Termine
+				</a>
+				<a href="/admin/keynotes-seite" class="admin-sidebar-link">
+					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="12" height="12" rx="2"/><path d="M6 6.5h6M6 9h6M6 11.5h3.5"/></svg>
+					Keynotes-Seite
 				</a>
 				<a href="/admin/blog" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 3h10v12H4z"/><path d="M7 6h4M7 9h4M7 12h2"/></svg>

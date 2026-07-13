@@ -438,6 +438,116 @@ export interface KeynotesContent {
 	items: KeynoteItem[];
 }
 
+// ─── Keynotes-Seite (redaktioneller Inhalt der Subseite /keynotes) ───
+// Die Termine (kommend/vergangen) kommen weiterhin aus KeynotesContent.
+// Felder mit **fett**/*kursiv* werden via renderMarkdown im Akzent gesetzt.
+
+export interface KeynotesHero {
+	kicker: string;
+	title: string; // **…** im Akzent
+	subline: string;
+	ctaPrimary: string; // scrollt zu #talks
+	ctaSecondary: string; // scrollt zu #kontakt
+}
+
+export interface KeynotesTalk {
+	kicker: string; // z.B. «Die Simulation · Premiere Dänksymposium 2026»
+	title: string;
+	desc: string;
+	takeawaysLabel: string; // z.B. «Was bleibt hängen»
+	takeaways: string[];
+	meta: string[]; // z.B. «Keynote 30–60'», «GL · VR · Fachpublikum»
+	linkLabel: string;
+	linkUrl: string;
+	image?: string; // optionales Bild als Kartenkopf (Hintergrund mit Overlay)
+}
+
+export interface KeynotesSignature {
+	kicker: string;
+	title: string;
+	lead: string;
+	items: KeynotesTalk[];
+}
+
+export interface KeynotesUsp {
+	kicker: string;
+	big: string; // *…* kursiv im Akzent
+	small: string;
+	demo: string; // Callout «So sieht der Moment aus …»
+}
+
+export interface KeynotesFormat {
+	label: string; // z.B. «30–60 Minuten»
+	title: string;
+	desc: string;
+}
+
+export interface KeynotesFormats {
+	kicker: string;
+	title: string;
+	lead: string;
+	items: KeynotesFormat[];
+}
+
+export interface KeynotesLehreItem {
+	role: string; // z.B. «Studiengangsleitung»
+	title: string; // z.B. «CAS Projektmanagement»
+	org: string; // z.B. «Berner Fachhochschule»
+	note?: string; // optionaler Zusatz, z.B. «ehemals» oder «ab 2027»
+}
+
+export interface KeynotesLehre {
+	kicker: string;
+	title: string;
+	text: string;
+	quote: string;
+	items: KeynotesLehreItem[];
+}
+
+export interface KeynotesAuftritte {
+	kicker: string;
+	title: string;
+	lead: string; // Kopf; die Termine selbst kommen aus KeynotesContent
+}
+
+export interface KeynotesCtaDark {
+	title: string;
+	text: string;
+	ctaLabel: string;
+	speakerKitUrl: string; // Speaker-Kit-PDF; leer → E-Mail-Fallback
+	mailtoHref: string; // Fallback (mailto:…)
+}
+
+export interface KeynotesCtaLight {
+	title: string;
+	text: string;
+	ctaLabel: string;
+	ctaHref: string;
+}
+
+export interface KeynotesPostCard {
+	title: string;
+	desc: string;
+	url: string;
+}
+
+export interface KeynotesPostEvent {
+	kicker: string;
+	title: string;
+	cards: KeynotesPostCard[];
+}
+
+export interface KeynotesPageContent {
+	hero: KeynotesHero;
+	signature: KeynotesSignature;
+	usp: KeynotesUsp;
+	formats: KeynotesFormats;
+	lehre: KeynotesLehre;
+	auftritte: KeynotesAuftritte;
+	cta: { dark: KeynotesCtaDark; light: KeynotesCtaLight };
+	postEvent: KeynotesPostEvent;
+}
+
 // ─── FAQ ───
 export interface FaqItem {
 	question: string;
@@ -678,6 +788,7 @@ export type SectionKey =
 	| 'transformation'
 	| 'governance'
 	| 'keynotes'
+	| 'keynotespage'
 	| 'faq'
 	| 'hero'
 	| 'sections'
@@ -700,6 +811,7 @@ export type SectionContent =
 	| TransformationContent
 	| GovernanceContent
 	| KeynotesContent
+	| KeynotesPageContent
 	| FaqContent
 	| HeroContent
 	| SectionsContent

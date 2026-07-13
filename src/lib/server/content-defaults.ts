@@ -46,6 +46,7 @@ import type {
 	TransformationContent,
 	GovernanceContent,
 	KeynotesContent,
+	KeynotesPageContent,
 	FaqContent,
 	HeroContent,
 	HeroPreset,
@@ -707,6 +708,147 @@ export const defaultGovernance: GovernanceContent = {
 			ctaLabel: 'Lass uns reden →',
 			ctaHref: 'mailto:info@breakthebox.ch'
 		}
+	}
+};
+
+export const defaultKeynotesPage: KeynotesPageContent = {
+	hero: {
+		kicker: 'Keynotes & Lehre',
+		title: 'Referate, nach denen man **anders entscheidet.**',
+		subline:
+			'KI, Governance und digitale Urteilskraft — ohne Hype, aus erster Hand. Für Geschäftsleitungen, Verwaltungsräte und Fachpublikum, die mehr wollen als eine weitere Folienschlacht.',
+		ctaPrimary: 'Die Referate',
+		ctaSecondary: 'Speaker-Kit anfordern'
+	},
+	signature: {
+		kicker: 'Signature-Talks',
+		title: 'Zwei Referate. Beide selbst gebaut.',
+		lead: 'Keine Theorie-Vorträge: Beide Talks erzählen von Systemen, die ich selbst entwickelt habe und betreibe — mit allem, was funktioniert hat. Und allem, was nicht.',
+		items: [
+			{
+				kicker: 'Die Simulation · Premiere Dänksymposium 2026',
+				title: 'Mis(s)Govern — wenn Governance zum Spiel wird',
+				desc: 'Das Publikum übernimmt eine Firma, trifft sieben KI-Entscheidungen — und erlebt live, wie Kipppunkte entstehen. Auf dem eigenen Handy, während des Referats.',
+				takeawaysLabel: 'Was bleibt hängen',
+				takeaways: [
+					'KI-Entscheide sind Governance-Entscheide — sie gehören an den Führungstisch.',
+					'Systeme kippen nicht linear: Wer Kipppunkte versteht, investiert anders.',
+					'Jede Teilnehmerin geht mit dem KI-Readiness-Profil der eigenen Firma nach Hause.'
+				],
+				meta: ["Keynote 30–60'", 'GL · VR · Fachpublikum', 'Live-Simulation via QR'],
+				linkLabel: 'missgovern.breakthebox.ch →',
+				linkUrl: 'https://missgovern.breakthebox.ch'
+			},
+			{
+				kicker: 'Der Erfahrungsbericht · Dänk!Symposium 2025',
+				title: 'Miss Bizzy — Queen of AI Agents',
+				desc: 'Neun Monate Alltag mit selbstgebauten KI-Agenten: E-Mail, Controlling, Wissensdatenbank. Was funktioniert, was nervt — und was der ROI wirklich ist.',
+				takeawaysLabel: 'Was bleibt hängen',
+				takeaways: [
+					'Agenten bauen kann heute jede Organisation — die Hürde ist nicht die Technik.',
+					'Der ehrliche ROI: weniger Franken, mehr Lerneffekt und Lebensqualität.',
+					'Datenschutz braucht eigene Infrastruktur — nicht nur ein Low-Code-Abo.'
+				],
+				meta: ["Keynote 30–45'", 'KMU · Fachpublikum', 'Live-Einblick in die Agenten'],
+				linkLabel: 'Zum Erfahrungsbericht im Blog →',
+				linkUrl: ''
+			}
+		]
+	},
+	usp: {
+		kicker: 'Was meine Referate unterscheidet',
+		big: 'Keine Folienschlacht. *Das Publikum spielt mit.*',
+		small:
+			'Meine Systeme laufen live auf der Bühne — und im Saal: Beim Mis(s)Govern-Talk scannt das Publikum einen QR-Code und simuliert die eigene Firma, während ich spreche. Erprobt statt behauptet — das gilt auch für den Vortrag selbst.',
+		demo:
+			'So sieht der Moment aus: ein Code auf der Leinwand, hundert Firmen-Simulationen im Saal, und nach 15 Minuten vergleichen wir Profile.'
+	},
+	formats: {
+		kicker: 'Formate',
+		title: 'Von der Bühne bis ins Sitzungszimmer',
+		lead: 'Dieselbe Substanz, drei Gefässe — je nachdem, wen ihr bewegen wollt.',
+		items: [
+			{
+				label: '30–60 Minuten',
+				title: 'Keynote',
+				desc: 'Für Konferenzen, Verbandsanlässe und Firmen-Events. Mit oder ohne Live-Simulation — auf Wunsch massgeschneidert auf eure Branche.'
+			},
+			{
+				label: 'Halbtag',
+				title: 'Workshop',
+				desc: 'Vertiefung mit Führungsteams: KI-Readiness der eigenen Organisation, konkrete Use-Cases, erste Governance-Leitplanken — hands-on.'
+			},
+			{
+				label: '90 Minuten · im Gremium',
+				title: 'VR-Briefing',
+				desc: 'KI-Aufsicht fürs Gremium, direkt im Sitzungszimmer: Was der VR über KI wissen muss, um seiner Oberleitung gerecht zu werden (OR 716a). Diskret, konkret, ohne Publikum.'
+			}
+		]
+	},
+	lehre: {
+		kicker: 'Lehre',
+		title: 'Dozentin an der Berner Fachhochschule',
+		text: 'Regelmässige Lehrtätigkeit zu Digitalisierung und KI — vor Studierenden, die nachfragen, bis es sitzt. Die Lehre hält meine Inhalte ehrlich: Was ich dort nicht erklären kann, trage ich auch keiner Geschäftsleitung vor.',
+		quote: '«Befähigen statt dozieren — das ist der Anspruch. Auch auf der Bühne.»',
+		items: [
+			{
+				role: 'Studiengangsleitung',
+				title: 'CAS Projektmanagement',
+				org: 'Berner Fachhochschule'
+			},
+			{
+				role: 'Studiengangsleitung',
+				title: 'SAS Praxisupdate Projektmanagement',
+				org: 'Berner Fachhochschule'
+			},
+			{
+				role: 'Leitung',
+				title: 'Innovationsmanagement',
+				org: 'Feusi Bildungszentrum',
+				note: 'ehemals'
+			}
+		]
+	},
+	auftritte: {
+		kicker: 'Auftritte',
+		title: 'Wo du mich hörst',
+		lead: 'Kommende und vergangene Bühnen — eine Auswahl.'
+	},
+	cta: {
+		dark: {
+			title: 'Für Programmverantwortliche',
+			text: 'Das Speaker-Kit als PDF: Kurz-Bio, Talk-Abstracts, Pressefoto und Technik-Anforderungen — zum internen Weiterreichen an Programmkommission oder OK.',
+			ctaLabel: 'Speaker-Kit anfordern →',
+			speakerKitUrl: '',
+			mailtoHref: 'mailto:info@breakthebox.ch?subject=Speaker-Kit'
+		},
+		light: {
+			title: 'Direkt anfragen',
+			text: 'Datum, Publikum, Anlass — mehr brauche ich für eine erste Antwort nicht. Du hörst innert zweier Arbeitstage von mir.',
+			ctaLabel: 'Lass uns reden →',
+			ctaHref: 'mailto:info@breakthebox.ch'
+		}
+	},
+	postEvent: {
+		kicker: 'Gerade in meinem Referat gewesen?',
+		title: 'Hier geht es weiter.',
+		cards: [
+			{
+				title: 'Simulation spielen →',
+				desc: 'Mis(s)Govern: die eigene Firma simulieren, 15 Minuten, kein Login.',
+				url: 'https://missgovern.breakthebox.ch'
+			},
+			{
+				title: 'Unterlagen holen →',
+				desc: 'Die Kernaussagen des Referats als kompaktes PDF.',
+				url: ''
+			},
+			{
+				title: 'Gespräch anfragen →',
+				desc: 'Wenn das Thema in eurer Organisation brennt: Lass uns reden.',
+				url: 'mailto:info@breakthebox.ch'
+			}
+		]
 	}
 };
 

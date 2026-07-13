@@ -1,15 +1,20 @@
 // ═══════════════════════════════════════════════════════════
-// Keynotes — Server Load (gleiche Quelle wie die Bühne-Sektion)
+// Keynotes — Server Load
+// Redaktioneller Inhalt aus 'keynotespage', Termine aus 'keynotes'.
 // ═══════════════════════════════════════════════════════════
 
 import type { PageServerLoad } from './$types';
 import { getSectionContent } from '$lib/server/db/queries/content';
-import { defaultKeynotes } from '$lib/server/content-defaults';
-import type { KeynotesContent } from '$lib/types/content';
+import { defaultKeynotesPage, defaultKeynotes, mergeContent } from '$lib/server/content-defaults';
+import type { KeynotesPageContent, KeynotesContent } from '$lib/types/content';
 
 export const load: PageServerLoad = async () => {
-	const raw = await getSectionContent<KeynotesContent>('keynotes');
+	const [page, events] = await Promise.all([
+		getSectionContent<KeynotesPageContent>('keynotespage'),
+		getSectionContent<KeynotesContent>('keynotes')
+	]);
 	return {
-		content: { ...defaultKeynotes, ...((raw as Partial<KeynotesContent>) ?? {}) }
+		content: mergeContent(defaultKeynotesPage, page),
+		events: mergeContent(defaultKeynotes, events)
 	};
 };
