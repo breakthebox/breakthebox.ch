@@ -473,6 +473,7 @@ export interface GovernanceContent {
 	mandates: GovernanceMandates;
 	stance: GovernanceStance;
 	cta: GovernanceCta;
+	faq: FaqContent;
 }
 
 // ─── Keynotes / Bühne (Keynotes, Panels, Workshops) ───
@@ -605,6 +606,7 @@ export interface KeynotesPageContent {
 	auftritte: KeynotesAuftritte;
 	cta: { dark: KeynotesCtaDark; light: KeynotesCtaLight };
 	postEvent: KeynotesPostEvent;
+	faq: FaqContent;
 }
 
 // ─── FAQ ───

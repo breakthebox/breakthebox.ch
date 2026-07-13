@@ -11,6 +11,7 @@
 	let expContrib = $state<number | null>(0);
 	let expRows = $state<number | null>(null);
 	let expMandate = $state<number | null>(null);
+	let expFaq = $state<number | null>(null);
 
 	// Dossier-PDF hochladen/ersetzen
 	let dossierUploading = $state(false);
@@ -278,6 +279,33 @@
 					<div class="field"><label class="field-label" for="cl-l">Button-Label</label><input id="cl-l" type="text" class="field-input" bind:value={content.cta.light.ctaLabel} /></div>
 					<div class="field"><label class="field-label" for="cl-h">Button-Ziel</label><input id="cl-h" type="text" class="field-input" bind:value={content.cta.light.ctaHref} placeholder="mailto:…" /></div>
 				</div>
+			</div>
+		</details>
+
+		<!-- FAQ -->
+		<details class="card">
+			<summary class="card-head"><h2>Häufige Fragen</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
+			<div class="card-body">
+				<p class="card-note">Erscheint als «Kurz beantwortet» und speist die FAQ-Structured-Data (SEO/GEO).</p>
+				<div class="items">
+					{#each content.faq.items as item, i}
+						<AdminAccordionItem
+							index={i}
+							total={content.faq.items.length}
+							title={item.question || 'Neue Frage'}
+							expanded={expFaq === i}
+							removeLabel="Frage löschen"
+							ontoggle={() => (expFaq = expFaq === i ? null : i)}
+							onmoveup={() => (expFaq = move(content.faq.items, i, -1))}
+							onmovedown={() => (expFaq = move(content.faq.items, i, 1))}
+							onremove={() => content.faq.items.splice(i, 1)}
+						>
+							<div class="field"><label class="field-label" for="fq-{i}">Frage</label><input id="fq-{i}" type="text" class="field-input" bind:value={item.question} /></div>
+							<div class="field"><label class="field-label" for="fa-{i}">Antwort</label><textarea id="fa-{i}" class="field-textarea" rows="3" bind:value={item.answer}></textarea></div>
+						</AdminAccordionItem>
+					{/each}
+				</div>
+				<button type="button" class="btn-add" onclick={() => { content.faq.items.push({ question: '', answer: '' }); expFaq = content.faq.items.length - 1; }}>+ Frage hinzufügen</button>
 			</div>
 		</details>
 

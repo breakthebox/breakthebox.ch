@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { env } from '$env/dynamic/public';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages.js';
 	import { renderMarkdown } from '$lib/utils/markdown';
@@ -8,10 +9,16 @@
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import FaqList from '$lib/components/ui/FaqList.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { buildFaqPage } from '$lib/utils/schema';
 	import type { TransformationContent } from '$lib/types/content';
 
 	let { data } = $props();
 	const c: TransformationContent = data.content;
+
+	// FAQ als strukturierte Daten (GEO/SEO) — kanonische deutsche URL.
+	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
+	const faqJsonLd = buildFaqPage(SITE_URL + '/transformation', c.faq.items);
 
 	// Nav-Links zeigen auf die Startseiten-Sektionen (Unterseite).
 	const home = localizeHref('/');
@@ -33,6 +40,8 @@
 		content="Transformation, die trägt — IT-, Digital- und KI-Strategie in Stufen, die einzeln bestehen. Für Geschäftsleitungen und Verwaltungsräte."
 	/>
 </svelte:head>
+
+<JsonLd data={faqJsonLd} />
 
 <div class="tf">
 	<ScrollProgress />
