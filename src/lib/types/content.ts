@@ -305,6 +305,118 @@ export interface TransformationContent {
 	banner: TransformationBanner;
 }
 
+// ─── Verwaltungsrat (Subseite) ───
+// Öffentliches VR-Dossier statt Verkaufstrichter. Felder mit **fett**/*kursiv*
+// werden via renderMarkdown im Akzent hervorgehoben.
+
+export interface GovernanceHero {
+	kicker: string;
+	title: string; // **…** im Akzent
+	subline: string; // **fett** hervorgehoben (z.B. OR 716a)
+	ctaPrimary: string; // Label; scrollt zum Dossier-CTA (#dossier)
+	ctaSecondary: string; // Label; scrollt zum Kontakt (#kontakt)
+}
+
+export interface GovernanceChair {
+	kicker: string;
+	big: string; // *…* kursiv im Akzent
+	small: string;
+}
+
+export interface GovernanceContribution {
+	title: string;
+	text: string;
+	exampleLabel: string; // z.B. «Im Alltag» / «Der Beweis»
+	example: string;
+	url?: string; // optionaler Link (dann wird «example» zum Link)
+}
+
+export interface GovernanceContributions {
+	kicker: string;
+	title: string;
+	lead: string;
+	items: GovernanceContribution[];
+}
+
+export interface GovernanceMatrixRow {
+	label: string;
+	level: number; // Abdeckung 0–3 (Pips)
+	highlight?: boolean; // die hervorgehobene Zeile («die oft fehlt»)
+	note?: string; // Zusatz, nur bei highlight sichtbar
+}
+
+export interface GovernanceFact {
+	label: string;
+	value: string;
+}
+
+export interface GovernanceMatrix {
+	kicker: string;
+	title: string;
+	lead: string;
+	rows: GovernanceMatrixRow[];
+	facts: GovernanceFact[];
+	note: string;
+}
+
+export interface GovernanceMandate {
+	org: string;
+	role: string;
+	president?: boolean; // VRP-Hervorhebung
+	desc: string;
+	logo?: string; // optionales Logo der Organisation (Bild-URL)
+	website?: string; // optionaler Link zur Website der Organisation
+}
+
+export interface GovernanceMandates {
+	kicker: string;
+	title: string;
+	lead: string;
+	items: GovernanceMandate[];
+	principleTitle: string; // **…** im Akzent
+	principleText: string;
+}
+
+export interface GovernanceStance {
+	kicker: string;
+	quote: string;
+	citeText: string; // z.B. «Aus meinem Manifest —»
+	citeLinkLabel: string; // Link-Label
+	citeUrl: string; // Ziel (z.B. /manifest)
+}
+
+export interface GovernanceCtaCard {
+	title: string;
+	text: string;
+	ctaLabel: string;
+	ctaHref: string; // mailto: oder Anker
+}
+
+// Dunkle Karte: der Button verlinkt auf das Dossier-PDF (im Backend ersetzbar).
+export interface GovernanceCtaDarkCard {
+	title: string;
+	text: string;
+	ctaLabel: string;
+	dossierUrl: string; // Link zum Dossier-PDF
+	email: string;
+	phone: string;
+}
+
+export interface GovernanceCta {
+	dark: GovernanceCtaDarkCard;
+	light: GovernanceCtaCard;
+}
+
+export interface GovernanceContent {
+	hero: GovernanceHero;
+	chair: GovernanceChair;
+	contributions: GovernanceContributions;
+	matrix: GovernanceMatrix;
+	mandates: GovernanceMandates;
+	stance: GovernanceStance;
+	cta: GovernanceCta;
+}
+
 // ─── Keynotes / Bühne (Keynotes, Panels, Workshops) ───
 export interface KeynoteItem {
 	key?: string;
@@ -564,6 +676,7 @@ export type SectionKey =
 	| 'manifest'
 	| 'referenzprojekte'
 	| 'transformation'
+	| 'governance'
 	| 'keynotes'
 	| 'faq'
 	| 'hero'
@@ -585,6 +698,7 @@ export type SectionContent =
 	| ManifestContent
 	| ReferenceProjectsContent
 	| TransformationContent
+	| GovernanceContent
 	| KeynotesContent
 	| FaqContent
 	| HeroContent

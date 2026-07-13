@@ -63,6 +63,12 @@
 			icon: '▤'
 		},
 		{
+			id: 'governance',
+			title: 'Governance',
+			description: 'Die Dossier-Seite «Governance» — VR, Stiftungs- & Aufsichtsrat: Matrix, Mandate',
+			icon: '⚖'
+		},
+		{
 			id: 'references',
 			title: 'Kundenlogos',
 			description: 'Logos der Referenz-Marquee verwalten',

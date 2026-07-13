@@ -4,6 +4,32 @@
 // Extracted from messages/de.json. Used as initial seed and
 // fallback when the database has no content for a section.
 
+/**
+ * Tiefes Zusammenführen von Default und gespeichertem Content.
+ * Gespeicherte Werte gewinnen; verschachtelte Objekte werden rekursiv
+ * gemergt, sodass später hinzugefügte Felder immer aus den Defaults
+ * kommen (statt zu fehlen, wenn eine ältere Zeile in der DB liegt).
+ * Arrays und Primitive werden ganz ersetzt (gespeicherter Wert gewinnt).
+ */
+export function mergeContent<T>(base: T, override: unknown): T {
+	if (override === undefined || override === null) return base;
+	if (
+		Array.isArray(base) ||
+		Array.isArray(override) ||
+		typeof base !== 'object' ||
+		typeof override !== 'object'
+	) {
+		return override as T;
+	}
+	const out: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+	for (const key of Object.keys(override as Record<string, unknown>)) {
+		const b = (base as Record<string, unknown>)[key];
+		const o = (override as Record<string, unknown>)[key];
+		out[key] = key in (base as Record<string, unknown>) ? mergeContent(b, o) : o;
+	}
+	return out as T;
+}
+
 import type {
 	PillarsContent,
 	AboutContent,
@@ -18,6 +44,7 @@ import type {
 	ManifestContent,
 	ReferenceProjectsContent,
 	TransformationContent,
+	GovernanceContent,
 	KeynotesContent,
 	FaqContent,
 	HeroContent,
@@ -43,12 +70,12 @@ export const defaultPillars: PillarsContent = {
 		},
 		{
 			key: 'governance',
-			title: 'Verwaltungsrat',
+			title: 'Governance',
 			note: 'Digitalkompetenz, wo es zählt',
 			desc: 'Digitale Urteilskraft dauerhaft im Gremium: Ich stelle die unbequemen Fragen, gehe in Vorleistung und bewahre vor teuren Fehlentscheiden. Verantwortung nach OR 716a.',
 			tags: ['VR-Mandate', 'IT-Governance', 'OR 716a', 'Digital-Aufsicht'],
 			examples: [],
-			subpageUrl: '/vr'
+			subpageUrl: '/governance'
 		},
 		{
 			key: 'keynotes',
@@ -566,6 +593,120 @@ export const defaultTransformation: TransformationContent = {
 		text: 'Aus der Simulation? Euer grösster blinder Fleck war **Governance** — genau dafür gibt es hier den passenden Einstieg.',
 		ctaLabel: 'Zum passenden Einstieg',
 		ctaHref: '#kontakt'
+	}
+};
+
+export const defaultGovernance: GovernanceContent = {
+	hero: {
+		kicker: 'Verwaltungsrat · Digitale Urteilskraft im Gremium',
+		title: 'Digitalisierung lässt sich nicht delegieren. **Auch nicht im Verwaltungsrat.**',
+		subline:
+			'Die Oberleitung der Gesellschaft ist unübertragbar — **OR 716a** kennt keine Ausnahme für IT und KI. Was sich ändern lässt: wer mit am Tisch sitzt, wenn diese Entscheide fallen.',
+		ctaPrimary: 'VR-Dossier anfordern',
+		ctaSecondary: 'Direkt anfragen'
+	},
+	chair: {
+		kicker: 'Der leere Stuhl',
+		big: 'KI-Entscheide sind Oberleitungs-Entscheide geworden: Investitionen, Risiken, Reputation. Aber am Tisch sitzt selten jemand, der die Vorlage dahinter *wirklich beurteilen kann.*',
+		small:
+			'Das Resultat kennt jedes Gremium: Man vertraut der Management-Präsentation, dem externen Gutachten, dem Bauchgefühl. Genau diese Lücke in der Kompetenz-Matrix fülle ich — als Verwaltungsrätin, nicht als zugekaufte Expertin ohne Verantwortung.'
+	},
+	contributions: {
+		kicker: 'Was ich an den Tisch bringe',
+		title: 'Drei Beiträge, jeden Sitzungstag',
+		lead: 'Keine Karten zum Umdrehen — konkrete Arbeit im Gremium.',
+		items: [
+			{
+				title: 'Die Frage, die im Raum fehlt',
+				text: 'Betriebswirtschaft auf GL-Niveau plus digitale Urteilskraft: Ich frage nach, bevor es teuer wird — bei Investitionsanträgen, Sourcing-Entscheiden und Projektampeln, die zu grün aussehen.',
+				exampleLabel: 'Im Alltag',
+				example: 'Vorlagen-Review vor der Sitzung, kritische Würdigung statt Kenntnisnahme.'
+			},
+			{
+				title: 'Entscheidungsreife statt Papierberge',
+				text: 'Ich arbeite in Vorleistung: Anträge werden vorgeprüft, Traktanden geschärft, Optionen echt vergleichbar gemacht — damit das Gremium entscheidet statt durchwinkt.',
+				exampleLabel: 'Im Alltag',
+				example: 'Strategie-Klausuren, Digital-Traktanden, Ausschussarbeit.'
+			},
+			{
+				title: 'Erprobt, nicht nachgeplappert',
+				text: 'Ich baue und betreibe eigene KI-Systeme — self-hosted, im täglichen Einsatz. Meine Einschätzungen stammen aus erster Hand, nicht aus dem Analystenbericht.',
+				exampleLabel: 'Der Beweis',
+				example: 'Mis(s)Govern — meine Governance-Simulation, selbst gebaut →',
+				url: ''
+			}
+		]
+	},
+	matrix: {
+		kicker: 'Profil auf einen Blick',
+		title: 'Die Kompetenz-Matrix-Perspektive',
+		lead: 'Findungskommissionen denken in Zeilen und Lücken. Das ist meine Abdeckung — ehrlich markiert.',
+		rows: [
+			{ label: 'Digital / IT / KI', level: 3, highlight: true, note: 'die Zeile, die oft fehlt' },
+			{ label: 'Betriebswirtschaft & Finanzen', level: 2 },
+			{ label: 'Governance & Aufsicht', level: 3 },
+			{ label: 'Strategie & Transformation', level: 3 },
+			{ label: 'Recht & Compliance', level: 1 },
+			{ label: 'Branchen: Versicherung · IT · Bildung', level: 2 }
+		],
+		facts: [
+			{ label: 'Informatik', value: 'BSc Informatik' },
+			{ label: 'Betriebswirtschaft', value: 'Executive MBA' },
+			{ label: 'Gremienarbeit', value: 'CAS Verwaltungsrat' },
+			{ label: 'Lehre', value: 'Dozentin BFH' },
+			{ label: 'Praxis', value: 'Eigene KI-Systeme, self-hosted' },
+			{ label: 'Bühne', value: 'Keynotes zu KI & Governance' }
+		],
+		note: 'Bewusst keine Vollabdeckung — ein Gremium braucht Zeilen, die sich ergänzen, nicht sechs Generalisten.'
+	},
+	mandates: {
+		kicker: 'Aktuelle Mandate',
+		title: 'Wo ich Verantwortung trage',
+		lead: 'Öffentlich, transparent, mit Rolle — Interessenbindungen auf Anfrage vollständig offengelegt.',
+		items: [
+			{
+				org: 'Nexplore AG',
+				role: 'Verwaltungsratspräsidentin',
+				president: true,
+				desc: 'Präsidium eines IT-Dienstleisters — Strategie, Aufsicht und Führung des Gremiums.'
+			},
+			{
+				org: 'GVB Gebäudeversicherung Bern',
+				role: 'Verwaltungsrätin',
+				desc: 'Digitale Urteilskraft in einem regulierten Versicherungsumfeld.'
+			},
+			{
+				org: 'AKB / IVBE',
+				role: 'Verwaltungsrätin',
+				desc: 'Governance und Digitalisierung.'
+			}
+		],
+		principleTitle: 'Ich sammle keine Mandate. **Ich wähle sie.**',
+		principleText:
+			'Bewusst, gezielt und im Rahmen meiner Kapazität — jedes Gremium hat Anspruch auf eine Verwaltungsrätin, die vorbereitet in die Sitzung kommt. Und: keine Interessenbindungen zu IT-Anbietern, keine Reseller-Verhältnisse. Mein Urteil gehört dem Gremium.'
+	},
+	stance: {
+		kicker: 'Haltung',
+		quote: '«Ein gutes Gremium braucht keine Ja-Sager. Es braucht jemanden, der nachfragt.»',
+		citeText: 'Aus meinem Manifest —',
+		citeLinkLabel: 'alle Ansagen lesen →',
+		citeUrl: '/manifest'
+	},
+	cta: {
+		dark: {
+			title: 'Für Findungskommissionen & Headhunter',
+			text: 'Das VR-Dossier als PDF: Profil, Kompetenz-Matrix, Mandate und Interessenbindungen auf einer Seite — zum internen Weiterreichen.',
+			ctaLabel: 'Dossier öffnen (PDF) →',
+			dossierUrl: '/governance-dossier.pdf',
+			email: 'info@breakthebox.ch',
+			phone: '+41 76 309 20 88'
+		},
+		light: {
+			title: 'Für den direkten Austausch',
+			text: 'Ihr sucht die Digital-Zeile für eure Matrix — oder eine Zweitmeinung, ob ihr sie braucht? Ein Gespräch klärt das schneller als jedes Dossier.',
+			ctaLabel: 'Lass uns reden →',
+			ctaHref: 'mailto:info@breakthebox.ch'
+		}
 	}
 };
 
