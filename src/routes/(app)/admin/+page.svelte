@@ -88,9 +88,15 @@
 		},
 		{
 			id: 'keynotes',
-			title: 'Keynotes',
-			description: 'Keynotes, Panels und Workshops — kommend prominent, vergangen im Rückblick',
+			title: 'Keynotes / Termine',
+			description: 'Auftritts-Termine — kommend prominent, vergangen im Rückblick (speist auch die Keynotes-Seite)',
 			icon: '◈'
+		},
+		{
+			id: 'keynotes-seite',
+			title: 'Keynotes-Seite',
+			description: 'Redaktioneller Inhalt der Seite «Keynotes» — Talks, USP, Formate, Lehre, CTA',
+			icon: '◍'
 		},
 		{
 			id: 'blog',
