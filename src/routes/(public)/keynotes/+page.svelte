@@ -1,16 +1,24 @@
 <script lang="ts">
+	import { env } from '$env/dynamic/public';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages.js';
 	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
+	import FaqList from '$lib/components/ui/FaqList.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { buildFaqPage } from '$lib/utils/schema';
 	import type { KeynotesPageContent, KeynotesContent, KeynoteItem } from '$lib/types/content';
 
 	let { data } = $props();
 	const c: KeynotesPageContent = data.content;
 	const events: KeynotesContent = data.events;
+
+	// FAQ als strukturierte Daten (GEO/SEO) — kanonische deutsche URL.
+	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
+	const faqJsonLd = buildFaqPage(SITE_URL + '/keynotes', c.faq.items);
 
 	const home = localizeHref('/');
 	const navLinks = [
@@ -63,6 +71,8 @@
 		content="Keynotes zu KI, Governance und digitaler Urteilskraft — ohne Hype, aus erster Hand. Formate, Auftritte und Speaker-Kit von Brigitte Hulliger."
 	/>
 </svelte:head>
+
+<JsonLd data={faqJsonLd} />
 
 <div class="kn">
 	<ScrollProgress />
@@ -272,6 +282,15 @@
 		</div>
 	</section>
 
+	<!-- ═══════ FAQ ═══════ -->
+	<section class="block">
+		<div class="wrap">
+			<span class="kick">Häufige Fragen</span>
+			<h2 class="faq-title">Kurz beantwortet</h2>
+			<FaqList items={c.faq.items} />
+		</div>
+	</section>
+
 	<ContactBand />
 	<SiteFooter />
 </div>
@@ -321,6 +340,9 @@
 		font-size: clamp(1.5rem, 3.4vw, 2rem);
 		color: var(--text-heading);
 		margin-bottom: 8px;
+	}
+	.faq-title {
+		margin-bottom: 18px;
 	}
 	.kick {
 		display: block;

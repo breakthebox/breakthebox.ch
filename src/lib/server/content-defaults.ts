@@ -834,6 +834,40 @@ export const defaultGovernance: GovernanceContent = {
 			ctaLabel: 'Lass uns reden →',
 			ctaHref: 'mailto:info@breakthebox.ch'
 		}
+	},
+	faq: {
+		items: [
+			{
+				question: 'Für welche Gremien stehe ich zur Verfügung?',
+				answer:
+					'Für Verwaltungsräte, Stiftungsräte sowie Aufsichts- und Beiräte — mit Schwerpunkt auf KMU und öffentlich-nahen Organisationen in der Schweiz, die IT-, Digitalisierungs- und KI-Kompetenz auf strategischer Ebene brauchen.'
+			},
+			{
+				question: 'Was bringe ich in ein Gremium ein?',
+				answer:
+					'Eine unabhängige Perspektive auf Technologie und Digitalisierung — fundiert durch BSc Informatik, EMBA, CAS Verwaltungsrat und die tägliche Praxis, eigene KI-Plattformen zu bauen und zu betreiben. Ich beurteile Technologie aus erster Hand, nicht aus Folien.'
+			},
+			{
+				question: 'Kombiniere ich Beratung und ein Mandat für dieselbe Organisation?',
+				answer:
+					'Nein — bewusst nicht. Ein Aufsichtsmandat verlangt Unabhängigkeit; ein Beratungsauftrag für dieselbe Organisation würde sie gefährden. Ich trenne beide Rollen klar und schliesse Interessenkonflikte (Art. 717 OR) von vornherein aus.'
+			},
+			{
+				question: 'Wie halte ich meine Mandate handhabbar?',
+				answer:
+					'Ich halte die Zahl meiner Mandate bewusst überschaubar. Ein Mandat ist Verantwortung, keine Visitenkarte — jedes soll die nötige Präsenz, Vorbereitung und Sorgfalt bekommen.'
+			},
+			{
+				question: 'Wie gehe ich mit Interessenkonflikten um?',
+				answer:
+					'Transparent: Mögliche Konflikte lege ich offen und trete bei Bedarf in den Ausstand. Unabhängigkeit ist die Grundlage jeder Aufsichtsfunktion — nicht verhandelbar.'
+			},
+			{
+				question: 'Wie läuft ein erstes Gespräch ab?',
+				answer:
+					'Unverbindlich und konkret: Wir klären, ob Thema, Gremienkultur und mein Profil zusammenpassen. Honorar und Rahmen richten sich nach Verantwortung und Aufwand des Mandats und werden transparent vereinbart.'
+			}
+		]
 	}
 };
 
@@ -973,6 +1007,39 @@ export const defaultKeynotesPage: KeynotesPageContent = {
 				title: 'Gespräch anfragen →',
 				desc: 'Wenn das Thema in eurer Organisation brennt: Lass uns reden.',
 				url: 'mailto:info@breakthebox.ch'
+			}
+		]
+	},
+	faq: {
+		items: [
+			{
+				question: 'Welche Formate biete ich an?',
+				answer:
+					'Von der kompakten Impuls-Keynote über interaktive Formate bis zum halbtägigen Workshop. Länge und Tiefe stimme ich auf euren Anlass ab — Bühne, Retreat oder Klausur.'
+			},
+			{
+				question: 'In welchen Sprachen halte ich Referate?',
+				answer: 'Auf Deutsch und Englisch.'
+			},
+			{
+				question: 'Welche Themen decke ich ab?',
+				answer:
+					'KI-Strategie und -Governance, Shadow-AI, Digitalisierung und IT-Strategie — für Geschäftsleitungen und Verwaltungsräte, immer mit konkretem Praxisbezug statt Buzzwords.'
+			},
+			{
+				question: 'Was macht meine Keynotes besonders?',
+				answer:
+					'Ich rede nur über Technologie, die ich selbst gebaut und betrieben habe. Herzstück ist oft die Governance-Simulation Mis(s)Govern — abstrakte KI-Entscheidungen werden zu erlebbaren Konsequenzen.'
+			},
+			{
+				question: 'Wie viel Vorlaufzeit braucht ihr?',
+				answer:
+					'Je früher, desto besser — für eine massgeschneiderte Keynote plane ich gern einige Wochen Vorlauf ein. Kurzfristige Anfragen prüfe ich nach Verfügbarkeit.'
+			},
+			{
+				question: 'Wie sieht das Honorar aus?',
+				answer:
+					'Das Honorar richtet sich nach Format, Aufwand und Kontext (Wirtschaft, Bildung oder Non-Profit). Fordert das Speaker-Kit an oder schreibt mir — wir finden eine faire Lösung.'
 			}
 		]
 	}
