@@ -188,6 +188,123 @@ export interface ReferenceProjectsContent {
 	items: ReferenceProject[];
 }
 
+// ─── Transformation (Subseite) ───
+// Redaktionelle Service-Seite: Hero, Spiegel-Situationen, Drei-Stufen-Treppe,
+// Wirkung, Beweis/Case-Timeline, MissGovern-Brücke, Abgrenzung, Erstgespräch, FAQ.
+// Felder mit **fett**/*kursiv* werden via renderMarkdown im Akzent hervorgehoben.
+
+export interface TransformationHero {
+	kicker: string;
+	title: string; // **…** wird im Akzent gesetzt
+	subline: string;
+	ctaPrimary: string; // Label; scrollt zu #stufen
+	ctaSecondary: string; // Label; scrollt zu #kontakt
+}
+
+export interface TransformationSituation {
+	quote: string; // die Frage im Raum
+	answer: string; // «Der Einstieg: …» — **fett** im Akzent
+}
+
+export interface TransformationMirror {
+	kicker: string;
+	title: string;
+	lead: string;
+	situations: TransformationSituation[];
+}
+
+export interface TransformationStep {
+	no: string; // «01»
+	durationTag: string; // kleines Label unter der Nummer, z.B. «Tage»
+	title: string;
+	question: string; // «Entscheiden wir richtig?»
+	description: string;
+	tags: string[];
+	result: string; // Ergebnis
+	duration: string; // Dauer
+	exit: string; // Ausgangs-Zeile
+}
+
+export interface TransformationSteps {
+	kicker: string;
+	title: string;
+	claim: string; // **…** im Akzent
+	items: TransformationStep[];
+}
+
+export interface TransformationImpact {
+	kicker: string;
+	big: string; // *…* kursiv im Akzent
+	small: string;
+}
+
+export interface TransformationCaseRow {
+	month: string;
+	text: string; // **fett** hervorgehoben
+	tag?: string; // z.B. «Stufe 1»
+}
+
+export interface TransformationMissgovern {
+	title: string;
+	text: string;
+	cta: string;
+	url: string;
+}
+
+export interface TransformationProof {
+	kicker: string;
+	title: string;
+	lead: string;
+	caseLabel: string; // z.B. «Schweizer Unternehmensgruppe · Industrie»
+	caseRows: TransformationCaseRow[];
+	missgovern: TransformationMissgovern;
+}
+
+export interface TransformationBoundaryItem {
+	title: string;
+	desc: string;
+}
+
+export interface TransformationBoundaries {
+	kicker: string;
+	title: string;
+	lead: string;
+	items: TransformationBoundaryItem[];
+}
+
+export interface TransformationContactBox {
+	title: string; // überschreibt den Titel der geteilten ContactBand
+	text: string; // überschreibt den Text der ContactBand
+	mgLine: string; // personalisierter Text, nur bei UTM-Ankunft (ContactBand-Text)
+}
+
+export interface TransformationContact {
+	kicker: string;
+	title: string;
+	lead: string;
+	steps: string[]; // die drei «30-Minuten»-Schritte
+	box: TransformationContactBox;
+}
+
+export interface TransformationBanner {
+	utmSource: string; // utm_source-Wert, der den Banner auslöst (z.B. «missgovern»)
+	text: string; // **fett** im Akzent
+	ctaLabel: string; // Link-Label im Banner
+	ctaHref: string; // Ziel (z.B. #kontakt)
+}
+
+export interface TransformationContent {
+	hero: TransformationHero;
+	mirror: TransformationMirror;
+	steps: TransformationSteps;
+	impact: TransformationImpact;
+	proof: TransformationProof;
+	boundaries: TransformationBoundaries;
+	contact: TransformationContact;
+	faq: FaqContent;
+	banner: TransformationBanner;
+}
+
 // ─── Keynotes / Bühne (Keynotes, Panels, Workshops) ───
 export interface KeynoteItem {
 	key?: string;
@@ -446,6 +563,7 @@ export type SectionKey =
 	| 'partners'
 	| 'manifest'
 	| 'referenzprojekte'
+	| 'transformation'
 	| 'keynotes'
 	| 'faq'
 	| 'hero'
@@ -466,6 +584,7 @@ export type SectionContent =
 	| PartnersContent
 	| ManifestContent
 	| ReferenceProjectsContent
+	| TransformationContent
 	| KeynotesContent
 	| FaqContent
 	| HeroContent

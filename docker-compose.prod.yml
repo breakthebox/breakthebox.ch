@@ -55,6 +55,20 @@ services:
       - 'traefik.http.routers.breakthebox.tls.domains[0].main=web.breakthebox.ch'
       - 'traefik.http.services.breakthebox.loadbalancer.server.port=3000'
       - 'traefik.docker.network=n8n_internal'
+      # ─── Redirect: www.brigittehulliger.ch → web.breakthebox.ch (301) ───
+      # Eigener Router mit TLS-Zertifikat; die Middleware leitet um, bevor die
+      # Anfrage die App erreicht (service=breakthebox nur, weil Traefik einen
+      # Service verlangt). $$ escaped das $ vor Compose-Interpolation.
+      - 'traefik.http.routers.brigittehulliger.rule=Host(`www.brigittehulliger.ch`)'
+      - 'traefik.http.routers.brigittehulliger.entrypoints=websecure'
+      - 'traefik.http.routers.brigittehulliger.tls=true'
+      - 'traefik.http.routers.brigittehulliger.tls.certresolver=myresolver'
+      - 'traefik.http.routers.brigittehulliger.tls.domains[0].main=www.brigittehulliger.ch'
+      - 'traefik.http.routers.brigittehulliger.service=breakthebox'
+      - 'traefik.http.routers.brigittehulliger.middlewares=brigittehulliger-redirect'
+      - 'traefik.http.middlewares.brigittehulliger-redirect.redirectregex.regex=^https?://[^/]+/(.*)'
+      - 'traefik.http.middlewares.brigittehulliger-redirect.redirectregex.replacement=https://web.breakthebox.ch/$${1}'
+      - 'traefik.http.middlewares.brigittehulliger-redirect.redirectregex.permanent=true'
 
 volumes:
   pgdata:

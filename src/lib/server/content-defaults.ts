@@ -17,6 +17,7 @@ import type {
 	PartnersContent,
 	ManifestContent,
 	ReferenceProjectsContent,
+	TransformationContent,
 	KeynotesContent,
 	FaqContent,
 	HeroContent,
@@ -373,6 +374,199 @@ export const defaultReferenceProjects: ReferenceProjectsContent = {
 				'Vorträge und Workshops zu KI, Digitalisierung und digitaler Urteilskraft — gebaut aus gelebter Praxis (BFH, Feusi, CAS). Substanz statt Show: befähigen statt dozieren, damit das Publikum mitkommt und weiterträgt.'
 		}
 	]
+};
+
+export const defaultTransformation: TransformationContent = {
+	hero: {
+		kicker: 'Transformation · IT-, Digital- & KI-Strategie',
+		title: 'Transformation, **die trägt.**',
+		subline:
+			'Von der Standortbestimmung bis zur verankerten Umsetzung — in Stufen, die einzeln bestehen. Für Geschäftsleitungen und Verwaltungsräte, die souverän entscheiden wollen statt getrieben zu werden.',
+		ctaPrimary: 'So arbeiten wir',
+		ctaSecondary: 'Direkt anfragen'
+	},
+	mirror: {
+		kicker: 'Woran es sich zeigt',
+		title: 'Kommt dir eine dieser Situationen bekannt vor?',
+		lead: 'Transformation beginnt selten mit einem grossen Plan. Sie beginnt mit einem Moment, in dem eine Frage im Raum steht.',
+		situations: [
+			{
+				quote:
+					'«Auf dem Tisch liegt ein Investitionsantrag über eine Million — und niemand im Gremium kann beurteilen, ob die Zahlen tragen.»',
+				answer: 'Der Einstieg: **eine unabhängige Stellungnahme.** Stufe 1.'
+			},
+			{
+				quote:
+					'«Wir haben eine Digitalstrategie. Sie liegt seit achtzehn Monaten in der Schublade, und keiner kann sagen, was davon umgesetzt ist.»',
+				answer: 'Der Einstieg: **Standortbestimmung — was trägt, was ist Papier.** Stufe 2.'
+			},
+			{
+				quote:
+					'«Der VR fragt nach unserer KI-Strategie. Die Mitarbeitenden nutzen längst ChatGPT — mit Kundendaten, ohne Regeln.»',
+				answer: 'Der Einstieg: **KI-Readiness und ein Governance-Rahmen, der gelebt wird.** Stufe 2–3.'
+			},
+			{
+				quote:
+					'«Unser IT-Partner empfiehlt schon wieder sein eigenes Produkt. Wir bräuchten jemanden, der nichts verkauft ausser seinem Urteil.»',
+				answer: 'Der Einstieg: **eine Zweitmeinung ohne eigene Agenda.** Stufe 1.'
+			}
+		]
+	},
+	steps: {
+		kicker: 'So arbeiten wir',
+		title: 'Drei Stufen. Drei Ausgänge.',
+		claim: 'Jede Stufe endet mit einem Ergebnis — **und mit einer freien Entscheidung.** Keine Stufe verkauft automatisch die nächste.',
+		items: [
+			{
+				no: '01',
+				durationTag: 'Tage',
+				title: 'Der Spiegel',
+				question: '«Entscheiden wir richtig?»',
+				description:
+					'Ein klar umrissener Auftrag mit klarem Ende: Ich schaue von aussen auf das, was auf eurem Tisch liegt, und sage, was ich sehe — schriftlich, begründet, ohne Rücksicht auf eine Verlängerung.',
+				tags: [
+					'Review Investitions- & Projektanträge',
+					'Zweitmeinung System- & Sourcing-Entscheide',
+					'Durchsicht IT-Strategien & Statusberichte',
+					'Vertrags- & Offert-Reviews'
+				],
+				result: 'Schriftliche Stellungnahme + Besprechung',
+				duration: 'Wenige Tage, fixer Rahmen',
+				exit: 'Hier können wir aufhören. Ihr seid klüger — mit oder ohne mich.'
+			},
+			{
+				no: '02',
+				durationTag: '3–6 Monate',
+				title: 'Die Strategie',
+				question: '«Wo stehen wir — und wohin?»',
+				description:
+					'Wenn der Spiegel Handlungsbedarf zeigt: IT-, Digital- oder KI-Strategie — von der Standortbestimmung über das Zielbild bis zur Roadmap mit messbaren Etappen. Erarbeitet mit der GL, nicht für sie.',
+				tags: [
+					'IT-Gesamtstrategie',
+					'Digital-Strategie',
+					'KI-Strategie & KI-Readiness',
+					'Roadmap mit Etappen & Kosten'
+				],
+				result: 'Eine Strategie, die die GL selbst vertreten kann',
+				duration: '3–6 Monate, projektförmig',
+				exit: 'Auch hier: Die Roadmap gehört euch. Umsetzen könnt ihr sie selbst.'
+			},
+			{
+				no: '03',
+				durationTag: '6–12 Monate',
+				title: 'Die Verankerung',
+				question: '«Kommt es auch an?»',
+				description:
+					'Wenn gewünscht, begleite ich die Umsetzung — Roadmap in Betrieb bringen, Governance-Rahmen etablieren, Schlüsselpersonen befähigen. Mit eingebautem Ende: Mein Auftrag ist erfüllt, wenn ihr mich nicht mehr braucht.',
+				tags: [
+					'Umsetzungsbegleitung',
+					'Governance & Shadow-AI-Rahmen',
+					'Befähigung GL & Schlüsselpersonen'
+				],
+				result: 'Eine Organisation, die selbst steuert',
+				duration: '6–12 Monate, degressiv',
+				exit: 'Der geplante Ausgang: Es trägt ohne mich.'
+			}
+		]
+	},
+	impact: {
+		kicker: 'Was am Ende steht',
+		big: 'Kein Konzept, das liegen bleibt. Sondern eine Organisation, die digital urteilen und handeln kann — *auch wenn ich längst weg bin.*',
+		small:
+			'Deshalb ist die Begleitung degressiv angelegt: Am Anfang bin ich oft da, am Ende selten. Gute Beratung macht sich überflüssig — das steht so in meinem Manifest, und es steht so in meinen Offerten.'
+	},
+	proof: {
+		kicker: 'Erprobt, nicht nachgeplappert',
+		title: 'Wie das konkret aussieht',
+		lead: 'Ein Beispiel aus dem letzten Winter — so entsteht aus einer Stufe die nächste. Oder eben nicht.',
+		caseLabel: 'Schweizer Unternehmensgruppe · Industrie',
+		caseRows: [
+			{
+				month: 'Dezember',
+				text: 'Anfrage: **Review eines Investitionsantrags** — eine unabhängige Einschätzung vor dem VR-Entscheid.',
+				tag: 'Stufe 1'
+			},
+			{
+				month: 'Januar',
+				text: '**Schriftliche Stellungnahme, abgeschlossen.** Empfehlung darin: Der Antrag braucht ein strategisches Fundament, das fehlt.'
+			},
+			{
+				month: 'Februar',
+				text: 'Rückfrage der Gruppe: **«Erarbeiten Sie die IT- und Digitalstrategie mit uns?»** Daraus wurde ein sechsmonatiges Engagement.',
+				tag: 'Stufe 2'
+			}
+		],
+		missgovern: {
+			title: 'Governance kann man bei mir nicht nur buchen. Man kann sie spielen.',
+			text: 'Mis(s)Govern: 15 Minuten Simulation, 7 Entscheidungen, euer KI-Readiness-Profil — selbst gebaut, self-hosted.',
+			cta: 'Simulation starten',
+			url: ''
+		}
+	},
+	boundaries: {
+		kicker: 'Der Ehrlichkeit halber',
+		title: 'Was ich nicht mache',
+		lead: 'Damit wir keine Zeit verlieren — eure nicht und meine nicht.',
+		items: [
+			{
+				title: 'Konzepte im Kilo-Format',
+				desc: 'Keine 200 Seiten fürs Archiv. Was ich abgebe, ist zum Entscheiden gedacht, nicht zum Ablegen.'
+			},
+			{
+				title: 'Mandate ohne Ende',
+				desc: 'Keine Beratung, die sich selbst verlängert. Jede Stufe hat einen Ausgang, und der steht in der Offerte.'
+			},
+			{
+				title: 'Verkauf im Beratermantel',
+				desc: 'Keine Produkte, keine Reseller-Provisionen, keine Partner-Deals. Ich verkaufe ein Urteil — sonst nichts.'
+			}
+		]
+	},
+	contact: {
+		kicker: 'Der erste Schritt',
+		title: '30 Minuten, unverbindlich',
+		lead: 'Kein Verkaufsgespräch — eine erste Einschätzung.',
+		steps: [
+			'Ihr schildert die Situation — der Antrag, die Strategie, die Frage im Raum.',
+			'Ich sage, was ich sehe: wo ich helfen kann und wo ihr mich nicht braucht.',
+			'Wenn es passt: ein Vorschlag für Stufe 1 — mit fixem Rahmen und fixem Ende.'
+		],
+		box: {
+			title: 'Erzähl mir, was auf eurem Tisch liegt.',
+			text: 'Du bekommst eine ehrliche erste Einschätzung — und keine Verkaufsschlaufe.',
+			mgLine: 'Aus der Simulation: Euer blinder Fleck war **Governance** — bring das Factsheet mit.'
+		}
+	},
+	faq: {
+		items: [
+			{
+				question: 'Was kostet der Einstieg?',
+				answer:
+					'Stufe 1 hat einen fixen Rahmen von wenigen Tagen — du erhältst vorab eine Offerte mit Festpreis. Keine offenen Tagessätze, keine Überraschungen.'
+			},
+			{
+				question: 'Wie lange dauert eine Strategie-Erarbeitung?',
+				answer:
+					'Drei bis sechs Monate, abhängig von Grösse und Entscheidungstempo der Organisation. Die Etappen und Meilensteine stehen in der Roadmap — inklusive dem Punkt, an dem mein Teil endet.'
+			},
+			{
+				question: 'Für welche Organisationen passt das?',
+				answer:
+					'Schweizer KMU und Organisationen mit einer Geschäftsleitung oder einem Verwaltungsrat, der die Veränderung selbst tragen will. Branchenerfahrung u.a. Versicherung, Industrie, Bildung, öffentliche Hand.'
+			},
+			{
+				question: 'Warum keine langfristige Betreuung?',
+				answer:
+					'Weil Unabhängigkeit meine wichtigste Arbeitsgrundlage ist. Wer zu lange bleibt, wird quasi-intern und verliert die Aussenperspektive — genau die bezahlt ihr aber. Deshalb: Stufen mit Ausgängen statt Mandate ohne Ende.'
+			}
+		]
+	},
+	banner: {
+		utmSource: 'missgovern',
+		text: 'Aus der Simulation? Euer grösster blinder Fleck war **Governance** — genau dafür gibt es hier den passenden Einstieg.',
+		ctaLabel: 'Zum passenden Einstieg',
+		ctaHref: '#kontakt'
+	}
 };
 
 export const defaultBlog: BlogContent = {
