@@ -3,8 +3,10 @@
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import type { PillarsContent, AboutContent, ReferencesContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent, HeroPreset, SectionSetting } from '$lib/types/content';
 	import HeroSlider from '$lib/components/ui/HeroSlider.svelte';
+	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
+	import FaqList from '$lib/components/ui/FaqList.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
 	import { env } from '$env/dynamic/public';
@@ -193,9 +195,13 @@
 		}
 	}
 
-	let navScrolled = $state(false);
-	let menuOpen = $state(false);
 	let activeSection = $state('');
+	// Nav-Links für die geteilte SiteNav (Active-State aus dem Scroll-Spy).
+	let navLinks = $derived([
+		{ href: '#angebot', label: m.nav_services(), active: activeSection === 'angebot' },
+		{ href: '#about', label: m.nav_about(), active: activeSection === 'about' },
+		{ href: localizeHref('/impulse'), label: m.nav_blog() }
+	]);
 
 	const faq: FaqContent = data.faq;
 	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
@@ -243,7 +249,6 @@
 	// Scroll-aware nav: backdrop + active section
 	$effect(() => {
 		function onScroll() {
-			navScrolled = window.scrollY > 20;
 			const sectionIds = ['angebot', 'about', 'haltung', 'stimmen', 'impulse', 'kontakt'];
 			let current = '';
 			for (const id of sectionIds) {
@@ -300,46 +305,8 @@
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z" /></svg>
 		{/if}
 	{/snippet}
-	<!-- ═══════ NAVIGATION ═══════ -->
-	<nav class="nav" class:nav-scrolled={navScrolled}>
-		<div class="nav-inner">
-			<a href="/" class="brand">
-				<img src="/box.svg" alt="" class="brand-cube" width="34" height="34" />
-				<span class="brand-txt">
-					<span class="brand-m">Brigitte Hulliger</span>
-					<span class="brand-c">Break the Box</span>
-				</span>
-			</a>
-			<div class="nav-links">
-				<a href="#angebot" class:active={activeSection === 'angebot'}>{m.nav_services()}</a>
-				<a href="#about" class:active={activeSection === 'about'}>{m.nav_about()}</a>
-				<a href={localizeHref('/impulse')}>{m.nav_blog()}</a>
-			</div>
-			<a class="btn solid nav-cta" href="#kontakt">{m.h_nav_cta()}</a>
-			<button
-				type="button"
-				class="nav-burger"
-				aria-label={menuOpen ? 'Menü schliessen' : 'Menü öffnen'}
-				aria-expanded={menuOpen}
-				aria-controls="mobile-menu"
-				onclick={() => (menuOpen = !menuOpen)}
-			>
-				{#if menuOpen}
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-				{:else}
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
-				{/if}
-			</button>
-		</div>
-		{#if menuOpen}
-			<div class="nav-mobile" id="mobile-menu">
-				<a href="#angebot" onclick={() => (menuOpen = false)}>{m.nav_services()}</a>
-				<a href="#about" onclick={() => (menuOpen = false)}>{m.nav_about()}</a>
-				<a href={localizeHref('/impulse')} onclick={() => (menuOpen = false)}>{m.nav_blog()}</a>
-				<a class="btn solid" href="#kontakt" onclick={() => (menuOpen = false)}>{m.h_nav_cta()}</a>
-			</div>
-		{/if}
-	</nav>
+	<!-- ═══════ NAVIGATION (geteilte Komponente) ═══════ -->
+	<SiteNav {theme} links={navLinks} ctaHref="#kontakt" subtitle="Break the Box" />
 
 	<!-- ═══════ ANKÜNDIGUNGS-STREIFEN (nur bei nahem Termin) ═══════ -->
 	{#if stripVisible && stripCandidate}
@@ -888,16 +855,8 @@
 				<h2 class="serif">{cfg.faq.title || m.section_faq_title()}</h2>
 				{#if cfg.faq.subtitle}<p class="sub">{cfg.faq.subtitle}</p>{/if}
 			</div>
-			<div class="faq-list reveal">
-				{#each faq.items as item, i}
-					<details class="faq-item" open={i === 0}>
-						<summary class="faq-question">
-							<span>{item.question}</span>
-							<span class="faq-icon" aria-hidden="true">+</span>
-						</summary>
-						<p class="faq-answer">{item.answer}</p>
-					</details>
-				{/each}
+			<div class="reveal">
+				<FaqList items={faq.items} firstOpen />
 			</div>
 		</div>
 	</section>
@@ -1001,116 +960,7 @@
 		background: var(--redd);
 	}
 
-	/* ═══════ NAV ═══════ */
-	.nav {
-		position: sticky;
-		top: 0;
-		z-index: var(--z-sticky);
-		background: color-mix(in srgb, var(--navbg) 90%, transparent);
-		backdrop-filter: blur(8px);
-		border-bottom: 1px solid var(--navline);
-		color: var(--navtext);
-		transition: box-shadow 0.3s ease;
-	}
-	.nav-scrolled {
-		box-shadow: 0 1px 10px rgba(120, 20, 40, 0.06);
-	}
-	.nav-inner {
-		max-width: 1280px;
-		margin: 0 auto;
-		padding: 18px 40px;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 20px;
-	}
-	.brand {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 11px;
-	}
-	.brand-cube {
-		width: 34px;
-		height: auto;
-		flex-shrink: 0;
-	}
-	.brand-txt {
-		display: flex;
-		flex-direction: column;
-		line-height: 1.05;
-	}
-	.brand-m {
-		font-family: var(--serif);
-		font-weight: 700;
-		font-size: 22px;
-		letter-spacing: -0.01em;
-	}
-	.brand-c {
-		font-family: var(--sans);
-		font-weight: 600;
-		font-size: 10px;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
-		color: var(--navaccent);
-		margin-top: 3px;
-	}
-	.nav-links {
-		display: flex;
-		gap: 34px;
-		font-size: 13px;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-	}
-	.nav-links a {
-		color: var(--navtext);
-		opacity: 0.7;
-		transition: opacity 0.2s, color 0.2s;
-	}
-	.nav-links a:hover,
-	.nav-links a.active {
-		opacity: 1;
-		color: var(--navaccent);
-	}
-	/* Burger + Mobile-Menü (Desktop: versteckt) */
-	.nav-burger {
-		display: none;
-		width: 42px;
-		height: 42px;
-		align-items: center;
-		justify-content: center;
-		background: none;
-		border: none;
-		color: var(--navtext);
-		cursor: pointer;
-		padding: 0;
-	}
-	.nav-burger svg {
-		width: 26px;
-		height: 26px;
-	}
-	.nav-mobile {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 4px;
-		padding: 6px 22px 20px;
-		border-top: 1px solid var(--navline);
-	}
-	.nav-mobile a {
-		display: block;
-		padding: 12px 0;
-		font-size: 15px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--navtext);
-	}
-	.nav-mobile a.btn {
-		margin-top: 8px;
-		padding: 14px 26px;
-	}
+	/* Nav lebt jetzt in der geteilten Komponente SiteNav.svelte */
 
 	/* ═══════ HERO ═══════ */
 	.hero {
@@ -2537,64 +2387,9 @@
 	.faq-container {
 		max-width: 820px;
 	}
-	.faq-list {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-	}
-	.faq-item {
-		background: #fff;
-		border: 1px solid var(--line);
-		border-radius: 12px;
-		transition: border-color 0.18s;
-	}
-	.faq-item[open] {
-		border-color: var(--red);
-	}
-	.faq-question {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 16px;
-		padding: 18px 22px;
-		cursor: pointer;
-		font-weight: 600;
-		font-size: 16px;
-		color: var(--ink);
-		list-style: none;
-	}
-	.faq-question::-webkit-details-marker {
-		display: none;
-	}
-	.faq-icon {
-		font-size: 22px;
-		font-weight: 300;
-		color: var(--red);
-		transition: transform 0.18s;
-		flex-shrink: 0;
-	}
-	.faq-item[open] .faq-icon {
-		transform: rotate(45deg);
-	}
-	.faq-answer {
-		padding: 0 22px 20px;
-		margin: 0;
-		color: var(--dim);
-		line-height: 1.65;
-		font-size: 14.5px;
-	}
 
 	/* ═══════ RESPONSIVE ═══════ */
 	@media (max-width: 980px) {
-		.nav-links {
-			display: none;
-		}
-		.nav-burger {
-			display: flex;
-		}
-		.nav-cta {
-			margin-left: auto;
-		}
 		.heroGrid {
 			min-height: 480px;
 		}
@@ -2689,12 +2484,6 @@
 		}
 		.role-label {
 			flex-basis: auto;
-		}
-		.nav-inner {
-			padding: 13px 18px;
-		}
-		.nav-inner .btn.solid {
-			display: none;
 		}
 		.wrap {
 			padding: 0 18px;

@@ -57,9 +57,9 @@
 			icon: '❝'
 		},
 		{
-			id: 'referenzprojekte',
+			id: 'transformation',
 			title: 'Transformation',
-			description: 'Drehbare Karten für die Subseite «Transformation»',
+			description: 'Die Service-Seite «Transformation» — Stufen, Spiegel, Case, FAQ',
 			icon: '▤'
 		},
 		{

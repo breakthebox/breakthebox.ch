@@ -1,15 +1,15 @@
 // ═══════════════════════════════════════════════════════════
-// Referenzprojekte — Server Load
+// Transformation — Server Load
 // ═══════════════════════════════════════════════════════════
 
 import type { PageServerLoad } from './$types';
 import { getSectionContent } from '$lib/server/db/queries/content';
-import { defaultReferenceProjects } from '$lib/server/content-defaults';
-import type { ReferenceProjectsContent } from '$lib/types/content';
+import { defaultTransformation } from '$lib/server/content-defaults';
+import type { TransformationContent } from '$lib/types/content';
 
 export const load: PageServerLoad = async () => {
-	const raw = await getSectionContent<ReferenceProjectsContent>('referenzprojekte');
+	const raw = await getSectionContent<TransformationContent>('transformation');
 	return {
-		content: { ...defaultReferenceProjects, ...((raw as Partial<ReferenceProjectsContent>) ?? {}) }
+		content: { ...defaultTransformation, ...((raw as Partial<TransformationContent>) ?? {}) }
 	};
 };

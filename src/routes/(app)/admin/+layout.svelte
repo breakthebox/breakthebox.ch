@@ -74,7 +74,7 @@
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H8l-4 3V5a1 1 0 0 1 1-1z"/></svg>
 					Stimmen
 				</a>
-				<a href="/admin/referenzprojekte" class="admin-sidebar-link">
+				<a href="/admin/transformation" class="admin-sidebar-link">
 					<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="12" height="10" rx="1.5"/><path d="M3 8h12M9 4v10"/></svg>
 					Transformation
 				</a>
