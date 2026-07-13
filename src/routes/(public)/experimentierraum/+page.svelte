@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages.js';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
@@ -157,12 +157,16 @@
 				<span class="kick">{c.discarded.kicker}</span>
 				<h2>{c.discarded.title}</h2>
 				<p class="lead">{c.discarded.lead}</p>
-				<div class="frow">
+				<div class="dgrid">
 					{#each c.discarded.items as item}
-						<div class="fcard">
-							<b>{item.title}</b>
-							<p>{item.text}</p>
-						</div>
+						<article class="dcard">
+							<div class="dcard-top">
+								<span class="dcard-x" aria-hidden="true">✕</span>
+								<span class="dcard-tag">Eingestellt</span>
+							</div>
+							<h3 class="dcard-t">{item.title}</h3>
+							<div class="dcard-d md">{@html renderMarkdownBlock(item.text)}</div>
+						</article>
 					{/each}
 				</div>
 			</div>
@@ -453,33 +457,64 @@
 		background: var(--bg-section-alt);
 		border-bottom: 1px solid var(--exp-line);
 	}
-	.frow {
+	.dgrid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 16px;
+		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+		gap: 18px;
 	}
-	.fcard {
-		border: 1px dashed var(--exp-muted);
-		border-radius: 14px;
-		padding: 20px 22px;
-		background: transparent;
+	.dcard {
+		display: flex;
+		flex-direction: column;
+		background: var(--exp-surface);
+		border: 1px solid var(--exp-line);
+		border-radius: 16px;
+		padding: 26px 28px;
+		box-shadow: var(--shadow-card);
 	}
-	.fcard b {
-		display: block;
+	.dcard-top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 16px;
+	}
+	.dcard-x {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 34px;
+		height: 34px;
+		border-radius: 50%;
+		background: var(--bg-section-alt);
+		border: 1px solid var(--exp-line);
+		color: var(--exp-muted);
+		font-size: 0.85rem;
+	}
+	.dcard-tag {
+		font-family: var(--ff-ui);
+		font-size: 0.6rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--exp-muted);
+	}
+	.dcard-t {
 		font-family: var(--ff-serif);
 		font-weight: 700;
-		font-size: 1rem;
-		margin-bottom: 6px;
+		font-size: 1.15rem;
+		line-height: 1.3;
+		color: var(--text-heading);
+		margin-bottom: 10px;
+	}
+	.dcard-d {
+		font-size: 0.88rem;
+		line-height: 1.65;
 		color: var(--exp-graphite);
 	}
-	.fcard b::before {
-		content: '✕ ';
-		color: var(--exp-accent-strong);
+	.dcard-d :global(p) {
+		margin-bottom: 8px;
 	}
-	.fcard p {
-		font-size: 0.85rem;
-		line-height: 1.6;
-		color: var(--exp-graphite);
+	.dcard-d :global(p:last-child) {
+		margin-bottom: 0;
 	}
 
 	/* ─── Transfer (dunkle Zitat-Box wie die Haltungs-Box) ─── */
@@ -611,11 +646,6 @@
 			grid-template-columns: 1fr;
 		}
 		.rules {
-			grid-template-columns: 1fr;
-		}
-	}
-	@media (max-width: 720px) {
-		.frow {
 			grid-template-columns: 1fr;
 		}
 	}
