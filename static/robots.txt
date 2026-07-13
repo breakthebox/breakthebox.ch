@@ -18,4 +18,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://breakthebox.ch/sitemap.xml
+Sitemap: https://web.breakthebox.ch/sitemap.xml
