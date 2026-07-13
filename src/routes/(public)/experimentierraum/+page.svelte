@@ -6,6 +6,7 @@
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+	import MissBizzyChat from '$lib/components/ui/MissBizzyChat.svelte';
 	import type { ExperimentierraumContent } from '$lib/types/content';
 
 	let { data } = $props();
@@ -81,6 +82,8 @@
 	{#if toast}
 		<div class="eb-toast" role="status">{toast}</div>
 	{/if}
+
+	<MissBizzyChat />
 
 	<SiteNav theme={data.theme} links={navLinks} subtitle="Experimentierraum" />
 
