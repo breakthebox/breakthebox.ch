@@ -47,7 +47,7 @@
 		{
 			id: 'experimentierraum',
 			title: 'Experimentierraum',
-			description: 'Plattformen und laufende Projekte (Subseite)',
+			description: 'Die Werkstatt-Seite «Experimentierraum» — Regeln, Werkbank mit Lehrgeld, Verworfen, Transfer',
 			icon: '⚡'
 		},
 		{

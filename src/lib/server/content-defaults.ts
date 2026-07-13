@@ -39,6 +39,7 @@ import type {
 	AngebotContent,
 	TestimonialsContent,
 	ExperimentsContent,
+	ExperimentierraumContent,
 	MetricsContent,
 	PartnersContent,
 	ManifestContent,
@@ -290,6 +291,131 @@ export const defaultExperiments: ExperimentsContent = {
 			status: 'Laufend'
 		}
 	]
+};
+
+export const defaultExperimentierraum: ExperimentierraumContent = {
+	hero: {
+		kicker: 'Experimentierraum · Die Werkstatt',
+		title: 'Ich verstehe, wovon ich rede — *weil ich es selbst baue.*',
+		subline:
+			'Neben Mandaten und Beratung betreibe ich eine digitale Werkstatt: eigene Plattformen, eigene KI-Agenten, eigene Infrastruktur. Hier wird nichts verkauft — hier wird gelernt. Auf eigene Rechnung, mit Lehrgeld inklusive.'
+	},
+	rules: [
+		{
+			no: 'Regel 01',
+			title: 'Selbst gebaut, selbst betrieben',
+			text: 'Alles hier läuft self-hosted auf eigener Infrastruktur. Wer Datenschutz empfiehlt, sollte wissen, was er kostet.'
+		},
+		{
+			no: 'Regel 02',
+			title: 'Nicht kommerziell',
+			text: 'Diese Experimente sind kein Angebot. Sie sind der Grund, warum meine Empfehlungen aus erster Hand stammen.'
+		},
+		{
+			no: 'Regel 03',
+			title: 'Ehrlich dokumentiert',
+			text: 'Jedes Experiment zeigt sein Lehrgeld — auch das, was nicht funktioniert hat. Sonst wäre es Marketing.'
+		}
+	],
+	bench: {
+		kicker: 'Die Werkbank',
+		title: 'Fünf Experimente, fünf Erkenntnisse',
+		lead: 'Jedes Projekt mit Status, Substanz — und dem, was ich dabei gelernt habe.',
+		items: [
+			{
+				key: 'missgovern',
+				image: '/api/uploads/platform-logo-3-header-1783000467219.webp',
+				status: 'Live · Bühne & Web',
+				name: 'Mis(s)Govern',
+				what: 'KI-Readiness als Simulation — Governance spielen statt predigen',
+				desc: 'Eine Firma übernehmen, sieben KI-Entscheidungen treffen, Kipppunkte erleben: Die Simulation macht abstrakte Governance zu Konsequenzen. Herzstück meiner Keynote am Dänksymposium 2026.',
+				stack: ['SvelteKit', 'PostgreSQL', 'AI-Scan', 'self-hosted'],
+				url: 'https://missgovern.breakthebox.ch',
+				urlLabel: 'missgovern.breakthebox.ch',
+				lehrgeld:
+					'Spielmechanik ist härter als Software: Eine Simulation, die zu leicht gewinnbar ist, lehrt das Falsche. Balancing hat mich mehr Iterationen gekostet als der ganze Code.'
+			},
+			{
+				key: 'miss-bizzy',
+				image: '/api/uploads/project-image-0-header-1782999447508.webp',
+				status: 'Im täglichen Einsatz',
+				name: 'Miss Bizzy',
+				what: 'Ein Universum von KI-Agenten für den Firmenalltag',
+				desc: 'Selbst gehostete n8n-Agenten für E-Mail, Controlling, Wissensmanagement, Recherche und CRM — seit über einem Jahr im Betrieb. Der ganze Erfahrungsbericht steht im Blog.',
+				stack: ['n8n', 'self-hosted', '24/7'],
+				url: '/impulse',
+				urlLabel: 'Zum Erfahrungsbericht «Queen of AI Agents»',
+				lehrgeld:
+					'Der ehrliche ROI: finanziell fraglich, als Lerneffekt unbezahlbar. Und: Sichere Agenten brauchen eigene Infrastruktur — ein Low-Code-Abo genügt nicht.'
+			},
+			{
+				key: 'ductivo',
+				image: '/api/uploads/platform-logo-0-header-1782999247782.webp',
+				status: 'Live · im Hochschuleinsatz',
+				name: 'Ductivo',
+				what: 'KI-Tutor «Duci» — Hinweise statt Lösungen',
+				desc: 'Lernplattform für Projektmanagement an Schweizer Hochschulen. Der Tutor gibt Scaffolding statt Antworten: Er führt zum Denken, statt es abzunehmen.',
+				stack: ['KI-Tutoring', 'Hochschule'],
+				url: 'https://www.ductivo.ch',
+				urlLabel: 'www.ductivo.ch',
+				lehrgeld:
+					'Eine KI dazu zu bringen, *nicht* zu antworten, ist schwieriger, als sie antworten zu lassen. Didaktik lässt sich nicht prompten — sie muss ins System. *[verifizieren]*'
+			},
+			{
+				key: 'entorakel',
+				image: '/api/uploads/platform-logo-1-header-1782999252572.webp',
+				status: 'Live',
+				name: 'Ent.Orakel',
+				what: 'Systemik erfahrbar machen',
+				desc: 'Interaktives Werkzeug für komplexe Zusammenhänge: DCIA-Matrix, Szenarien, Frühwarnindikatoren — Systemdenken zum Anfassen statt als Theorie-Folie.',
+				stack: ['Systemik', 'Szenarien'],
+				url: 'https://entorakel.breakthebox.ch',
+				urlLabel: 'entorakel.breakthebox.ch',
+				lehrgeld:
+					'Komplexität kann man nicht erklären, nur erleben lassen — dieselbe Erkenntnis, die später Mis(s)Govern geprägt hat. *[verifizieren]*'
+			},
+			{
+				key: 'marketingcockpit',
+				image: '/api/uploads/platform-logo-2-header-1782999257028.webp',
+				status: 'Live',
+				name: 'marketingcockpit.ai',
+				what: 'Strategie als lebendiger Prozess',
+				desc: 'KI-gestützte Marketing-Strategien nach Lombriser/Abplanalp — von der Analyse bis zur Balanced Scorecard. Entstanden, um zu prüfen, wie weit KI strukturierte Strategiearbeit trägt.',
+				stack: ['KI-Strategie', 'Lombriser/Abplanalp'],
+				url: 'https://marketingcockpit.ai',
+				urlLabel: 'marketingcockpit.ai',
+				lehrgeld:
+					'KI liefert saubere Struktur und schnelle Entwürfe — aber die strategische Entscheidung bleibt Handarbeit. Genau da verläuft die Grenze, über die ich in Gremien rede. *[verifizieren]*'
+			}
+		]
+	},
+	discarded: {
+		kicker: 'Der Ehrlichkeit halber',
+		title: 'Verworfen',
+		lead: 'Ein Experimentierraum ohne Fehlversuche wäre ein Schaufenster. Diese Ideen haben es nicht geschafft — und auch das war Lehrgeld.',
+		items: [
+			{
+				title: '[Verworfenes Experiment 1]',
+				text: 'Was es war, warum es scheiterte, was es gelehrt hat. [von Brigitte zu füllen — z.B. ein Agent, der wieder abgeschaltet wurde, ein Tool-Ansatz, der nicht trug]'
+			},
+			{
+				title: '[Verworfenes Experiment 2]',
+				text: 'Auch ein bewusst beendetes Experiment gehört hierhin — Aufhören ist ein Ergebnis. [von Brigitte zu füllen]'
+			}
+		]
+	},
+	transfer: {
+		kicker: 'Warum das alles',
+		quote: '«Ich empfehle nichts, was ich nicht selbst ausprobiert habe.»',
+		text: 'Dieser Raum ist der Grund, warum dieser Satz kein Marketing ist. Neugier ist bei mir keine Spielerei — sie ist Sorgfaltspflicht: Wer Technologie beurteilen soll, muss sie angefasst haben. Mehr dazu [im Manifest →](/manifest)'
+	},
+	softCta: {
+		text: 'Hier gibt es nichts zu kaufen. Aber wenn du wissen willst, was diese Experimente für eure Organisation bedeuten — das ist dann meine andere Werkstatt.',
+		primaryLabel: 'Zur Beratung',
+		primaryHref: '/#angebot',
+		secondaryLabel: 'Impulse lesen',
+		secondaryHref: '/impulse'
+	}
 };
 
 export const defaultReferences: ReferencesContent = {

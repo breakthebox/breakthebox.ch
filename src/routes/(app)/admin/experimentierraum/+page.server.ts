@@ -1,13 +1,13 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getSectionContent, saveSectionContent } from '$lib/server/db/queries/content';
-import { defaultExperiments, normalizeExperiments } from '$lib/server/content-defaults';
-import type { ExperimentsContent } from '$lib/types/content';
+import { defaultExperimentierraum, mergeContent } from '$lib/server/content-defaults';
+import type { ExperimentierraumContent } from '$lib/types/content';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
-	const raw = await getSectionContent<ExperimentsContent>('experiments');
+	const raw = await getSectionContent<ExperimentierraumContent>('experimentierraum');
 	return {
-		content: normalizeExperiments(raw ?? defaultExperiments)
+		content: mergeContent(defaultExperimentierraum, raw)
 	};
 };
 
@@ -21,30 +21,21 @@ export const actions: Actions = {
 		}
 
 		try {
-			const parsed = JSON.parse(json);
+			const content = JSON.parse(json) as ExperimentierraumContent;
 
-			if (!Array.isArray(parsed.platforms) || !Array.isArray(parsed.projects)) {
-				return fail(400, { error: 'Ungültige Daten.' });
+			if (!content.hero || !content.bench || !content.transfer) {
+				return fail(400, { error: 'Ungültige Daten — Grundstruktur fehlt.' });
 			}
-			// Normalisieren (desc → Abschnitte-Array, leere Absätze entfernen)
-			const content = normalizeExperiments(parsed);
-			content.platforms = content.platforms.map((p) => ({
-				...p,
-				desc: p.desc.map((d) => d.trim()).filter(Boolean)
-			}));
-
-			for (const p of content.platforms) {
-				if (!p.name) {
-					return fail(400, { error: 'Jede Plattform braucht einen Namen.' });
-				}
+			if (!content.hero.title?.trim()) {
+				return fail(400, { error: 'Der Hero braucht einen Titel.' });
 			}
-			for (const p of content.projects) {
-				if (!p.name || !p.desc) {
-					return fail(400, { error: 'Jedes Projekt braucht einen Namen und eine Beschreibung.' });
+			for (const exp of content.bench.items ?? []) {
+				if (!exp.name?.trim()) {
+					return fail(400, { error: 'Jedes Experiment braucht einen Namen.' });
 				}
 			}
 
-			await saveSectionContent('experiments', content, locals.user?.id);
+			await saveSectionContent('experimentierraum', content, locals.user?.id);
 			return { success: true };
 		} catch {
 			return fail(400, { error: 'Ungültiges JSON-Format.' });

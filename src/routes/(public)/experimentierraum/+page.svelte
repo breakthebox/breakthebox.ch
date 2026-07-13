@@ -1,15 +1,23 @@
 <script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import { renderMarkdown } from '$lib/utils/markdown';
+	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
-	import MissBizzyChat from '$lib/components/ui/MissBizzyChat.svelte';
-	import type { ExperimentsContent } from '$lib/types/content';
+	import type { ExperimentierraumContent } from '$lib/types/content';
 
 	let { data } = $props();
-	const experiments: ExperimentsContent = data.experiments;
+	const c: ExperimentierraumContent = data.content;
+
+	// Nav-Links zeigen auf die Startseiten-Sektionen (Unterseite).
+	const home = localizeHref('/');
+	const navLinks = [
+		{ href: `${home}#angebot`, label: m.nav_services() },
+		{ href: `${home}#about`, label: m.nav_about() },
+		{ href: localizeHref('/impulse'), label: m.nav_blog() }
+	];
 
 	let eightBit = $state(false);
 	let toast = $state('');
@@ -18,7 +26,7 @@
 		// Konsolen-Easter-Egg für Devs
 		console.log(
 			'%c🍓 Break the Box · Experimentierraum',
-			'color:#B11E2C;font-size:15px;font-weight:bold'
+			'color:#0f7c82;font-size:15px;font-weight:bold'
 		);
 		console.log(
 			'%cDu liest die Konsole? Dann sind wir uns sympathisch. Schreib mir: info@breakthebox.ch',
@@ -49,8 +57,11 @@
 </script>
 
 <svelte:head>
-	<title>{m.exp_page_title()} — Brigitte Hulliger | Break the Box</title>
-	<meta name="description" content={m.exp_page_subtitle()} />
+	<title>Experimentierraum — Brigitte Hulliger | Break the Box</title>
+	<meta
+		name="description"
+		content="Die Werkstatt statt Portfolio: eigene Plattformen, KI-Agenten und Infrastruktur — self-hosted, nicht kommerziell, ehrlich dokumentiert. Ich empfehle nichts, was ich nicht selbst gebaut habe."
+	/>
 </svelte:head>
 
 <!-- Pixel-Filter (Easter-Egg / Hover) -->
@@ -64,67 +75,93 @@
 	</filter>
 </svg>
 
-<div class="sub" class:is-8bit={eightBit}>
+<div class="exp" class:is-8bit={eightBit}>
 	<ScrollProgress />
+
 	{#if toast}
 		<div class="eb-toast" role="status">{toast}</div>
 	{/if}
-	<MissBizzyChat />
-	<header class="subbar">
-		<SubpageBrand subtitle="Experimentierraum" />
-		<a href={localizeHref('/')} class="back">← {m.exp_back()}</a>
+
+	<SiteNav theme={data.theme} links={navLinks} subtitle="Experimentierraum" />
+
+	<!-- ═══════ Hero ═══════ -->
+	<header class="hero">
+		<div class="wrap">
+			<span class="kick">{c.hero.kicker}</span>
+			<div class="hero-lead">
+				<h1 class="md">{@html renderMarkdown(c.hero.title)}</h1>
+				<div class="hero-side">
+					<p class="sub">{c.hero.subline}</p>
+				</div>
+			</div>
+
+			{#if c.rules.length}
+				<div class="rules">
+					{#each c.rules as rule}
+						<div class="rule">
+							<span class="rn">{rule.no}</span>
+							<b>{rule.title}</b>
+							<p>{rule.text}</p>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
 	</header>
 
-	<section class="hero">
-		<div class="wrap">
-			<div class="kick">{m.exp_page_title()}</div>
-			<h1>{m.exp_page_subtitle()}</h1>
-			<p class="intro">{m.exp_intro()}</p>
-		</div>
-	</section>
-
+	<!-- ═══════ Werkbank ═══════ -->
 	<section class="block">
 		<div class="wrap">
-			<h2 class="block-title">{m.exp_platforms_label()}</h2>
-			<div class="grid">
-				{#each experiments.platforms as p}
-					<div class="card">
-						{#if p.image}
-							<img src={p.image} alt={p.name} class="card-img" loading="lazy" />
+			<span class="kick">{c.bench.kicker}</span>
+			<h2>{c.bench.title}</h2>
+			<p class="lead">{c.bench.lead}</p>
+
+			<div class="bench">
+				{#each c.bench.items as exp}
+					<article class="wb">
+						{#if exp.image}
+							<div class="wb-img"><img src={exp.image} alt={exp.name} loading="lazy" /></div>
 						{/if}
-						<h3>{p.name}</h3>
-						{#if p.sketch}<span class="sketch">{p.sketch}</span>{/if}
-						{#each p.desc as para}
-							<p>{para}</p>
-						{/each}
-						{#if p.url}
-							<a href={p.url} target="_blank" rel="noopener noreferrer" class="card-link">{m.exp_visit()} →</a>
+						<div class="wb-body">
+							{#if exp.status}<span class="status">{exp.status}</span>{/if}
+							<h3>{exp.name}</h3>
+							{#if exp.what}<p class="what">{exp.what}</p>{/if}
+							<p class="desc">{exp.desc}</p>
+							{#if exp.stack?.length}
+								<div class="stack">
+									{#each exp.stack as tech}<span>{tech}</span>{/each}
+								</div>
+							{/if}
+							{#if exp.url}
+								<a class="visit" href={exp.url} target="_blank" rel="noopener noreferrer">
+									{exp.urlLabel || exp.url} →
+								</a>
+							{/if}
+						</div>
+						{#if exp.lehrgeld}
+							<div class="learn">
+								<span class="ll">Lehrgeld</span>
+								<p class="md">{@html renderMarkdown(exp.lehrgeld)}</p>
+							</div>
 						{/if}
-					</div>
+					</article>
 				{/each}
 			</div>
 		</div>
 	</section>
 
-	{#if experiments.projects.length > 0}
-		<section class="block block-alt">
+	<!-- ═══════ Verworfen ═══════ -->
+	{#if c.discarded.items.length}
+		<section class="failed">
 			<div class="wrap">
-				<h2 class="block-title">{m.exp_projects_label()}</h2>
-				<div class="grid">
-					{#each experiments.projects as project}
-						<div class="card">
-							{#if project.image}
-								<img src={project.image} alt={project.name} class="card-img" loading="lazy" />
-							{/if}
-							<div class="card-head">
-								<h3>{project.name}</h3>
-								{#if project.status}<span class="status">{project.status}</span>{/if}
-							</div>
-							{#if project.sketch}<span class="sketch">{project.sketch}</span>{/if}
-							<p>{project.desc}</p>
-							{#if project.url}
-								<a href={project.url} target="_blank" rel="noopener noreferrer" class="card-link">{m.exp_visit()} →</a>
-							{/if}
+				<span class="kick">{c.discarded.kicker}</span>
+				<h2>{c.discarded.title}</h2>
+				<p class="lead">{c.discarded.lead}</p>
+				<div class="frow">
+					{#each c.discarded.items as item}
+						<div class="fcard">
+							<b>{item.title}</b>
+							<p>{item.text}</p>
 						</div>
 					{/each}
 				</div>
@@ -132,128 +169,412 @@
 		</section>
 	{/if}
 
+	<!-- ═══════ Transfer (dunkle Zitat-Box) ═══════ -->
+	<section class="transfer">
+		<div class="wrap">
+			<span class="kick kick-light">{c.transfer.kicker}</span>
+			<blockquote>{c.transfer.quote}</blockquote>
+			<p class="small md">{@html renderMarkdown(c.transfer.text)}</p>
+		</div>
+	</section>
+
+	<!-- ═══════ Soft CTA ═══════ -->
+	<section class="soft">
+		<div class="wrap">
+			<p>{c.softCta.text}</p>
+			<div class="soft-cta">
+				<a class="btn" href={c.softCta.primaryHref}>{c.softCta.primaryLabel} →</a>
+				<a class="btn ghost" href={c.softCta.secondaryHref}>{c.softCta.secondaryLabel}</a>
+			</div>
+		</div>
+	</section>
+
 	<ContactBand />
 	<SiteFooter />
 </div>
 
 <style>
-	.sub {
+	.exp {
+		--exp-accent: var(--btb-steel);
+		--exp-accent-strong: var(--btb-steel-hover);
+		--exp-accent-soft: var(--btb-teal-light);
+		--exp-ink: var(--text-heading);
+		--exp-paper: var(--bg-page);
+		--exp-surface: var(--bg-surface);
+		--exp-line: var(--border);
+		--exp-muted: var(--text-muted);
+		--exp-graphite: var(--text-secondary);
+
 		background: var(--bg-page);
 		color: var(--text-primary);
 		min-height: 100vh;
 	}
 	.wrap {
-		max-width: 1080px;
+		max-width: 960px;
 		margin: 0 auto;
-		padding: 0 34px;
+		padding: 0 24px;
 	}
-	.subbar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 18px 34px;
-		border-bottom: 1px solid var(--border);
-		background: rgba(251, 241, 236, 0.9);
-		backdrop-filter: blur(8px);
-		position: sticky;
-		top: 0;
-		z-index: var(--z-sticky);
+
+	/* Akzent-Auszeichnung aus Markdown (**fett** / *kursiv*) */
+	.md :global(strong) {
+		color: var(--exp-accent-strong);
+		font-weight: 700;
 	}
-	.back {
-		font-size: 0.82rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--text-secondary);
-		text-decoration: none;
-		transition: color 0.15s;
+	.md :global(em) {
+		color: var(--exp-accent-strong);
+		font-style: normal;
 	}
-	.back:hover {
-		color: var(--btb-steel);
+
+	/* ─── Section-Grundlagen ─── */
+	.block {
+		padding: 64px 0;
+		border-bottom: 1px solid var(--exp-line);
 	}
-	.hero {
-		padding: 70px 0 40px;
+	h2 {
+		font-family: var(--ff-serif);
+		font-weight: 700;
+		font-size: clamp(1.5rem, 3.4vw, 2rem);
+		color: var(--text-heading);
+		margin-bottom: 8px;
 	}
 	.kick {
+		display: block;
 		font-family: var(--ff-ui);
-		text-transform: uppercase;
-		letter-spacing: 0.2em;
 		font-size: 0.72rem;
 		font-weight: 600;
-		color: var(--btb-steel);
-		margin-bottom: 14px;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--exp-accent);
+		margin-bottom: 16px;
+	}
+	.lead {
+		color: var(--exp-graphite);
+		font-size: 0.97rem;
+		line-height: 1.7;
+		max-width: 62ch;
+		margin-bottom: 32px;
+	}
+
+	/* ─── Hero ─── */
+	.hero {
+		padding: 72px 0 60px;
+		border-bottom: 1px solid var(--exp-line);
+	}
+	.hero-lead {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: 44px;
+		align-items: center;
 	}
 	.hero h1 {
 		font-family: var(--ff-serif);
-		font-weight: 600;
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.05;
+		font-weight: 700;
+		font-size: clamp(2.1rem, 5.2vw, 3.2rem);
+		line-height: 1.1;
+		max-width: 20ch;
 		color: var(--text-heading);
-		max-width: 720px;
 	}
-	.intro {
-		margin-top: 18px;
-		font-size: 1.05rem;
-		line-height: 1.7;
-		color: var(--text-secondary);
-		max-width: 640px;
+	.hero-side {
+		padding-left: 20px;
+		border-left: 3px solid var(--exp-accent);
 	}
-	.block {
-		padding: 48px 0 60px;
-	}
-	.block-alt {
-		background: var(--bg-section-alt);
-		border-top: 1px solid var(--border);
-		border-bottom: 1px solid var(--border);
-	}
-	.block-title {
-		font-family: var(--ff-serif);
-		font-weight: 600;
-		font-size: 1.6rem;
-		color: var(--text-heading);
-		margin-bottom: 28px;
-	}
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: 22px;
-	}
-	.card {
-		background: var(--bg-surface);
-		border: 1px solid var(--border);
-		border-radius: 14px;
-		padding: 28px;
-		box-shadow: 0 18px 40px -34px rgba(120, 20, 40, 0.28);
-		display: flex;
-		flex-direction: column;
-	}
-	.card-img {
-		width: 100%;
-		height: 150px;
-		object-fit: cover;
-		border-radius: 8px;
-		margin-bottom: 16px;
-		transition: filter 0.12s steps(2);
-	}
-	/* Pixel-Effekt beim Hover */
-	.card:hover .card-img {
-		filter: url(#pixelate);
+	.hero .sub {
+		color: var(--exp-graphite);
+		font-size: 1.02rem;
+		line-height: 1.6;
+		max-width: 46ch;
+		margin: 0;
 	}
 
-	/* ═══════ 8-BIT-MODUS (Konami-Code) ═══════ */
-	.is-8bit .card-img {
+	/* ─── Regeln des Raums ─── */
+	.rules {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 16px;
+		margin-top: 40px;
+	}
+	.rule {
+		background: var(--exp-surface);
+		border: 1px solid var(--exp-line);
+		border-top: 3px solid var(--exp-accent);
+		border-radius: 4px 4px 16px 16px;
+		padding: 20px 22px;
+		box-shadow: var(--shadow-card);
+	}
+	.rule .rn {
+		font-family: var(--ff-ui);
+		font-size: 0.66rem;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--exp-muted);
+	}
+	.rule b {
+		display: block;
+		font-family: var(--ff-serif);
+		font-weight: 700;
+		font-size: 1.05rem;
+		color: var(--text-heading);
+		margin: 6px 0 6px;
+	}
+	.rule p {
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--exp-graphite);
+	}
+
+	/* ─── Werkbank (2-Spalten-Karten) ─── */
+	.bench {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 22px;
+	}
+	.wb {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		background: var(--exp-surface);
+		border: 1px solid var(--exp-line);
+		border-radius: 16px;
+		overflow: hidden;
+		box-shadow: var(--shadow-card);
+	}
+	.wb-img {
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		border-bottom: 1px solid var(--exp-line);
+	}
+	.wb-img img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		transition: filter 0.12s steps(2), transform 0.4s ease;
+	}
+	.wb:hover .wb-img img {
+		transform: scale(1.03);
+	}
+	.wb-body {
+		display: flex;
+		flex-direction: column;
+		padding: 26px 28px 22px;
+	}
+	.status {
+		display: inline-block;
+		font-family: var(--ff-ui);
+		font-size: 0.66rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--exp-accent-strong);
+		background: var(--btb-steel-subtle);
+		border: 1px solid color-mix(in srgb, var(--exp-accent) 30%, transparent);
+		border-radius: 100px;
+		padding: 4px 12px;
+		margin-bottom: 12px;
+	}
+	.status::before {
+		content: '● ';
+	}
+	.wb h3 {
+		font-family: var(--ff-serif);
+		font-weight: 700;
+		font-size: 1.35rem;
+		color: var(--text-heading);
+		margin-bottom: 3px;
+	}
+	.wb .what {
+		font-family: var(--ff-serif);
+		font-style: italic;
+		font-size: 0.95rem;
+		color: var(--exp-accent-strong);
+		margin-bottom: 10px;
+	}
+	.wb .desc {
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--text-primary);
+	}
+	.stack {
+		display: flex;
+		gap: 7px;
+		flex-wrap: wrap;
+		margin-top: 14px;
+	}
+	.stack span {
+		font-family: var(--ff-ui);
+		font-size: 0.68rem;
+		color: var(--exp-graphite);
+		border: 1px solid var(--exp-line);
+		border-radius: 100px;
+		padding: 3px 11px;
+		background: var(--bg-section-alt);
+	}
+	.visit {
+		display: inline-block;
+		margin-top: 14px;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--exp-accent-strong);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.visit:hover {
+		color: var(--exp-accent);
+	}
+	.learn {
+		margin-top: auto;
+		border-top: 1px solid color-mix(in srgb, var(--exp-accent) 18%, transparent);
+		background: var(--bg-section-alt);
+		padding: 18px 28px 20px;
+	}
+	.learn .ll {
+		display: inline-block;
+		font-family: var(--ff-ui);
+		font-size: 0.6rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--exp-accent-strong);
+		margin-bottom: 8px;
+	}
+	.learn .ll::before {
+		content: '→ ';
+	}
+	.learn p {
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--text-primary);
+	}
+
+	/* ─── Verworfen ─── */
+	.failed {
+		padding: 64px 0;
+		background: var(--bg-section-alt);
+		border-bottom: 1px solid var(--exp-line);
+	}
+	.frow {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 16px;
+	}
+	.fcard {
+		border: 1px dashed var(--exp-muted);
+		border-radius: 14px;
+		padding: 20px 22px;
+		background: transparent;
+	}
+	.fcard b {
+		display: block;
+		font-family: var(--ff-serif);
+		font-weight: 700;
+		font-size: 1rem;
+		margin-bottom: 6px;
+		color: var(--exp-graphite);
+	}
+	.fcard b::before {
+		content: '✕ ';
+		color: var(--exp-accent-strong);
+	}
+	.fcard p {
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--exp-graphite);
+	}
+
+	/* ─── Transfer (dunkle Zitat-Box wie die Haltungs-Box) ─── */
+	.transfer {
+		padding: 64px 0;
+		background: radial-gradient(
+			120% 130% at 18% 0%,
+			color-mix(in srgb, var(--exp-ink) 74%, #6b7280) 0%,
+			var(--exp-ink) 60%,
+			#14090b 118%
+		);
+		border-bottom: 1px solid var(--exp-line);
+	}
+	.kick-light {
+		color: var(--exp-accent-soft);
+	}
+	.transfer blockquote {
+		font-family: var(--ff-serif);
+		font-style: italic;
+		font-weight: 600;
+		font-size: clamp(1.25rem, 3vw, 1.7rem);
+		line-height: 1.4;
+		max-width: 34ch;
+		color: #fff;
+	}
+	.transfer .small {
+		color: rgba(255, 255, 255, 0.78);
+		font-size: 0.9rem;
+		line-height: 1.7;
+		max-width: 58ch;
+		margin-top: 18px;
+	}
+	.transfer .small :global(a) {
+		color: var(--exp-accent-soft);
+		font-weight: 600;
+		text-decoration: none;
+	}
+	.transfer .small :global(a:hover) {
+		text-decoration: underline;
+	}
+
+	/* ─── Soft CTA ─── */
+	.soft {
+		padding: 64px 0;
+		text-align: center;
+	}
+	.soft p {
+		color: var(--exp-graphite);
+		font-size: 1rem;
+		line-height: 1.7;
+		max-width: 52ch;
+		margin: 0 auto 24px;
+	}
+	.soft-cta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		justify-content: center;
+	}
+	.btn {
+		display: inline-block;
+		background: var(--exp-accent);
+		color: #fff;
+		text-decoration: none;
+		font-weight: 700;
+		font-size: 0.95rem;
+		padding: 15px 30px;
+		border-radius: var(--radius-md);
+		transition: transform 0.15s, background 0.15s;
+	}
+	.btn:hover {
+		transform: translateY(-2px);
+		background: var(--exp-accent-strong);
+	}
+	.btn.ghost {
+		background: transparent;
+		border: 1.5px solid var(--exp-accent);
+		color: var(--exp-accent-strong);
+	}
+	.btn.ghost:hover {
+		background: var(--btb-steel-subtle);
+	}
+
+	/* ─── 8-Bit-Modus (Konami-Code) ─── */
+	.is-8bit .wb-img img {
 		filter: url(#pixelate);
 		image-rendering: pixelated;
 	}
 	.is-8bit .hero h1,
-	.is-8bit .block-title,
-	.is-8bit .card h3,
+	.is-8bit h2,
+	.is-8bit .wb h3,
+	.is-8bit .rule b,
 	.is-8bit .kick {
 		font-family: var(--ff-mono, monospace);
 		letter-spacing: 0;
-	}
-	.is-8bit .sketch {
-		font-family: var(--ff-mono, monospace);
 	}
 	.eb-toast {
 		position: fixed;
@@ -270,69 +591,42 @@
 		border-radius: 8px;
 		box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.5);
 	}
-	@media (prefers-reduced-motion: reduce) {
-		.card-img {
-			transition: none;
+
+	/* ─── Responsive ─── */
+	@media (max-width: 860px) {
+		.hero-lead {
+			grid-template-columns: 1fr;
+			gap: 24px;
+		}
+		.hero-side {
+			border-left: none;
+			padding-left: 0;
+		}
+		.hero .sub {
+			max-width: 52ch;
 		}
 	}
-	.card-head {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 12px;
+	@media (max-width: 780px) {
+		.bench {
+			grid-template-columns: 1fr;
+		}
+		.rules {
+			grid-template-columns: 1fr;
+		}
 	}
-	.card h3 {
-		font-family: var(--ff-serif);
-		font-weight: 600;
-		font-size: 1.2rem;
-		color: var(--text-heading);
-	}
-	.status {
-		flex-shrink: 0;
-		font-size: 0.68rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		padding: 4px 10px;
-		border-radius: 999px;
-		background: var(--btb-teal-subtle);
-		color: var(--btb-steel);
-	}
-	.sketch {
-		display: block;
-		font-family: var(--ff-sketch);
-		font-size: 1.15rem;
-		color: var(--btb-steel);
-		margin: 6px 0 10px;
-	}
-	.card p {
-		font-size: 0.9rem;
-		line-height: 1.6;
-		color: var(--text-secondary);
-		margin-bottom: 10px;
-	}
-	.card p:last-of-type {
-		margin-bottom: 0;
-	}
-	.card-link {
-		display: inline-block;
-		margin-top: auto;
-		padding-top: 16px;
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: var(--btb-steel);
-		text-decoration: none;
-		transition: color 0.15s;
-	}
-	.card-link:hover {
-		color: var(--btb-steel-hover);
+	@media (max-width: 720px) {
+		.frow {
+			grid-template-columns: 1fr;
+		}
 	}
 	@media (max-width: 560px) {
 		.wrap {
 			padding: 0 18px;
 		}
-		.subbar {
-			padding: 14px 18px;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.wb-img img {
+			transition: none;
 		}
 	}
 </style>

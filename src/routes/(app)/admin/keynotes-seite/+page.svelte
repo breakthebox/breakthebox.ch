@@ -221,6 +221,7 @@
 							</div>
 							<div class="field"><label class="field-label" for="lt-{i}">Titel <span class="field-hint">z.B. «CAS Projektmanagement»</span></label><input id="lt-{i}" type="text" class="field-input" bind:value={item.title} /></div>
 							<div class="field"><label class="field-label" for="lo-{i}">Institution</label><input id="lo-{i}" type="text" class="field-input" bind:value={item.org} /></div>
+							<div class="field"><label class="field-label" for="lu-{i}">Link zum Lehrgang <span class="field-hint">optional — Anmeldung / Info</span></label><input id="lu-{i}" type="text" class="field-input" bind:value={item.url} placeholder="https://…" /></div>
 						</AdminAccordionItem>
 					{/each}
 				</div>
