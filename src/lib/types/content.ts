@@ -174,6 +174,64 @@ export interface ExperimentsContent {
 	projects: ExperimentProject[];
 }
 
+// ─── Experimentierraum (redaktionelle Seite «Werkstatt») ───
+export interface ExpRule {
+	no: string; // z.B. «Regel 01»
+	title: string;
+	text: string;
+}
+
+export interface ExpExperiment {
+	key?: string;
+	status: string; // z.B. «Live · Bühne & Web»
+	name: string;
+	what: string; // kursiver Untertitel
+	desc: string;
+	stack: string[]; // Tech-Tags
+	url?: string;
+	urlLabel?: string; // Beschriftung des Besuchs-Links
+	lehrgeld: string; // die Lernspalte (Markdown erlaubt)
+	image?: string;
+}
+
+export interface ExpDiscarded {
+	title: string;
+	text: string;
+}
+
+export interface ExperimentierraumContent {
+	hero: {
+		kicker: string;
+		title: string; // Markdown-Akzent erlaubt
+		subline: string;
+	};
+	rules: ExpRule[];
+	bench: {
+		kicker: string;
+		title: string;
+		lead: string;
+		items: ExpExperiment[];
+	};
+	discarded: {
+		kicker: string;
+		title: string;
+		lead: string;
+		items: ExpDiscarded[];
+	};
+	transfer: {
+		kicker: string;
+		quote: string;
+		text: string; // Markdown-Link erlaubt
+	};
+	softCta: {
+		text: string;
+		primaryLabel: string;
+		primaryHref: string;
+		secondaryLabel: string;
+		secondaryHref: string;
+	};
+}
+
 // ─── Referenzprojekte ───
 export interface ReferenceProject {
 	key?: string;
@@ -494,6 +552,7 @@ export interface KeynotesLehreItem {
 	title: string; // z.B. «CAS Projektmanagement»
 	org: string; // z.B. «Berner Fachhochschule»
 	note?: string; // optionaler Zusatz, z.B. «ehemals» oder «ab 2027»
+	url?: string; // optionaler Link zum Lehrgang (Anmeldung / Info)
 }
 
 export interface KeynotesLehre {
@@ -781,6 +840,7 @@ export type SectionKey =
 	| 'angebot'
 	| 'testimonials'
 	| 'experiments'
+	| 'experimentierraum'
 	| 'metrics'
 	| 'partners'
 	| 'manifest'
@@ -804,6 +864,7 @@ export type SectionContent =
 	| AngebotContent
 	| TestimonialsContent
 	| ExperimentsContent
+	| ExperimentierraumContent
 	| MetricsContent
 	| PartnersContent
 	| ManifestContent

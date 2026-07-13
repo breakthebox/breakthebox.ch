@@ -1,100 +1,36 @@
 <script lang="ts">
-	import type { ExperimentsContent } from '$lib/types/content';
-	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
+	import type { ExperimentierraumContent } from '$lib/types/content';
 	import AdminAccordionItem from '$lib/components/ui/AdminAccordionItem.svelte';
+	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
 
 	let { data, form } = $props();
-	let content = $state<ExperimentsContent>(structuredClone(data.content));
+	let content = $state<ExperimentierraumContent>(structuredClone(data.content));
 	let saving = $state(false);
 	let showSuccess = $state(false);
-	let expandedPlatform = $state<number | null>(0);
-	let expandedProject = $state<number | null>(0);
 
-	function togglePlatform(i: number) {
-		expandedPlatform = expandedPlatform === i ? null : i;
-	}
-	function toggleProject(i: number) {
-		expandedProject = expandedProject === i ? null : i;
-	}
+	let expRules = $state<number | null>(null);
+	let expBench = $state<number | null>(0);
+	let expDiscarded = $state<number | null>(null);
 
-	function addPlatform() {
-		content.platforms.push({ key: 'platform-' + (content.platforms.length + 1), name: '', sketch: '', desc: [''], url: '', image: '' });
-		expandedPlatform = content.platforms.length - 1;
+	// Stack-Zeilen erst beim Speichern trimmen.
+	function cleaned(): ExperimentierraumContent {
+		const c = structuredClone($state.snapshot(content)) as ExperimentierraumContent;
+		c.bench.items = c.bench.items.map((e) => ({
+			...e,
+			stack: (e.stack ?? []).map((x) => x.trim()).filter(Boolean)
+		}));
+		return c;
 	}
-	function removePlatform(i: number) {
-		if (!confirm('Diese Plattform wirklich löschen?')) return;
-		content.platforms.splice(i, 1);
-		if (expandedPlatform !== null && expandedPlatform >= content.platforms.length) {
-			expandedPlatform = content.platforms.length - 1 >= 0 ? content.platforms.length - 1 : null;
-		}
-	}
-	function movePlatform(i: number, dir: -1 | 1) {
+	let serialized = $derived(JSON.stringify(cleaned()));
+
+	function move<T>(arr: T[], i: number, dir: -1 | 1): number {
 		const t = i + dir;
-		if (t < 0 || t >= content.platforms.length) return;
-		[content.platforms[i], content.platforms[t]] = [content.platforms[t], content.platforms[i]];
-		if (expandedPlatform === i) expandedPlatform = t;
-		else if (expandedPlatform === t) expandedPlatform = i;
+		if (t < 0 || t >= arr.length) return i;
+		[arr[i], arr[t]] = [arr[t], arr[i]];
+		return t;
 	}
-	function addParagraph(pi: number) {
-		content.platforms[pi].desc.push('');
-	}
-	function removeParagraph(pi: number, j: number) {
-		content.platforms[pi].desc.splice(j, 1);
-	}
-
-	function addProject() {
-		content.projects.push({ key: 'project-' + (content.projects.length + 1), name: '', sketch: '', desc: '', status: '', url: '', image: '' });
-		expandedProject = content.projects.length - 1;
-	}
-	function removeProject(i: number) {
-		if (!confirm('Dieses Projekt wirklich löschen?')) return;
-		content.projects.splice(i, 1);
-		if (expandedProject !== null && expandedProject >= content.projects.length) {
-			expandedProject = content.projects.length - 1 >= 0 ? content.projects.length - 1 : null;
-		}
-	}
-	function moveProject(i: number, dir: -1 | 1) {
-		const t = i + dir;
-		if (t < 0 || t >= content.projects.length) return;
-		[content.projects[i], content.projects[t]] = [content.projects[t], content.projects[i]];
-		if (expandedProject === i) expandedProject = t;
-		else if (expandedProject === t) expandedProject = i;
-	}
-
-	// Projekt (Work in Progress) → Plattform verschieben (desc-String → Abschnitte-Array)
-	function projectToPlatform(i: number) {
-		const p = content.projects[i];
-		content.platforms.push({
-			key: p.key ?? 'platform-' + (content.platforms.length + 1),
-			name: p.name,
-			sketch: p.sketch ?? '',
-			desc: p.desc ? [p.desc] : [''],
-			url: p.url ?? '',
-			image: p.image ?? ''
-		});
-		content.projects.splice(i, 1);
-		expandedPlatform = content.platforms.length - 1;
-		if (expandedProject !== null && expandedProject >= content.projects.length) {
-			expandedProject = content.projects.length - 1 >= 0 ? content.projects.length - 1 : null;
-		}
-	}
-	// Plattform → Projekt (Work in Progress) verschieben (Abschnitte → desc-String)
-	function platformToProject(i: number) {
-		const p = content.platforms[i];
-		content.projects.push({
-			key: p.key ?? 'project-' + (content.projects.length + 1),
-			name: p.name,
-			sketch: p.sketch ?? '',
-			desc: (p.desc ?? []).filter(Boolean).join('\n\n'),
-			status: '',
-			url: p.url ?? '',
-			image: p.image ?? ''
-		});
-		content.platforms.splice(i, 1);
-		expandedProject = content.projects.length - 1;
-		if (expandedPlatform !== null && expandedPlatform >= content.platforms.length) {
-			expandedPlatform = content.platforms.length - 1 >= 0 ? content.platforms.length - 1 : null;
-		}
+	function fromText(v: string): string[] {
+		return v.split('\n');
 	}
 
 	$effect(() => {
@@ -118,86 +54,153 @@
 			Zurück zum Dashboard
 		</a>
 		<h1>Experimentierraum</h1>
-		<p class="page-subtitle">Plattformen und laufende Projekte für die Subseite «Experimentierraum». Mit ⇄ verschiebst Du einen Eintrag zwischen «Projekte in Arbeit» und «Plattformen» — ohne ihn neu zu erfassen.</p>
+		<p class="page-subtitle">Der redaktionelle Inhalt der Seite «Experimentierraum» — Hero, Raum-Regeln, die Werkbank (Experimente mit Lehrgeld), «Verworfen», Transfer-Zitat und Soft-CTA. In Feldern mit dem Hinweis setzt <code class="hint-code">*Wort*</code> ein Wort in der Akzentfarbe.</p>
 	</div>
 
 	{#if showSuccess}<div class="toast toast-success">Änderungen erfolgreich gespeichert.</div>{/if}
 	{#if form?.error}<div class="toast toast-error">{form.error}</div>{/if}
 
 	<form method="POST" onsubmit={() => (saving = true)}>
-		<input type="hidden" name="content" value={JSON.stringify(content)} />
+		<input type="hidden" name="content" value={serialized} />
 
-		<h2 class="group-title">Plattformen</h2>
-		<div class="items">
-			{#each content.platforms as p, i}
-				<AdminAccordionItem
-					index={i}
-					total={content.platforms.length}
-					title={p.name || 'Neue Plattform'}
-					subtitle={p.key || undefined}
-					expanded={expandedPlatform === i}
-					removeLabel="Plattform löschen"
-					ontoggle={() => togglePlatform(i)}
-					onmoveup={() => movePlatform(i, -1)}
-					onmovedown={() => movePlatform(i, 1)}
-					onremove={() => removePlatform(i)}
-				>
-					<div class="field-row">
-						<div class="field"><label class="field-label" for="pn-{i}">Name</label><input id="pn-{i}" type="text" class="field-input" bind:value={p.name} /></div>
-						<div class="field"><label class="field-label" for="ps-{i}">Sketch-Notiz</label><input id="ps-{i}" type="text" class="field-input" bind:value={p.sketch} /></div>
-					</div>
-					<div class="field">
-						<label class="field-label">Beschreibung <span class="field-hint">ein oder mehrere Abschnitte</span></label>
-						{#each p.desc as _para, j}
-							<div class="para-row">
-								<textarea class="field-textarea" bind:value={p.desc[j]} rows="2" placeholder="Abschnitt {j + 1}…"></textarea>
-								{#if p.desc.length > 1}
-									<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeParagraph(i, j)} aria-label="Abschnitt löschen">&times;</button>
-								{/if}
+		<!-- Hero -->
+		<details class="card" open>
+			<summary class="card-head"><h2>Hero</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
+			<div class="card-body">
+				<div class="field"><label class="field-label" for="h-kick">Kicker</label><input id="h-kick" type="text" class="field-input" bind:value={content.hero.kicker} /></div>
+				<div class="field"><label class="field-label" for="h-title">Titel <span class="field-hint">*Wort* = Akzent</span></label><textarea id="h-title" class="field-textarea" rows="2" bind:value={content.hero.title}></textarea></div>
+				<div class="field"><label class="field-label" for="h-sub">Subline</label><textarea id="h-sub" class="field-textarea" rows="4" bind:value={content.hero.subline}></textarea></div>
+			</div>
+		</details>
+
+		<!-- Regeln des Raums -->
+		<details class="card">
+			<summary class="card-head"><h2>Regeln des Raums</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
+			<div class="card-body">
+				<p class="card-note">Die drei Karten unter dem Hero.</p>
+				<div class="items">
+					{#each content.rules as rule, i}
+						<AdminAccordionItem
+							index={i}
+							total={content.rules.length}
+							title={rule.title || 'Neue Regel'}
+							subtitle={rule.no || undefined}
+							expanded={expRules === i}
+							removeLabel="Regel löschen"
+							ontoggle={() => (expRules = expRules === i ? null : i)}
+							onmoveup={() => (expRules = move(content.rules, i, -1))}
+							onmovedown={() => (expRules = move(content.rules, i, 1))}
+							onremove={() => content.rules.splice(i, 1)}
+						>
+							<div class="field-row">
+								<div class="field"><label class="field-label" for="rn-{i}">Nummer <span class="field-hint">z.B. «Regel 01»</span></label><input id="rn-{i}" type="text" class="field-input" bind:value={rule.no} /></div>
+								<div class="field"><label class="field-label" for="rt-{i}">Titel</label><input id="rt-{i}" type="text" class="field-input" bind:value={rule.title} /></div>
 							</div>
-						{/each}
-						<button type="button" class="btn-add-sm" onclick={() => addParagraph(i)}>+ Abschnitt</button>
-					</div>
-					<div class="field-row">
-						<div class="field"><label class="field-label" for="pu-{i}">Link</label><input id="pu-{i}" type="text" class="field-input" bind:value={p.url} placeholder="https://…" /></div>
-						<div class="field field-full"><ImageUpload bind:value={p.image} section="platform-logo-{i}" label="Logo / Bild" /></div>
-					</div>
-					<button type="button" class="btn-move-list" onclick={() => platformToProject(i)}>⇄ Zu «Projekte in Arbeit» verschieben</button>
-				</AdminAccordionItem>
-			{/each}
-		</div>
-		<button type="button" class="btn-add" onclick={addPlatform}>+ Plattform hinzufügen</button>
+							<div class="field"><label class="field-label" for="rx-{i}">Text</label><textarea id="rx-{i}" class="field-textarea" rows="3" bind:value={rule.text}></textarea></div>
+						</AdminAccordionItem>
+					{/each}
+				</div>
+				<button type="button" class="btn-add" onclick={() => { content.rules.push({ no: `Regel 0${content.rules.length + 1}`, title: '', text: '' }); expRules = content.rules.length - 1; }}>+ Regel hinzufügen</button>
+			</div>
+		</details>
 
-		<h2 class="group-title">Projekte in Arbeit</h2>
-		<div class="items">
-			{#each content.projects as p, i}
-				<AdminAccordionItem
-					index={i}
-					total={content.projects.length}
-					title={p.name || 'Neues Projekt'}
-					subtitle={p.key || undefined}
-					expanded={expandedProject === i}
-					removeLabel="Projekt löschen"
-					ontoggle={() => toggleProject(i)}
-					onmoveup={() => moveProject(i, -1)}
-					onmovedown={() => moveProject(i, 1)}
-					onremove={() => removeProject(i)}
-				>
-					<div class="field-row">
-						<div class="field"><label class="field-label" for="jn-{i}">Name</label><input id="jn-{i}" type="text" class="field-input" bind:value={p.name} /></div>
-						<div class="field"><label class="field-label" for="jst-{i}">Status</label><input id="jst-{i}" type="text" class="field-input" bind:value={p.status} placeholder="z.B. Laufend" /></div>
-					</div>
-					<div class="field"><label class="field-label" for="js-{i}">Sketch-Notiz</label><input id="js-{i}" type="text" class="field-input" bind:value={p.sketch} /></div>
-					<div class="field"><label class="field-label" for="jd-{i}">Beschreibung</label><textarea id="jd-{i}" class="field-textarea" bind:value={p.desc} rows="2"></textarea></div>
-					<div class="field-row">
-						<div class="field"><label class="field-label" for="ju-{i}">Link</label><input id="ju-{i}" type="text" class="field-input" bind:value={p.url} placeholder="https://…" /></div>
-						<div class="field field-full"><ImageUpload bind:value={p.image} section="project-image-{i}" label="Bild (optional)" /></div>
-					</div>
-					<button type="button" class="btn-move-list" onclick={() => projectToPlatform(i)}>⇄ Zu «Plattformen» verschieben</button>
-				</AdminAccordionItem>
-			{/each}
-		</div>
-		<button type="button" class="btn-add" onclick={addProject}>+ Projekt hinzufügen</button>
+		<!-- Werkbank -->
+		<details class="card">
+			<summary class="card-head"><h2>Werkbank (Experimente)</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
+			<div class="card-body">
+				<div class="field"><label class="field-label" for="b-kick">Kicker</label><input id="b-kick" type="text" class="field-input" bind:value={content.bench.kicker} /></div>
+				<div class="field"><label class="field-label" for="b-title">Titel</label><input id="b-title" type="text" class="field-input" bind:value={content.bench.title} /></div>
+				<div class="field"><label class="field-label" for="b-lead">Lead</label><textarea id="b-lead" class="field-textarea" rows="2" bind:value={content.bench.lead}></textarea></div>
+
+				<div class="items">
+					{#each content.bench.items as exp, i}
+						<AdminAccordionItem
+							index={i}
+							total={content.bench.items.length}
+							title={exp.name || 'Neues Experiment'}
+							subtitle={exp.status || undefined}
+							expanded={expBench === i}
+							removeLabel="Experiment löschen"
+							ontoggle={() => (expBench = expBench === i ? null : i)}
+							onmoveup={() => (expBench = move(content.bench.items, i, -1))}
+							onmovedown={() => (expBench = move(content.bench.items, i, 1))}
+							onremove={() => content.bench.items.splice(i, 1)}
+						>
+							<div class="field-row">
+								<div class="field"><label class="field-label" for="en-{i}">Name</label><input id="en-{i}" type="text" class="field-input" bind:value={exp.name} /></div>
+								<div class="field"><label class="field-label" for="es-{i}">Status <span class="field-hint">z.B. «Live · Bühne & Web»</span></label><input id="es-{i}" type="text" class="field-input" bind:value={exp.status} /></div>
+							</div>
+							<div class="field"><label class="field-label" for="ew-{i}">Untertitel <span class="field-hint">kursiv im Akzent</span></label><input id="ew-{i}" type="text" class="field-input" bind:value={exp.what} /></div>
+							<div class="field"><label class="field-label" for="ed-{i}">Beschreibung</label><textarea id="ed-{i}" class="field-textarea" rows="3" bind:value={exp.desc}></textarea></div>
+							<div class="field"><label class="field-label" for="et-{i}">Tech-Tags <span class="field-hint">ein Tag pro Zeile</span></label><textarea id="et-{i}" class="field-textarea" rows="3" value={exp.stack.join('\n')} oninput={(e) => (exp.stack = fromText(e.currentTarget.value))}></textarea></div>
+							<div class="field-row">
+								<div class="field"><label class="field-label" for="eu-{i}">Link-URL <span class="field-hint">optional</span></label><input id="eu-{i}" type="text" class="field-input" bind:value={exp.url} placeholder="https://…" /></div>
+								<div class="field"><label class="field-label" for="el-{i}">Link-Label</label><input id="el-{i}" type="text" class="field-input" bind:value={exp.urlLabel} /></div>
+							</div>
+							<div class="field"><label class="field-label" for="eg-{i}">Lehrgeld <span class="field-hint">die Lernspalte · *Wort* = Akzent</span></label><textarea id="eg-{i}" class="field-textarea" rows="4" bind:value={exp.lehrgeld}></textarea></div>
+							<ImageUpload bind:value={exp.image} section="exp-{i}" label="Bild (optional, als Kartenkopf)" />
+						</AdminAccordionItem>
+					{/each}
+				</div>
+				<button type="button" class="btn-add" onclick={() => { content.bench.items.push({ status: 'Live', name: '', what: '', desc: '', stack: [], url: '', urlLabel: '', lehrgeld: '' }); expBench = content.bench.items.length - 1; }}>+ Experiment hinzufügen</button>
+			</div>
+		</details>
+
+		<!-- Verworfen -->
+		<details class="card">
+			<summary class="card-head"><h2>Verworfen</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
+			<div class="card-body">
+				<div class="field"><label class="field-label" for="v-kick">Kicker</label><input id="v-kick" type="text" class="field-input" bind:value={content.discarded.kicker} /></div>
+				<div class="field"><label class="field-label" for="v-title">Titel</label><input id="v-title" type="text" class="field-input" bind:value={content.discarded.title} /></div>
+				<div class="field"><label class="field-label" for="v-lead">Lead</label><textarea id="v-lead" class="field-textarea" rows="2" bind:value={content.discarded.lead}></textarea></div>
+
+				<div class="items">
+					{#each content.discarded.items as item, i}
+						<AdminAccordionItem
+							index={i}
+							total={content.discarded.items.length}
+							title={item.title || 'Neuer Fehlversuch'}
+							expanded={expDiscarded === i}
+							removeLabel="Eintrag löschen"
+							ontoggle={() => (expDiscarded = expDiscarded === i ? null : i)}
+							onmoveup={() => (expDiscarded = move(content.discarded.items, i, -1))}
+							onmovedown={() => (expDiscarded = move(content.discarded.items, i, 1))}
+							onremove={() => content.discarded.items.splice(i, 1)}
+						>
+							<div class="field"><label class="field-label" for="vt-{i}">Titel</label><input id="vt-{i}" type="text" class="field-input" bind:value={item.title} /></div>
+							<div class="field"><label class="field-label" for="vx-{i}">Text</label><textarea id="vx-{i}" class="field-textarea" rows="3" bind:value={item.text}></textarea></div>
+						</AdminAccordionItem>
+					{/each}
+				</div>
+				<button type="button" class="btn-add" onclick={() => { content.discarded.items.push({ title: '', text: '' }); expDiscarded = content.discarded.items.length - 1; }}>+ Eintrag hinzufügen</button>
+			</div>
+		</details>
+
+		<!-- Transfer -->
+		<details class="card">
+			<summary class="card-head"><h2>Transfer (dunkle Zitat-Box)</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
+			<div class="card-body">
+				<div class="field"><label class="field-label" for="t-kick">Kicker</label><input id="t-kick" type="text" class="field-input" bind:value={content.transfer.kicker} /></div>
+				<div class="field"><label class="field-label" for="t-quote">Zitat</label><textarea id="t-quote" class="field-textarea" rows="2" bind:value={content.transfer.quote}></textarea></div>
+				<div class="field"><label class="field-label" for="t-text">Text <span class="field-hint">[Label](url) = Link</span></label><textarea id="t-text" class="field-textarea" rows="3" bind:value={content.transfer.text}></textarea></div>
+			</div>
+		</details>
+
+		<!-- Soft CTA -->
+		<details class="card">
+			<summary class="card-head"><h2>Soft-CTA</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
+			<div class="card-body">
+				<div class="field"><label class="field-label" for="s-text">Text</label><textarea id="s-text" class="field-textarea" rows="3" bind:value={content.softCta.text}></textarea></div>
+				<div class="field-row">
+					<div class="field"><label class="field-label" for="s-pl">Button primär — Label</label><input id="s-pl" type="text" class="field-input" bind:value={content.softCta.primaryLabel} /></div>
+					<div class="field"><label class="field-label" for="s-ph">Button primär — Ziel</label><input id="s-ph" type="text" class="field-input" bind:value={content.softCta.primaryHref} /></div>
+				</div>
+				<div class="field-row">
+					<div class="field"><label class="field-label" for="s-sl">Button sekundär — Label</label><input id="s-sl" type="text" class="field-input" bind:value={content.softCta.secondaryLabel} /></div>
+					<div class="field"><label class="field-label" for="s-sh">Button sekundär — Ziel</label><input id="s-sh" type="text" class="field-input" bind:value={content.softCta.secondaryHref} /></div>
+				</div>
+			</div>
+		</details>
 
 		<div class="form-actions">
 			<button type="submit" class="btn-save" disabled={saving}>{saving ? 'Speichern...' : 'Speichern'}</button>
@@ -207,7 +210,7 @@
 
 <style>
 	.editor-page {
-		max-width: 800px;
+		max-width: 820px;
 	}
 	.page-header {
 		margin-bottom: var(--space-xl);
@@ -222,11 +225,12 @@
 		font-size: 0.92rem;
 		color: var(--text-secondary);
 	}
-	.group-title {
-		font-size: 1.05rem;
-		font-weight: 700;
-		color: var(--text-heading);
-		margin: var(--space-lg) 0 var(--space-md);
+	.hint-code {
+		font-family: var(--ff-mono);
+		font-size: 0.8rem;
+		background: var(--bg-elevated);
+		padding: 1px 5px;
+		border-radius: 4px;
 	}
 	.back-link {
 		display: inline-flex;
@@ -237,7 +241,6 @@
 		color: var(--text-secondary);
 		text-decoration: none;
 		margin-bottom: var(--space-md);
-		transition: color 0.15s;
 	}
 	.back-link:hover {
 		color: var(--btb-steel);
@@ -259,37 +262,65 @@
 		color: #be123c;
 		border: 1px solid var(--color-error);
 	}
+
+	.card {
+		background: var(--bg-surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+		margin-bottom: 12px;
+		overflow: hidden;
+	}
+	.card[open] {
+		border-color: var(--btb-steel);
+	}
+	.card-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 18px 24px;
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+	}
+	.card-head::-webkit-details-marker {
+		display: none;
+	}
+	.card-head:hover {
+		background: var(--bg-elevated);
+	}
+	.card-head h2 {
+		font-family: var(--ff-serif);
+		font-size: 1.2rem;
+		color: var(--text-heading);
+		margin: 0;
+	}
+	.card-chevron {
+		color: var(--text-muted);
+		font-size: 0.9rem;
+		transition: transform 0.2s;
+		flex-shrink: 0;
+	}
+	.card[open] .card-chevron {
+		transform: rotate(180deg);
+	}
+	.card-body {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		padding: 18px 24px 22px;
+		border-top: 1px solid var(--border);
+	}
+	.card-note {
+		font-size: 0.82rem;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
 	.items {
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
-		margin-bottom: var(--space-md);
-	}
-	.icon-btn {
-		width: 30px;
-		height: 30px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid var(--border);
-		background: var(--bg-surface);
-		border-radius: var(--radius-sm);
-		color: var(--text-secondary);
-		font-size: 0.95rem;
-		cursor: pointer;
-		transition: all 0.15s;
-	}
-	.icon-btn:hover:not(:disabled) {
-		border-color: var(--btb-steel);
-		color: var(--btb-steel);
-	}
-	.icon-btn:disabled {
-		opacity: 0.35;
-		cursor: not-allowed;
-	}
-	.icon-btn-danger:hover:not(:disabled) {
-		border-color: var(--color-error);
-		color: var(--color-error);
 	}
 	.field {
 		display: flex;
@@ -301,12 +332,6 @@
 		display: flex;
 		gap: 14px;
 	}
-	.field-row:has(.field-full) {
-		flex-wrap: wrap;
-	}
-	.field-full {
-		flex: 1 1 100%;
-	}
 	.field-label {
 		font-size: 0.82rem;
 		font-weight: 600;
@@ -317,45 +342,6 @@
 		color: var(--text-muted);
 		font-size: 0.75rem;
 		margin-left: 6px;
-	}
-	.para-row {
-		display: flex;
-		gap: 8px;
-		align-items: flex-start;
-		margin-bottom: 8px;
-	}
-	.para-row .field-textarea {
-		flex: 1;
-	}
-	.btn-add-sm {
-		align-self: flex-start;
-		padding: 6px 12px;
-		border: 1px dashed var(--btb-steel);
-		border-radius: var(--radius-sm);
-		background: none;
-		color: var(--btb-steel);
-		font-size: 0.8rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 0.15s;
-	}
-	.btn-add-sm:hover {
-		background: var(--btb-steel-subtle);
-	}
-	.btn-move-list {
-		align-self: flex-start;
-		padding: 6px 12px;
-		border: 1px solid var(--btb-teal);
-		border-radius: var(--radius-sm);
-		background: none;
-		color: var(--btb-teal);
-		font-size: 0.8rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 0.15s;
-	}
-	.btn-move-list:hover {
-		background: var(--btb-teal-subtle);
 	}
 	.field-input,
 	.field-textarea {
@@ -379,6 +365,7 @@
 		resize: vertical;
 		line-height: 1.5;
 	}
+
 	.btn-add {
 		width: 100%;
 		padding: 14px;
@@ -390,14 +377,18 @@
 		font-weight: 600;
 		cursor: pointer;
 		transition: background 0.15s;
-		margin-bottom: var(--space-xl);
 	}
 	.btn-add:hover {
 		background: var(--btb-steel-subtle);
 	}
+
 	.form-actions {
 		display: flex;
 		justify-content: flex-end;
+		position: sticky;
+		bottom: 0;
+		padding: 14px 0;
+		background: linear-gradient(transparent, var(--bg-page) 40%);
 	}
 	.btn-save {
 		padding: 12px 32px;

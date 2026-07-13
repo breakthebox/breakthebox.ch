@@ -164,12 +164,14 @@
 				<blockquote>{c.lehre.quote}</blockquote>
 			</div>
 			{#if c.lehre.items?.length}
-				<div class="lehre-list">
+				<div class="lehre-roles">
 					{#each c.lehre.items as item}
-						<div class="lehre-item">
-							<span class="lehre-item-role">{item.role}{#if item.note} · {item.note}{/if}</span>
-							<b>{item.title}</b>
-							<span class="lehre-item-org">{item.org}</span>
+						<div class="lehre-role-line">
+							<span class="lehre-role-label">{item.role}{#if item.note} · {item.note}{/if}</span>
+							<span class="lehre-role-val">{item.title}<span class="lehre-role-org"> · {item.org}</span></span>
+							{#if item.url}
+								<a class="lehre-role-link" href={item.url} target="_blank" rel="noopener noreferrer">Zum Lehrgang →</a>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -639,40 +641,52 @@
 		line-height: 1.4;
 		color: var(--text-heading);
 	}
-	.lehre-list {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 14px;
-		margin-top: 36px;
-	}
-	.lehre-item {
+	/* Lehr-Leitungen als kompakte Zeilen (wie die Rollen im «Über mich») */
+	.lehre-roles {
+		margin-top: 30px;
+		border-top: 1px solid var(--kn-line);
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
-		background: var(--kn-surface);
-		border: 1px solid var(--kn-line);
-		border-top: 3px solid var(--kn-accent);
-		border-radius: 4px 4px 14px 14px;
-		padding: 16px 18px;
-		box-shadow: var(--shadow-card);
 	}
-	.lehre-item-role {
-		font-size: 0.6rem;
-		font-weight: 600;
-		letter-spacing: 0.1em;
+	.lehre-role-line {
+		display: flex;
+		align-items: baseline;
+		gap: 16px;
+		padding: 12px 0;
+		border-bottom: 1px solid var(--kn-line);
+	}
+	.lehre-role-label {
+		flex: 0 0 200px;
 		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		font-size: 0.68rem;
+		font-weight: 700;
 		color: var(--kn-accent-strong);
 	}
-	.lehre-item b {
-		font-family: var(--ff-serif);
-		font-size: 1.02rem;
-		font-weight: 700;
+	.lehre-role-val {
+		flex: 1;
+		min-width: 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+		line-height: 1.5;
 		color: var(--text-heading);
-		line-height: 1.25;
 	}
-	.lehre-item-org {
-		font-size: 0.82rem;
+	.lehre-role-org {
+		font-weight: 400;
 		color: var(--kn-graphite);
+	}
+	.lehre-role-link {
+		flex-shrink: 0;
+		margin-left: auto;
+		font-size: 0.8rem;
+		font-weight: 600;
+		white-space: nowrap;
+		color: var(--kn-accent-strong);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.lehre-role-link:hover {
+		color: var(--kn-accent);
 	}
 
 	/* ─── Auftritte ─── */
@@ -911,9 +925,15 @@
 		.talks,
 		.formats,
 		.cta2,
-		.pe-grid,
-		.lehre-list {
+		.pe-grid {
 			grid-template-columns: 1fr;
+		}
+		.lehre-role-line {
+			flex-direction: column;
+			gap: 3px;
+		}
+		.lehre-role-label {
+			flex-basis: auto;
 		}
 	}
 	@media (max-width: 560px) {
