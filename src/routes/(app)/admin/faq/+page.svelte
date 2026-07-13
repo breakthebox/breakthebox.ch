@@ -1,22 +1,37 @@
 <script lang="ts">
-	import type { FaqContent } from '$lib/types/content';
+	import type { FaqItem } from '$lib/types/content';
+	import AdminAccordionItem from '$lib/components/ui/AdminAccordionItem.svelte';
+
+	type TabKey = 'faq' | 'transformation' | 'governance' | 'keynotespage';
 
 	let { data, form } = $props();
-	let content = $state<FaqContent>(structuredClone(data.content));
+
+	const TABS: { key: TabKey; label: string; note: string }[] = [
+		{ key: 'faq', label: 'Startseite', note: 'Erscheint auf der Startseite.' },
+		{ key: 'transformation', label: 'Transformation', note: 'Erscheint auf der Seite «Transformation» und speist deren FAQ-Structured-Data.' },
+		{ key: 'governance', label: 'Governance', note: 'Erscheint auf der Seite «Governance» und speist deren FAQ-Structured-Data.' },
+		{ key: 'keynotespage', label: 'Keynotes', note: 'Erscheint auf der Seite «Keynotes» und speist deren FAQ-Structured-Data.' }
+	];
+
+	let tabs = $state<Record<TabKey, FaqItem[]>>(structuredClone(data.tabs));
+	let active = $state<TabKey>((form?.target as TabKey) ?? 'faq');
+	let expanded = $state<number | null>(null);
 	let saving = $state(false);
 	let showSuccess = $state(false);
 
-	function addItem() {
-		content.items.push({ question: '', answer: '' });
+	let activeMeta = $derived(TABS.find((t) => t.key === active)!);
+	let items = $derived(tabs[active]);
+	let serialized = $derived(JSON.stringify(tabs[active]));
+
+	function switchTab(key: TabKey) {
+		active = key;
+		expanded = null;
 	}
-	function removeItem(i: number) {
-		if (!confirm('Diese Frage wirklich löschen?')) return;
-		content.items.splice(i, 1);
-	}
-	function move(i: number, dir: -1 | 1) {
+	function move(arr: FaqItem[], i: number, dir: -1 | 1): number {
 		const t = i + dir;
-		if (t < 0 || t >= content.items.length) return;
-		[content.items[i], content.items[t]] = [content.items[t], content.items[i]];
+		if (t < 0 || t >= arr.length) return i;
+		[arr[i], arr[t]] = [arr[t], arr[i]];
+		return t;
 	}
 
 	$effect(() => {
@@ -40,53 +55,71 @@
 			Zurück zum Dashboard
 		</a>
 		<h1>Häufige Fragen (FAQ)</h1>
-		<p class="page-subtitle">Fragen und Antworten für die FAQ-Sektion — Anzahl, Reihenfolge und Inhalte frei anpassbar.</p>
+		<p class="page-subtitle">Alle FAQ an einem Ort. Jeder Tab bearbeitet das FAQ einer Seite — die Startseite und die Unterseiten mit eigenem FAQ.</p>
 	</div>
 
 	{#if showSuccess}<div class="toast toast-success">Änderungen erfolgreich gespeichert.</div>{/if}
 	{#if form?.error}<div class="toast toast-error">{form.error}</div>{/if}
 
+	<div class="tabbar" role="tablist">
+		{#each TABS as tab}
+			<button
+				type="button"
+				role="tab"
+				class="tab"
+				class:active={active === tab.key}
+				aria-selected={active === tab.key}
+				onclick={() => switchTab(tab.key)}
+			>
+				{tab.label}
+				<span class="tab-count">{tabs[tab.key].length}</span>
+			</button>
+		{/each}
+	</div>
+
+	<p class="tab-note">{activeMeta.note}</p>
+
 	<form method="POST" onsubmit={() => (saving = true)}>
-		<input type="hidden" name="content" value={JSON.stringify(content)} />
+		<input type="hidden" name="target" value={active} />
+		<input type="hidden" name="items" value={serialized} />
 
 		<div class="items">
-			{#each content.items as item, i}
-				<div class="item-card">
-					<div class="item-head">
-						<span class="item-num">{i + 1}</span>
-						<span class="item-title">{item.question || 'Neue Frage'}</span>
-						<div class="item-actions">
-							<button type="button" class="icon-btn" onclick={() => move(i, -1)} disabled={i === 0} aria-label="Nach oben">↑</button>
-							<button type="button" class="icon-btn" onclick={() => move(i, 1)} disabled={i === content.items.length - 1} aria-label="Nach unten">↓</button>
-							<button type="button" class="icon-btn icon-btn-danger" onclick={() => removeItem(i)} aria-label="Löschen">&times;</button>
-						</div>
-					</div>
-					<div class="field">
-						<label class="field-label">Frage</label>
-						<input type="text" class="field-input" bind:value={item.question} placeholder="z.B. Für wen ist Break the Box die richtige Beratung?" />
-					</div>
-					<div class="field">
-						<label class="field-label">Antwort</label>
-						<textarea class="field-textarea" bind:value={item.answer} rows="4"></textarea>
-					</div>
-				</div>
+			{#each items as item, i (item)}
+				<AdminAccordionItem
+					index={i}
+					total={items.length}
+					title={item.question || 'Neue Frage'}
+					expanded={expanded === i}
+					removeLabel="Frage löschen"
+					ontoggle={() => (expanded = expanded === i ? null : i)}
+					onmoveup={() => (expanded = move(items, i, -1))}
+					onmovedown={() => (expanded = move(items, i, 1))}
+					onremove={() => items.splice(i, 1)}
+				>
+					<div class="field"><label class="field-label" for="q-{i}">Frage</label><input id="q-{i}" type="text" class="field-input" bind:value={item.question} /></div>
+					<div class="field"><label class="field-label" for="a-{i}">Antwort</label><textarea id="a-{i}" class="field-textarea" rows="4" bind:value={item.answer}></textarea></div>
+				</AdminAccordionItem>
 			{/each}
 		</div>
 
-		<button type="button" class="btn-add" onclick={addItem}>+ Frage hinzufügen</button>
+		{#if items.length === 0}
+			<p class="empty-note">Noch keine Fragen in diesem Bereich.</p>
+		{/if}
+
+		<button type="button" class="btn-add" onclick={() => { items.push({ question: '', answer: '' }); expanded = items.length - 1; }}>+ Frage hinzufügen</button>
 
 		<div class="form-actions">
-			<button type="submit" class="btn-save" disabled={saving}>{saving ? 'Speichern...' : 'Speichern'}</button>
+			<button type="submit" class="btn-save" disabled={saving}>{saving ? 'Speichern...' : `«${activeMeta.label}» speichern`}</button>
 		</div>
 	</form>
 </div>
 
 <style>
 	.editor-page {
-		max-width: 800px;
+		max-width: 820px;
 	}
 	.page-header {
-		margin-bottom: var(--space-xl);
+		margin-bottom: var(--space-lg);
 	}
 	.page-header h1 {
 		font-size: 1.6rem;
@@ -107,7 +140,6 @@
 		color: var(--text-secondary);
 		text-decoration: none;
 		margin-bottom: var(--space-md);
-		transition: color 0.15s;
 	}
 	.back-link:hover {
 		color: var(--btb-steel);
@@ -117,7 +149,7 @@
 		border-radius: var(--radius-sm);
 		font-size: 0.88rem;
 		font-weight: 500;
-		margin-bottom: var(--space-lg);
+		margin-bottom: var(--space-md);
 	}
 	.toast-success {
 		background: var(--btb-teal-subtle);
@@ -129,82 +161,70 @@
 		color: #be123c;
 		border: 1px solid var(--color-error);
 	}
+
+	/* ─── Tabs ─── */
+	.tabbar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		border-bottom: 1.5px solid var(--border);
+		margin-bottom: 14px;
+	}
+	.tab {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 16px;
+		border: none;
+		background: none;
+		border-bottom: 2px solid transparent;
+		margin-bottom: -1.5px;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: color 0.15s, border-color 0.15s;
+	}
+	.tab:hover {
+		color: var(--text-heading);
+	}
+	.tab.active {
+		color: var(--btb-steel-hover);
+		border-bottom-color: var(--btb-steel);
+	}
+	.tab-count {
+		font-size: 0.7rem;
+		font-weight: 700;
+		min-width: 18px;
+		height: 18px;
+		padding: 0 5px;
+		border-radius: 9px;
+		background: var(--bg-elevated);
+		color: var(--text-muted);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.tab.active .tab-count {
+		background: var(--btb-steel-subtle);
+		color: var(--btb-steel-hover);
+	}
+	.tab-note {
+		font-size: 0.82rem;
+		color: var(--text-muted);
+		margin-bottom: 18px;
+	}
+
 	.items {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
-		margin-bottom: var(--space-lg);
-	}
-	.item-card {
-		background: var(--bg-surface);
-		border: 1.5px solid var(--border);
-		border-radius: var(--radius-card);
-		padding: 20px 24px;
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-	}
-	.item-head {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-	.item-num {
-		width: 28px;
-		height: 28px;
-		border-radius: 8px;
-		background: var(--btb-steel-subtle);
-		color: var(--btb-steel);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.82rem;
-		font-weight: 700;
-		flex-shrink: 0;
-	}
-	.item-title {
-		flex: 1;
-		font-weight: 700;
-		font-size: 0.95rem;
-		color: var(--text-heading);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	.item-actions {
-		display: flex;
-		gap: 4px;
-	}
-	.icon-btn {
-		width: 30px;
-		height: 30px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid var(--border);
-		background: var(--bg-surface);
-		border-radius: var(--radius-sm);
-		color: var(--text-secondary);
-		font-size: 0.95rem;
-		cursor: pointer;
-		transition: all 0.15s;
-	}
-	.icon-btn:hover:not(:disabled) {
-		border-color: var(--btb-steel);
-		color: var(--btb-steel);
-	}
-	.icon-btn:disabled {
-		opacity: 0.35;
-		cursor: not-allowed;
-	}
-	.icon-btn-danger:hover:not(:disabled) {
-		border-color: var(--color-error);
-		color: var(--color-error);
+		gap: 8px;
 	}
 	.field {
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
+		flex: 1;
 	}
 	.field-label {
 		font-size: 0.82rem;
@@ -233,8 +253,15 @@
 		resize: vertical;
 		line-height: 1.5;
 	}
+	.empty-note {
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		padding: 8px 0 4px;
+	}
+
 	.btn-add {
 		width: 100%;
+		margin-top: 8px;
 		padding: 14px;
 		border: 1.5px dashed var(--btb-steel);
 		border-radius: var(--radius-card);
@@ -244,14 +271,18 @@
 		font-weight: 600;
 		cursor: pointer;
 		transition: background 0.15s;
-		margin-bottom: var(--space-xl);
 	}
 	.btn-add:hover {
 		background: var(--btb-steel-subtle);
 	}
+
 	.form-actions {
 		display: flex;
 		justify-content: flex-end;
+		position: sticky;
+		bottom: 0;
+		padding: 14px 0;
+		background: linear-gradient(transparent, var(--bg-page) 40%);
 	}
 	.btn-save {
 		padding: 12px 32px;

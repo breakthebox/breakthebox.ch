@@ -12,7 +12,6 @@
 	let expSteps = $state<number | null>(0);
 	let expCase = $state<number | null>(null);
 	let expBound = $state<number | null>(null);
-	let expFaq = $state<number | null>(null);
 
 	// Leere Einträge (Tags, Erstgespräch-Schritte) erst beim Speichern trimmen.
 	function cleaned(): TransformationContent {
@@ -265,31 +264,7 @@
 			</div>
 		</details>
 
-		<!-- FAQ -->
-		<details class="card">
-			<summary class="card-head"><h2>Häufige Fragen</h2><span class="card-chevron" aria-hidden="true">▾</span></summary>
-			<div class="card-body">
-				<div class="items">
-					{#each content.faq.items as item, i}
-						<AdminAccordionItem
-							index={i}
-							total={content.faq.items.length}
-							title={item.question || 'Neue Frage'}
-							expanded={expFaq === i}
-							removeLabel="Frage löschen"
-							ontoggle={() => (expFaq = expFaq === i ? null : i)}
-							onmoveup={() => (expFaq = move(content.faq.items, i, -1))}
-							onmovedown={() => (expFaq = move(content.faq.items, i, 1))}
-							onremove={() => content.faq.items.splice(i, 1)}
-						>
-							<div class="field"><label class="field-label" for="fq-{i}">Frage</label><input id="fq-{i}" type="text" class="field-input" bind:value={item.question} /></div>
-							<div class="field"><label class="field-label" for="fa-{i}">Antwort</label><textarea id="fa-{i}" class="field-textarea" rows="3" bind:value={item.answer}></textarea></div>
-						</AdminAccordionItem>
-					{/each}
-				</div>
-				<button type="button" class="btn-add" onclick={() => { content.faq.items.push({ question: '', answer: '' }); expFaq = content.faq.items.length - 1; }}>+ Frage hinzufügen</button>
-			</div>
-		</details>
+		<p class="faq-hint">Das FAQ dieser Seite bearbeitest du zentral unter <a href="/admin/faq">Häufige Fragen → Tab «Transformation»</a>.</p>
 
 		<!-- MissGovern-Banner -->
 		<details class="card">
@@ -327,6 +302,19 @@
 	.page-subtitle {
 		font-size: 0.92rem;
 		color: var(--text-secondary);
+	}
+	.faq-hint {
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		padding: 14px 16px;
+		background: var(--bg-elevated);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+		margin-bottom: 12px;
+	}
+	.faq-hint a {
+		color: var(--btb-steel);
+		font-weight: 600;
 	}
 	.hint-code {
 		font-family: var(--ff-mono);

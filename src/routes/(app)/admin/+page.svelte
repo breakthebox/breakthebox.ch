@@ -1,116 +1,8 @@
 <script lang="ts">
-	let { data } = $props();
+	import { adminNavGroups } from '$lib/config/admin-nav';
+	import AdminNavIcon from '$lib/components/admin/AdminNavIcon.svelte';
 
-	const sections = [
-		{
-			id: 'sections',
-			title: 'Sektionen',
-			description: 'Reihenfolge, Sichtbarkeit und Kopftexte der Startseiten-Sektionen',
-			icon: '☰'
-		},
-		{
-			id: 'hero',
-			title: 'Hero',
-			description: 'Startseiten-Hero — Variante (klassisch oder Zwei-Welten-Slider) und Texte',
-			icon: '◒'
-		},
-		{
-			id: 'mediathek',
-			title: 'Mediathek',
-			description: 'Gemeinsame Bild-Bibliothek für alle Bild-Slots',
-			icon: '▣'
-		},
-		{
-			id: 'pillars',
-			title: 'Pillars',
-			description: 'Pillar-Karten — Anzahl, Reihenfolge und Inhalte frei anpassbar',
-			icon: '◆'
-		},
-		{
-			id: 'angebot',
-			title: 'Angebot',
-			description: 'Angebots-Kacheln der Landing-Section «Angebot»',
-			icon: '❖'
-		},
-		{
-			id: 'about',
-			title: 'Über mich',
-			description: 'Texte, Qualifikationen und Rollen',
-			icon: '◎'
-		},
-		{
-			id: 'manifest',
-			title: 'Manifest',
-			description: 'Provokante Thesen für die Scroll-Seite «Mein Manifest»',
-			icon: '§'
-		},
-		{
-			id: 'experimentierraum',
-			title: 'Experimentierraum',
-			description: 'Die Werkstatt-Seite «Experimentierraum» — Regeln, Werkbank mit Lehrgeld, Verworfen, Transfer',
-			icon: '⚡'
-		},
-		{
-			id: 'testimonials',
-			title: 'Stimmen',
-			description: 'Testimonials — «Fremdbild statt Eigenlob»',
-			icon: '❝'
-		},
-		{
-			id: 'transformation',
-			title: 'Transformation',
-			description: 'Die Service-Seite «Transformation» — Stufen, Spiegel, Case, FAQ',
-			icon: '▤'
-		},
-		{
-			id: 'governance',
-			title: 'Governance',
-			description: 'Die Dossier-Seite «Governance» — VR, Stiftungs- & Aufsichtsrat: Matrix, Mandate',
-			icon: '⚖'
-		},
-		{
-			id: 'references',
-			title: 'Kundenlogos',
-			description: 'Logos der Referenz-Marquee verwalten',
-			icon: '★'
-		},
-		{
-			id: 'metrics',
-			title: 'Kennzahlen',
-			description: 'Die Kennzahlen-Leiste unterhalb der Kundenlogos',
-			icon: '▦'
-		},
-		{
-			id: 'partners',
-			title: 'Netzwerk / Partner',
-			description: 'Partnerfirmen mit Personen (Name, Rolle, Expertise)',
-			icon: '⬡'
-		},
-		{
-			id: 'keynotes',
-			title: 'Keynotes / Termine',
-			description: 'Auftritts-Termine — kommend prominent, vergangen im Rückblick (speist auch die Keynotes-Seite)',
-			icon: '◈'
-		},
-		{
-			id: 'keynotes-seite',
-			title: 'Keynotes-Seite',
-			description: 'Redaktioneller Inhalt der Seite «Keynotes» — Talks, USP, Formate, Lehre, CTA',
-			icon: '◍'
-		},
-		{
-			id: 'blog',
-			title: 'Blog',
-			description: 'Blogposts erstellen, bearbeiten und veröffentlichen',
-			icon: '✎'
-		},
-		{
-			id: 'faq',
-			title: 'Häufige Fragen',
-			description: 'Fragen und Antworten der FAQ-Sektion',
-			icon: '?'
-		}
-	];
+	let { data } = $props();
 </script>
 
 <svelte:head>
@@ -123,23 +15,28 @@
 		<p class="dashboard-subtitle">Willkommen, {data.user.name}. Hier kannst du die Inhalte deiner Website verwalten.</p>
 	</div>
 
-	<div class="sections-grid">
-		{#each sections as section}
-			<a href="/admin/{section.id}" class="section-card">
-				<span class="section-icon">{section.icon}</span>
-				<div>
-					<h3>{section.title}</h3>
-					<p>{section.description}</p>
-				</div>
-				<span class="section-arrow">&rarr;</span>
-			</a>
-		{/each}
-	</div>
+	{#each adminNavGroups as group}
+		<section class="dash-group">
+			<h2 class="dash-group-title">{group.label}</h2>
+			<div class="sections-grid">
+				{#each group.items as item}
+					<a href="/admin/{item.id}" class="section-card">
+						<span class="section-icon"><AdminNavIcon id={item.id} /></span>
+						<div>
+							<h3>{item.title}</h3>
+							<p>{item.description}</p>
+						</div>
+						<span class="section-arrow">&rarr;</span>
+					</a>
+				{/each}
+			</div>
+		</section>
+	{/each}
 </div>
 
 <style>
 	.dashboard-header {
-		margin-bottom: 40px;
+		margin-bottom: 36px;
 	}
 	.dashboard-header h1 {
 		font-size: 1.6rem;
@@ -152,16 +49,28 @@
 		color: var(--text-secondary);
 	}
 
+	.dash-group {
+		margin-bottom: 32px;
+	}
+	.dash-group-title {
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		margin-bottom: 12px;
+	}
+
 	.sections-grid {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 		gap: 12px;
 	}
 	.section-card {
 		display: flex;
 		align-items: center;
-		gap: 20px;
-		padding: 24px;
+		gap: 18px;
+		padding: 20px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--border);
 		border-radius: var(--radius-card-lg);
@@ -173,26 +82,27 @@
 		border-color: var(--btb-steel);
 	}
 	.section-icon {
-		width: 48px;
-		height: 48px;
+		width: 44px;
+		height: 44px;
 		border-radius: 12px;
 		background: var(--bg-elevated);
 		border: 1.5px solid var(--border);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 1.2rem;
 		flex-shrink: 0;
+		color: var(--btb-steel);
 	}
 	.section-card h3 {
-		font-size: 1rem;
+		font-size: 0.95rem;
 		font-weight: 700;
 		color: var(--text-heading);
 		margin-bottom: 2px;
 	}
 	.section-card p {
-		font-size: 0.82rem;
+		font-size: 0.8rem;
 		color: var(--text-secondary);
+		line-height: 1.4;
 	}
 	.section-arrow {
 		margin-left: auto;
