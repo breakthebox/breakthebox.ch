@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages.js';
+	import { slide } from 'svelte/transition';
+	import { quadOut } from 'svelte/easing';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
@@ -11,6 +14,13 @@
 
 	let { data } = $props();
 	const c: ExperimentierraumContent = data.content;
+
+	// Ein Experiment kann «gefeatured» sein (voll oben, immer offen); der Rest
+	// startet eingeklappt und wird auf Klick aufgeklappt.
+	const featured = c.bench.items.find((e) => e.featured);
+	const rest = c.bench.items.filter((e) => !e.featured);
+	let open = $state<Record<number, boolean>>({});
+	const toggle = (i: number) => (open[i] = !open[i]);
 
 	// Nav-Links zeigen auf die Startseiten-Sektionen (Unterseite).
 	const home = localizeHref('/');
@@ -119,32 +129,84 @@
 			<h2>{c.bench.title}</h2>
 			<p class="lead">{c.bench.lead}</p>
 
-			<div class="bench">
-				{#each c.bench.items as exp}
-					<article class="wb">
-						{#if exp.image}
-							<div class="wb-img"><img src={exp.image} alt={exp.name} loading="lazy" /></div>
+			{#if featured}
+				<article class="wb featured">
+					<div class="featured-media">
+						{#if featured.image}
+							<div class="wb-img"><img src={featured.image} alt={featured.name} loading="lazy" /></div>
 						{/if}
-						<div class="wb-body">
-							{#if exp.status}<span class="status">{exp.status}</span>{/if}
-							<h3>{exp.name}</h3>
-							{#if exp.what}<p class="what">{exp.what}</p>{/if}
-							<p class="desc">{exp.desc}</p>
-							{#if exp.stack?.length}
-								<div class="stack">
-									{#each exp.stack as tech}<span>{tech}</span>{/each}
-								</div>
-							{/if}
-							{#if exp.url}
-								<a class="visit" href={exp.url} target="_blank" rel="noopener noreferrer">
-									{exp.urlLabel || exp.url} →
-								</a>
-							{/if}
-						</div>
-						{#if exp.lehrgeld}
+						{#if featured.lehrgeld}
 							<div class="learn">
 								<span class="ll">Lehrgeld</span>
-								<p class="md">{@html renderMarkdown(exp.lehrgeld)}</p>
+								<p class="md">{@html renderMarkdown(featured.lehrgeld)}</p>
+							</div>
+						{/if}
+					</div>
+					<div class="wb-body">
+						<span class="fav-badge"><span class="fav-star" aria-hidden="true">★</span> Favorit der Werkbank</span>
+						{#if featured.status}<span class="status">{featured.status}</span>{/if}
+						<h3>{featured.name}</h3>
+						{#if featured.what}<p class="what">{featured.what}</p>{/if}
+						<p class="desc">{featured.desc}</p>
+						{#if featured.stack?.length}
+							<div class="stack">
+								{#each featured.stack as tech}<span>{tech}</span>{/each}
+							</div>
+						{/if}
+						{#if featured.url}
+							<a class="visit" href={featured.url} target="_blank" rel="noopener noreferrer">
+								{featured.urlLabel || featured.url} →
+							</a>
+						{/if}
+					</div>
+				</article>
+			{/if}
+
+			<div class="bench">
+				{#each rest as exp, i}
+					<article class="wb" class:is-open={open[i]}>
+						<button
+							class="wb-toggle"
+							type="button"
+							aria-expanded={open[i] ? 'true' : 'false'}
+							onclick={() => toggle(i)}
+						>
+							{#if exp.image}
+								<div class="wb-img"><img src={exp.image} alt={exp.name} loading="lazy" /></div>
+							{/if}
+							<div class="wb-teaser">
+								<div class="wb-teaser-txt">
+									<h3>{exp.name}</h3>
+									{#if exp.what}<p class="what">{exp.what}</p>{/if}
+								</div>
+								<span class="chev" aria-hidden="true"></span>
+							</div>
+						</button>
+						{#if open[i]}
+							<div
+								class="wb-detail"
+								transition:slide={{ duration: prefersReducedMotion.current ? 0 : 260, easing: quadOut }}
+							>
+								<div class="wb-body">
+									{#if exp.status}<span class="status">{exp.status}</span>{/if}
+									<p class="desc">{exp.desc}</p>
+									{#if exp.stack?.length}
+										<div class="stack">
+											{#each exp.stack as tech}<span>{tech}</span>{/each}
+										</div>
+									{/if}
+									{#if exp.url}
+										<a class="visit" href={exp.url} target="_blank" rel="noopener noreferrer">
+											{exp.urlLabel || exp.url} →
+										</a>
+									{/if}
+								</div>
+								{#if exp.lehrgeld}
+									<div class="learn">
+										<span class="ll">Lehrgeld</span>
+										<p class="md">{@html renderMarkdown(exp.lehrgeld)}</p>
+									</div>
+								{/if}
 							</div>
 						{/if}
 					</article>
@@ -334,6 +396,7 @@
 	.bench {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
+		align-items: start;
 		gap: 22px;
 	}
 	.wb {
@@ -455,6 +518,116 @@
 	}
 
 	/* ─── Verworfen ─── */
+	/* Featured (voll oben angepinnt): Bild + Lehrgeld links, Inhalt rechts */
+	.featured {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: stretch;
+		margin-bottom: 22px;
+	}
+	.featured-media {
+		display: flex;
+		flex-direction: column;
+		border-right: 1px solid var(--exp-line);
+	}
+	.featured .wb-img {
+		aspect-ratio: auto;
+		border-bottom: 1px solid var(--exp-line);
+		border-right: none;
+	}
+	.featured .wb-img img {
+		width: 100%;
+		height: auto;
+		object-fit: contain;
+	}
+	.featured .learn {
+		margin-top: 0;
+		flex: 1;
+		border-radius: 0;
+	}
+	.featured .wb-body {
+		padding: 34px 36px;
+	}
+	.featured h3 {
+		font-size: 1.7rem;
+	}
+	.fav-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		align-self: flex-start;
+		font-family: var(--ff-ui);
+		font-size: 0.64rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #fff;
+		background: var(--exp-accent);
+		border-radius: 100px;
+		padding: 5px 13px;
+		margin-bottom: 14px;
+	}
+	.fav-star {
+		font-size: 0.85rem;
+		line-height: 1;
+	}
+
+	/* Eingeklappte Kachel (Bild + Titel + Einzeiler) */
+	.wb-toggle {
+		display: block;
+		width: 100%;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
+	}
+	.wb-teaser {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 14px;
+		padding: 20px 24px;
+	}
+	.wb-teaser-txt {
+		min-width: 0;
+	}
+	.wb-teaser h3 {
+		font-family: var(--ff-serif);
+		font-weight: 700;
+		font-size: 1.2rem;
+		color: var(--text-heading);
+		margin-bottom: 3px;
+	}
+	.wb-teaser .what {
+		font-family: var(--ff-serif);
+		font-style: italic;
+		font-size: 0.9rem;
+		color: var(--exp-accent-strong);
+		margin: 0;
+	}
+	.chev {
+		width: 9px;
+		height: 9px;
+		margin-top: 7px;
+		border-right: 2px solid var(--exp-accent-strong);
+		border-bottom: 2px solid var(--exp-accent-strong);
+		transform: rotate(45deg);
+		transition: transform 0.2s ease;
+		flex-shrink: 0;
+	}
+	.is-open .chev {
+		transform: rotate(-135deg);
+	}
+	.wb-toggle:hover .wb-teaser h3 {
+		color: var(--exp-accent-strong);
+	}
+	.wb-detail .wb-body {
+		padding-top: 4px;
+	}
+
 	.failed {
 		padding: 64px 0;
 		background: var(--bg-section-alt);
@@ -650,6 +823,16 @@
 		}
 		.rules {
 			grid-template-columns: 1fr;
+		}
+		.featured {
+			grid-template-columns: 1fr;
+		}
+		.featured-media {
+			border-right: none;
+			border-bottom: 1px solid var(--exp-line);
+		}
+		.featured .wb-body {
+			padding: 26px 28px 22px;
 		}
 	}
 	@media (max-width: 560px) {

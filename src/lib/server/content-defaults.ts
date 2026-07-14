@@ -324,6 +324,7 @@ export const defaultExperimentierraum: ExperimentierraumContent = {
 		items: [
 			{
 				key: 'missgovern',
+				featured: true,
 				image: '/api/uploads/platform-logo-3-header-1783000467219.webp',
 				status: 'Live · Bühne & Web',
 				name: 'Mis(s)Govern',
