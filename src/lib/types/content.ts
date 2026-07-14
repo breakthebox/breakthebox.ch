@@ -192,6 +192,7 @@ export interface ExpExperiment {
 	urlLabel?: string; // Beschriftung des Besuchs-Links
 	lehrgeld: string; // die Lernspalte (Markdown erlaubt)
 	image?: string;
+	featured?: boolean; // voll oben angepinnt, immer aufgeklappt — nur eines aktiv
 }
 
 export interface ExpDiscarded {

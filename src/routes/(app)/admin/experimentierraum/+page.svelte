@@ -32,6 +32,10 @@
 	function fromText(v: string): string[] {
 		return v.split('\n');
 	}
+	// Nur ein Experiment kann «gefeatured» sein — beim Setzen die anderen zurücksetzen.
+	function setFeatured(i: number, on: boolean) {
+		content.bench.items.forEach((e, j) => (e.featured = on && j === i));
+	}
 
 	$effect(() => {
 		if (form?.success) {
@@ -130,6 +134,10 @@
 								<div class="field"><label class="field-label" for="en-{i}">Name</label><input id="en-{i}" type="text" class="field-input" bind:value={exp.name} /></div>
 								<div class="field"><label class="field-label" for="es-{i}">Status <span class="field-hint">z.B. «Live · Bühne & Web»</span></label><input id="es-{i}" type="text" class="field-input" bind:value={exp.status} /></div>
 							</div>
+							<label class="check-featured">
+								<input type="checkbox" checked={exp.featured ?? false} onchange={(e) => setFeatured(i, e.currentTarget.checked)} />
+								<span>Als Featured anpinnen <span class="field-hint">volle Breite, zuoberst, immer offen — nur ein Experiment</span></span>
+							</label>
 							<div class="field"><label class="field-label" for="ew-{i}">Untertitel <span class="field-hint">kursiv im Akzent</span></label><input id="ew-{i}" type="text" class="field-input" bind:value={exp.what} /></div>
 							<div class="field"><label class="field-label" for="ed-{i}">Beschreibung</label><textarea id="ed-{i}" class="field-textarea" rows="3" bind:value={exp.desc}></textarea></div>
 							<div class="field"><label class="field-label" for="et-{i}">Tech-Tags <span class="field-hint">ein Tag pro Zeile</span></label><textarea id="et-{i}" class="field-textarea" rows="3" value={exp.stack.join('\n')} oninput={(e) => (exp.stack = fromText(e.currentTarget.value))}></textarea></div>
@@ -364,6 +372,23 @@
 	.field-textarea {
 		resize: vertical;
 		line-height: 1.5;
+	}
+	.check-featured {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+		padding: 12px 14px;
+		border: 1.5px solid var(--border);
+		border-radius: var(--radius-sm);
+		background: var(--bg-page);
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-secondary);
+		cursor: pointer;
+	}
+	.check-featured input {
+		margin-top: 2px;
+		accent-color: var(--btb-steel);
 	}
 
 	.btn-add {
