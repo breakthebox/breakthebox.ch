@@ -228,11 +228,11 @@
 		padding: 0 24px;
 	}
 	.md :global(strong) {
-		color: var(--gov-accent-strong);
+		color: var(--gov-accent);
 		font-weight: 700;
 	}
 	.md :global(em) {
-		color: var(--gov-accent-strong);
+		color: var(--gov-accent);
 		font-style: normal;
 	}
 

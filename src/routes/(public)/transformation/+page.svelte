@@ -268,11 +268,11 @@
 
 	/* Akzent-Auszeichnung aus Markdown (**fett** / *kursiv*) */
 	.md :global(strong) {
-		color: var(--tf-accent-strong);
+		color: var(--tf-accent);
 		font-weight: 700;
 	}
 	.md :global(em) {
-		color: var(--tf-accent-strong);
+		color: var(--tf-accent);
 		font-style: normal;
 	}
 

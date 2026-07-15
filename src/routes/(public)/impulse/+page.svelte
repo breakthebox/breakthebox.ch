@@ -155,7 +155,7 @@
 	/* Akzent-Auszeichnung aus Markdown */
 	.md :global(strong),
 	.md :global(em) {
-		color: var(--imp-accent-strong);
+		color: var(--imp-accent);
 		font-weight: 700;
 		font-style: normal;
 	}

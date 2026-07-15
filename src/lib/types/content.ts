@@ -730,6 +730,8 @@ export interface SectionSetting {
 	kicker: string; // '' = Standardtext
 	title: string; // '' = Standardtext
 	subtitle: string; // '' = Standardtext
+	ctaPrimary?: string; // nur 'haltung': Link-Label linke Karte (Manifest)
+	ctaSecondary?: string; // nur 'haltung': Link-Label rechte Karte (Experimentierraum)
 }
 
 export interface SectionsContent {
