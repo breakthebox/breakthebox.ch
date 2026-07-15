@@ -163,10 +163,6 @@
 	}
 	const aboutVideoEmbed = ytEmbed(about.videoUrl);
 
-	// Split client logos into two rows for counter-scrolling marquee
-	const refHalf = Math.ceil(references.clients.length / 2);
-	const refRow1 = references.clients.slice(0, refHalf);
-	const refRow2 = references.clients.slice(refHalf);
 
 	// Pillar-Karten: Flip (Beispiele) oder Absprung (Subseite)
 	function pillarImage(p: PillarsContent['pillars'][number]): string | undefined {
@@ -434,14 +430,7 @@
 					<div class="marquee-track left">
 						{#each [0, 1] as dup}
 							<div class="marquee-row" aria-hidden={dup === 1}>
-								{#each refRow1 as client}{@render logo(client)}{/each}
-							</div>
-						{/each}
-					</div>
-					<div class="marquee-track right">
-						{#each [0, 1] as dup}
-							<div class="marquee-row" aria-hidden={dup === 1}>
-								{#each refRow2 as client}{@render logo(client)}{/each}
+								{#each references.clients as client}{@render logo(client)}{/each}
 							</div>
 						{/each}
 					</div>
@@ -630,13 +619,13 @@
 					<span class="leap-kick">{m.h_leap_manifest_kick()}</span>
 					<h3 class="serif">{m.h_leap_manifest_title()}</h3>
 					<p>{m.h_leap_manifest_text()}</p>
-					<span class="leap-cta">{m.h_leap_manifest_cta()} →</span>
+					<span class="leap-cta">{cfg.haltung.ctaPrimary || m.h_leap_manifest_cta()} →</span>
 				</a>
 				<a class="leap-card leap-petrol reveal" style="--stagger: 1" href={localizeHref('/experimentierraum')}>
 					<span class="leap-kick">{m.h_leap_exp_kick()}</span>
 					<h3 class="serif">{m.h_leap_exp_title()}</h3>
 					<p>{m.h_leap_exp_text()}</p>
-					<span class="leap-cta">{m.h_leap_exp_cta()} →</span>
+					<span class="leap-cta">{cfg.haltung.ctaSecondary || m.h_leap_exp_cta()} →</span>
 				</a>
 			</div>
 		</div>
@@ -1427,11 +1416,7 @@
 		width: max-content;
 	}
 	.marquee-track.left {
-		animation: marquee-left 42s linear infinite;
-	}
-	.marquee-track.right {
-		animation: marquee-right 42s linear infinite;
-		margin-top: 20px;
+		animation: marquee-left 75s linear infinite;
 	}
 	.marquee:hover .marquee-track {
 		animation-play-state: paused;
@@ -1440,8 +1425,8 @@
 		display: flex;
 		flex-shrink: 0;
 		align-items: center;
-		gap: 44px;
-		padding: 0 22px;
+		gap: 64px;
+		padding: 0 32px;
 	}
 	@keyframes marquee-left {
 		from {
@@ -1451,14 +1436,6 @@
 			transform: translateX(-50%);
 		}
 	}
-	@keyframes marquee-right {
-		from {
-			transform: translateX(-50%);
-		}
-		to {
-			transform: translateX(0);
-		}
-	}
 	.logo-item {
 		display: flex;
 		align-items: center;
@@ -1466,8 +1443,8 @@
 		flex-shrink: 0;
 	}
 	.logo-item img {
-		height: 34px;
-		max-width: 128px;
+		height: 48px;
+		max-width: 170px;
 		object-fit: contain;
 		filter: grayscale(1);
 		opacity: 0.55;
@@ -1478,7 +1455,7 @@
 		filter: grayscale(0);
 	}
 	.logo-text {
-		font-size: 15px;
+		font-size: 20px;
 		font-weight: 500;
 		color: var(--dim);
 		opacity: 0.6;
@@ -1499,7 +1476,7 @@
 
 	/* ═══════ TENSION / IMPULSE (rotes Band) ═══════ */
 	.tension {
-		background: var(--red);
+		background: radial-gradient(120% 130% at 82% 0%, color-mix(in srgb, var(--red) 68%, #d9f2f0) 0%, var(--red) 58%, var(--redd) 118%);
 		color: #fff;
 	}
 	.tensionin {

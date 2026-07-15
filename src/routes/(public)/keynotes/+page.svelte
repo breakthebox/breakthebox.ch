@@ -321,11 +321,11 @@
 		padding: 0 24px;
 	}
 	.md :global(strong) {
-		color: var(--kn-accent-strong);
+		color: var(--kn-accent);
 		font-weight: 700;
 	}
 	.md :global(em) {
-		color: var(--kn-accent-strong);
+		color: var(--kn-accent);
 		font-style: normal;
 	}
 

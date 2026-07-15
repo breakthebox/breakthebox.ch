@@ -1137,7 +1137,9 @@ export function normalizeSections(raw: unknown): SectionsContent {
 			visible: s.visible !== false,
 			kicker: s.kicker ?? '',
 			title: s.title ?? '',
-			subtitle: s.subtitle ?? ''
+			subtitle: s.subtitle ?? '',
+			...(typeof s.ctaPrimary === 'string' ? { ctaPrimary: s.ctaPrimary } : {}),
+			...(typeof s.ctaSecondary === 'string' ? { ctaSecondary: s.ctaSecondary } : {})
 		});
 	}
 	for (const key of LANDING_SECTION_KEYS) {

@@ -151,6 +151,16 @@
 								<label class="field-label" for="sub-{section.key}">Subtitel</label>
 								<input id="sub-{section.key}" type="text" class="field-input" bind:value={section.subtitle} placeholder="(kein Text)" />
 							</div>
+							{#if section.key === 'haltung'}
+								<div class="field">
+									<label class="field-label" for="cta1-{section.key}">Link-Label linke Karte (Manifest)</label>
+									<input id="cta1-{section.key}" type="text" class="field-input" bind:value={section.ctaPrimary} placeholder="(kein Text)" />
+								</div>
+								<div class="field">
+									<label class="field-label" for="cta2-{section.key}">Link-Label rechte Karte (Experimentierraum)</label>
+									<input id="cta2-{section.key}" type="text" class="field-input" bind:value={section.ctaSecondary} placeholder="(kein Text)" />
+								</div>
+							{/if}
 						</div>
 					{/if}
 				</div>

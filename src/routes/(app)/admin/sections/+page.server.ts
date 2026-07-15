@@ -39,7 +39,14 @@ export const load: PageServerLoad = async () => {
 					...s,
 					kicker: s.kicker || d.kicker,
 					title: s.title || d.title,
-					subtitle: s.subtitle || d.subtitle
+					subtitle: s.subtitle || d.subtitle,
+					// Nur 'haltung': die zwei Karten-Link-Labels mit aktuellem Text vorbefüllen.
+					...(s.key === 'haltung'
+						? {
+								ctaPrimary: s.ctaPrimary || m.h_leap_manifest_cta(),
+								ctaSecondary: s.ctaSecondary || m.h_leap_exp_cta()
+							}
+						: {})
 				};
 			})
 		}
