@@ -157,23 +157,6 @@ export interface TestimonialsContent {
 	items: Testimonial[];
 }
 
-// ─── Experimentierraum ───
-export interface ExperimentProject {
-	key?: string;
-	name: string;
-	sketch?: string;
-	desc: string;
-	status?: string;
-	url?: string;
-	image?: string;
-}
-
-export interface ExperimentsContent {
-	platforms: Platform[];
-	missbizzy: WalkTheTalkContent['missbizzy'];
-	projects: ExperimentProject[];
-}
-
 // ─── Experimentierraum (redaktionelle Seite «Werkstatt») ───
 export interface ExpRule {
 	no: string; // z.B. «Regel 01»
@@ -868,7 +851,6 @@ export type SectionContent =
 	| BlogContent
 	| AngebotContent
 	| TestimonialsContent
-	| ExperimentsContent
 	| ExperimentierraumContent
 	| MetricsContent
 	| PartnersContent

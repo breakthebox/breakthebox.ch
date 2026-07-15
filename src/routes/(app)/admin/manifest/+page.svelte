@@ -113,6 +113,10 @@
 				<label class="field-label" for="ctitle">Titel</label>
 				<textarea id="ctitle" class="field-textarea" bind:value={content.closingTitle} rows="2"></textarea>
 			</div>
+			<div class="field">
+				<label class="field-label" for="ctext">Signaturzeile <span class="hint-inline">unter den drei Spalten · leer = ausgeblendet · **doppelte Sternchen** = Akzent</span></label>
+				<textarea id="ctext" class="field-textarea" bind:value={content.closingText} rows="2" placeholder="z.B. Strategin im Verwaltungsrat · Architektin der Digitalstrategie · Builderin im Experimentierraum."></textarea>
+			</div>
 			<p class="block-note">Die drei Spalten (Experimentierraum · VR-Mandate · Fundament) werden automatisch aus «Experimentierraum» und «Über mich» befüllt.</p>
 		</div>
 

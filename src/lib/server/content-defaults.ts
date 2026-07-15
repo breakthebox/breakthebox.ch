@@ -38,7 +38,6 @@ import type {
 	BlogContent,
 	AngebotContent,
 	TestimonialsContent,
-	ExperimentsContent,
 	ExperimentierraumContent,
 	MetricsContent,
 	PartnersContent,
@@ -166,7 +165,7 @@ export const defaultManifest: ManifestContent = {
 	closingKicker: 'neugierig. unabhängig. fundiert.',
 	closingTitle: 'Haltung ist gut.\nBeweis ist besser.',
 	closingText:
-		'Strategin im Verwaltungsrat · Architektin der Digitalstrategie · Builderin im Maschinenraum.'
+		'Strategin im Verwaltungsrat · Architektin der Digitalstrategie · Builderin im Experimentierraum.'
 };
 
 export const defaultPartners: PartnersContent = {
@@ -268,27 +267,6 @@ export const defaultTestimonials: TestimonialsContent = {
 				'Sehr **bodenständig, mit ausgeprägter Bodenhaftung**. Was sie sagt, ist fundiert. Kein Blabla.',
 			author: 'Aschi',
 			role: 'VR-Kollege'
-		}
-	]
-};
-
-export const defaultExperiments: ExperimentsContent = {
-	platforms: defaultWalkTheTalk.platforms,
-	missbizzy: defaultWalkTheTalk.missbizzy,
-	projects: [
-		{
-			key: 'miss-bizzy',
-			name: 'Miss Bizzy',
-			sketch: 'AI-Agent-Ökosystem im täglichen Einsatz',
-			desc: 'Selbst gehostetes n8n-System mit spezialisierten Agenten für E-Mail, Controlling, Wissensmanagement, Recherche und CRM.',
-			status: 'Im täglichen Einsatz'
-		},
-		{
-			key: 'break-the-box-web',
-			name: 'breakthebox.ch',
-			sketch: 'Diese Website — selbst gebaut',
-			desc: 'SvelteKit-Plattform mit eigenem CMS, KI-gestütztem Blog-Editor und Design-System. Gebaut mit Claude Code.',
-			status: 'Laufend'
 		}
 	]
 };
@@ -1068,27 +1046,6 @@ export const defaultBlog: BlogContent = {
 		}
 	]
 };
-
-// Normalisiert Experiments-Content: legacy String-desc → Array (Abschnitte).
-export function normalizeExperiments(raw: unknown): ExperimentsContent {
-	const c = (raw ?? {}) as {
-		platforms?: Array<Record<string, unknown>>;
-		projects?: unknown;
-		missbizzy?: ExperimentsContent['missbizzy'];
-	};
-	const platforms = (Array.isArray(c.platforms) ? c.platforms : []).map((p) => {
-		const d = (p as { desc?: unknown }).desc;
-		return {
-			...(p as object),
-			desc: Array.isArray(d) ? (d as string[]) : d ? [String(d)] : []
-		};
-	}) as ExperimentsContent['platforms'];
-	return {
-		platforms,
-		missbizzy: c.missbizzy ?? defaultExperiments.missbizzy,
-		projects: (Array.isArray(c.projects) ? c.projects : []) as ExperimentsContent['projects']
-	};
-}
 
 // ─── Sektionen der Landing ───
 // Feste Keys in der Standard-Reihenfolge. Hero ist fix zuoberst (eigenes
