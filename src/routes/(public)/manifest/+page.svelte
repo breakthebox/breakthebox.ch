@@ -105,7 +105,7 @@
 				<div class="proof-col">
 					<div class="proof-h">Eigener Experimentierraum</div>
 					{#each platforms as p}
-						<p class="proof-item"><strong>{p.name}</strong>{#if p.sketch} — {p.sketch}{/if}</p>
+						<p class="proof-item"><strong>{p.name}</strong>{#if p.what}{' — '}{p.what}{/if}</p>
 					{/each}
 				</div>
 				<div class="proof-col">
@@ -120,6 +120,9 @@
 				</div>
 			</div>
 
+			{#if manifest.closingText}
+				<p class="closing-sig reveal" style="--stagger: 3">{@html renderMarkdown(manifest.closingText)}</p>
+			{/if}
 		</div>
 	</section>
 
@@ -277,7 +280,7 @@
 
 	/* Roter Abschluss-Banner */
 	.closing {
-		background: var(--btb-steel);
+		background: radial-gradient(120% 130% at 82% 0%, color-mix(in srgb, var(--btb-steel) 68%, #d9f2f0) 0%, var(--btb-steel) 58%, var(--btb-steel-hover) 118%);
 		color: #fff;
 		padding: 110px 34px;
 	}
@@ -316,6 +319,17 @@
 	}
 	.proof-item:last-child {
 		margin-bottom: 0;
+	}
+	/* Signaturzeile: fasst die drei Beleg-Spalten in einem Satz zusammen */
+	.closing-sig {
+		font-family: var(--ff-serif);
+		font-style: italic;
+		font-size: clamp(1rem, 1.8vw, 1.25rem);
+		line-height: 1.5;
+		color: #fff;
+		margin-top: 40px;
+		padding-top: 32px;
+		border-top: 1px solid rgba(255, 255, 255, 0.18);
 	}
 	.proof-item strong {
 		color: #fff;
