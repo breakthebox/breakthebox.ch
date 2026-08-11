@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { localizeHref } from '$lib/paraglide/runtime';
-	import * as m from '$lib/paraglide/messages.js';
+	import { page } from '$app/state';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import { slide } from 'svelte/transition';
 	import { quadOut } from 'svelte/easing';
 	import { prefersReducedMotion } from 'svelte/motion';
@@ -22,13 +22,10 @@
 	let open = $state<Record<number, boolean>>({});
 	const toggle = (i: number) => (open[i] = !open[i]);
 
-	// Nav-Links zeigen auf die Startseiten-Sektionen (Unterseite).
-	const home = localizeHref('/');
-	const navLinks = [
-		{ href: `${home}#angebot`, label: m.nav_services() },
-		{ href: `${home}#about`, label: m.nav_about() },
-		{ href: localizeHref('/impulse'), label: m.nav_blog() }
-	];
+	// Nav-Links aus der admin-verwalteten Menü-Liste (site-weit, eine Quelle).
+	const navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
+	);
 
 	let eightBit = $state(false);
 	let toast = $state('');

@@ -42,6 +42,12 @@ export const adminNavGroups: AdminNavGroup[] = [
 		]
 	},
 	{
+		label: 'Navigation',
+		items: [
+			{ id: 'menu', title: 'Menü', description: 'Menü-Punkte der Website — Titel (DE/EN/FR) und Ziel, site-weit' }
+		]
+	},
+	{
 		label: 'Inhalte',
 		items: [
 			{ id: 'blog', title: 'Blog / Impulse', description: 'Blogposts erstellen, bearbeiten und veröffentlichen' },

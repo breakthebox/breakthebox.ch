@@ -1,7 +1,13 @@
 <script lang="ts">
-	import { localizeHref } from '$lib/paraglide/runtime';
-	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import { page } from '$app/state';
+	import SiteNav from '$lib/components/ui/SiteNav.svelte';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+
+	let { data } = $props();
+	const navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
+	);
 </script>
 
 <svelte:head>
@@ -13,10 +19,7 @@
 </svelte:head>
 
 <div class="sub">
-	<header class="subbar">
-		<SubpageBrand subtitle="Kontakt" />
-		<a href={localizeHref('/')} class="back">← Zur Startseite</a>
-	</header>
+	<SiteNav theme={data.theme} links={navLinks} subtitle="Kontakt" />
 
 	<section class="hero">
 		<div class="wrap">
@@ -56,27 +59,6 @@
 		max-width: 1080px;
 		margin: 0 auto;
 		padding: 0 34px;
-	}
-	.subbar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 18px 34px;
-		border-bottom: 1px solid var(--border);
-		background: color-mix(in srgb, var(--bg-page) 90%, transparent);
-		backdrop-filter: blur(8px);
-		position: sticky;
-		top: 0;
-		z-index: var(--z-sticky);
-	}
-	.back {
-		font-size: 0.85rem;
-		font-weight: 500;
-		color: var(--text-secondary);
-		text-decoration: none;
-	}
-	.back:hover {
-		color: var(--btb-steel);
 	}
 	.hero {
 		flex: 1;

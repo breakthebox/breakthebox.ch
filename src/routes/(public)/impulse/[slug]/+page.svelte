@@ -1,7 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import SiteNav from '$lib/components/ui/SiteNav.svelte';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
@@ -53,13 +54,9 @@
 		});
 	}
 
-	function goBack() {
-		if (browser && window.history.length > 1) {
-			window.history.back();
-		} else {
-			window.location.href = localizeHref('/impulse');
-		}
-	}
+	const navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
+	);
 
 	// Track page view
 	$effect(() => {
@@ -80,14 +77,11 @@
 
 <JsonLd data={schemaGraph} />
 
+<SiteNav theme={data.theme} links={navLinks} subtitle="Blog" />
+
 <div class="post-page">
 	<ScrollProgress />
 	<div class="post-inner">
-	<!-- Nav -->
-	<nav class="post-nav">
-		<SubpageBrand subtitle="Blog" />
-		<button type="button" onclick={goBack} class="post-nav-back">&larr; {m.blog_all_posts()}</button>
-	</nav>
 
 	<article class="post-article">
 		<!-- Header Image -->
@@ -129,9 +123,9 @@
 
 		<!-- Back -->
 		<div class="post-footer">
-			<button type="button" onclick={goBack} class="post-back-link">
+			<a href={localizeHref('/impulse')} class="post-back-link">
 				&larr; {m.blog_all_posts()}
-			</button>
+			</a>
 		</div>
 	</article>
 	</div>
@@ -148,27 +142,6 @@
 		margin: 0 auto;
 		padding: 0 24px 80px;
 	}
-
-	/* ═══════ Nav ═══════ */
-	.post-nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 20px 0;
-		margin-bottom: var(--space-xl);
-	}
-	.post-nav-back {
-		font-size: 0.85rem;
-		color: var(--text-secondary);
-		text-decoration: none;
-		transition: color var(--t-fast);
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: 0;
-		font-family: inherit;
-	}
-	.post-nav-back:hover { color: var(--btb-steel); }
 
 	/* ═══════ Article ═══════ */
 	.post-hero-img {

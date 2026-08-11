@@ -1,6 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { page } from '$app/state';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { BlogPostRow } from '$lib/server/db/queries/blog';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
@@ -11,12 +13,9 @@
 	let { data } = $props();
 	const posts = data.posts as BlogPostRow[];
 
-	const home = localizeHref('/');
-	const navLinks = [
-		{ href: `${home}#angebot`, label: m.nav_services() },
-		{ href: `${home}#about`, label: m.nav_about() },
-		{ href: localizeHref('/impulse'), label: m.nav_blog() }
-	];
+	const navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
+	);
 
 	// Neuster Beitrag prominent, der Rest als Jahres-Archiv.
 	const featured = posts[0] ?? null;

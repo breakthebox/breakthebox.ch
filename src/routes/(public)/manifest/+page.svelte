@@ -1,8 +1,9 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { localizeHref } from '$lib/paraglide/runtime';
+	import { page } from '$app/state';
 	import { renderMarkdown } from '$lib/utils/markdown';
-	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import SiteNav from '$lib/components/ui/SiteNav.svelte';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
@@ -14,6 +15,9 @@
 	const vrRoles = data.vrRoles;
 	const qualifications = data.qualifications;
 	const total = manifest.theses.length;
+	const navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
+	);
 
 	let current = $state(0);
 
@@ -65,10 +69,7 @@
 <div class="mani">
 	<ScrollProgress />
 
-	<header class="subbar">
-		<SubpageBrand subtitle="Manifest" />
-		<a href={localizeHref('/')} class="back">← {m.manifest_back()}</a>
-	</header>
+	<SiteNav theme={data.theme} links={navLinks} subtitle="Manifest" />
 
 	<div class="counter"><b>{pad(current)}</b> / {pad(total)}</div>
 
@@ -135,32 +136,6 @@
 		background: var(--bg-page);
 		color: var(--text-primary);
 		overflow-x: hidden;
-	}
-
-	/* Top-Bar */
-	.subbar {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 16px 34px;
-		z-index: var(--z-sticky);
-		mix-blend-mode: multiply;
-	}
-	.back {
-		font-size: 0.8rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--text-secondary);
-		text-decoration: none;
-		transition: color 0.15s;
-	}
-	.back:hover {
-		color: var(--btb-steel);
 	}
 
 	/* Zähler */
@@ -346,9 +321,6 @@
 		.act {
 			padding: 96px 20px;
 			min-height: 82vh;
-		}
-		.subbar {
-			padding: 14px 20px;
 		}
 		.closing {
 			padding: 80px 20px;

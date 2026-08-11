@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import type { PillarsContent, AboutContent, ReferencesContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent, HeroPreset, SectionSetting } from '$lib/types/content';
 	import HeroSlider from '$lib/components/ui/HeroSlider.svelte';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
@@ -192,12 +193,10 @@
 	}
 
 	let activeSection = $state('');
-	// Nav-Links für die geteilte SiteNav (Active-State aus dem Scroll-Spy).
-	let navLinks = $derived([
-		{ href: '#angebot', label: m.nav_services(), active: activeSection === 'angebot' },
-		{ href: '#about', label: m.nav_about(), active: activeSection === 'about' },
-		{ href: localizeHref('/impulse'), label: m.nav_blog() }
-	]);
+	// Nav-Links aus der admin-verwalteten Menü-Liste (Active-State aus dem Scroll-Spy).
+	let navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: '/', isHome: true, activeSection })
+	);
 
 	const faq: FaqContent = data.faq;
 	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');

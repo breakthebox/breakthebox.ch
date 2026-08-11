@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
+	import { page } from '$app/state';
 	import { localizeHref } from '$lib/paraglide/runtime';
-	import * as m from '$lib/paraglide/messages.js';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
@@ -20,12 +21,9 @@
 	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
 	const faqJsonLd = buildFaqPage(SITE_URL + '/keynotes', c.faq.items);
 
-	const home = localizeHref('/');
-	const navLinks = [
-		{ href: `${home}#angebot`, label: m.nav_services() },
-		{ href: `${home}#about`, label: m.nav_about() },
-		{ href: localizeHref('/impulse'), label: m.nav_blog() }
-	];
+	const navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
+	);
 
 	// ─── Termine: kommend/vergangen (gleiche Logik wie bisher) ───
 	const MONTHS_SHORT_DE = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sept', 'Okt', 'Nov', 'Dez'];

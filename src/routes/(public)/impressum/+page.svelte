@@ -1,10 +1,16 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { localizeHref } from '$lib/paraglide/runtime';
-	import SubpageBrand from '$lib/components/ui/SubpageBrand.svelte';
+	import { page } from '$app/state';
+	import SiteNav from '$lib/components/ui/SiteNav.svelte';
+	import { resolveMenuLinks } from '$lib/utils/menu';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+
+	let { data } = $props();
+	const navLinks = $derived(
+		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
+	);
 </script>
 
 <svelte:head>
@@ -12,12 +18,10 @@
 	<meta name="description" content={m.meta_impressum_description()} />
 </svelte:head>
 
+<SiteNav theme={data.theme} links={navLinks} subtitle="Impressum" />
+
 <div class="legal-page">
 	<ScrollProgress />
-	<nav class="legal-nav">
-		<SubpageBrand subtitle="Impressum" />
-		<a href={localizeHref('/')} class="legal-nav-back">&larr; Zur Hauptseite</a>
-	</nav>
 
 	<article class="legal-content">
 		<h1>Impressum</h1>
@@ -78,25 +82,6 @@
 		max-width: 780px;
 		margin: 0 auto;
 		padding: 0 24px 80px;
-	}
-
-	.legal-nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 20px 0;
-		margin-bottom: var(--space-xl);
-	}
-
-	.legal-nav-back {
-		font-size: 0.85rem;
-		color: var(--text-secondary);
-		text-decoration: none;
-		transition: color var(--t-fast);
-	}
-
-	.legal-nav-back:hover {
-		color: var(--btb-steel);
 	}
 
 	.legal-content h1 {

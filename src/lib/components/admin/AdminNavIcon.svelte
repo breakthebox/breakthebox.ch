@@ -31,6 +31,8 @@
 	<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 3v4L3 14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1L11 7V3" /><path d="M6 3h6" /></svg>
 {:else if id === 'manifest'}
 	<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 3h8l2 2v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" /><path d="M6 7h6M6 10h6M6 13h4" /></svg>
+{:else if id === 'menu'}
+	<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="13" height="3.6" rx="1.2" /><path d="M4 11h3M9 11h5M4 14h6" /></svg>
 {:else if id === 'blog'}
 	<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 3h10v12H4z" /><path d="M7 6h4M7 9h4M7 12h2" /></svg>
 {:else if id === 'keynotes'}

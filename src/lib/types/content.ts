@@ -818,6 +818,21 @@ export interface ThemeContent {
 	themes: Theme[];
 }
 
+// ─── Menü / Navigation (admin-verwaltet, site-weit) ───
+/** Ein Menü-Item der öffentlichen Navigation. `target` ist eine ID aus der
+ *  Ziel-Registry ($lib/config/menu-targets) — keine Freitext-URLs. */
+export interface MenuItem {
+	id: string;
+	titleDe: string;
+	titleEn: string;
+	titleFr: string;
+	target: string; // MenuTarget.id (Section-Anker oder Unterseite)
+}
+
+export interface MenuContent {
+	items: MenuItem[];
+}
+
 // ─── Section Union ───
 export type SectionKey =
 	| 'pillars'
@@ -841,6 +856,7 @@ export type SectionKey =
 	| 'hero'
 	| 'sections'
 	| 'media'
+	| 'menu'
 	| 'theme';
 
 export type SectionContent =
@@ -864,4 +880,5 @@ export type SectionContent =
 	| HeroContent
 	| SectionsContent
 	| MediaContent
+	| MenuContent
 	| ThemeContent;

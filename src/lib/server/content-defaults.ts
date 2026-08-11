@@ -53,10 +53,13 @@ import type {
 	SectionSetting,
 	SectionsContent,
 	MediaContent,
+	MenuContent,
+	MenuItem,
 	ThemeImageAsset,
 	Theme,
 	ThemeContent
 } from '$lib/types/content';
+import { MENU_TARGET_IDS } from '$lib/config/menu-targets';
 
 export const defaultPillars: PillarsContent = {
 	pillars: [
@@ -1122,6 +1125,39 @@ export function normalizeSections(raw: unknown): SectionsContent {
 		out.splice(insertAt, 0, entry);
 	}
 	return { sections: out };
+}
+
+// ─── Menü / Navigation ───
+// Default = die bisher hartcodierte Navigation (Angebot, Über mich, Blog→Impulse),
+// damit sich am öffentlichen Look nichts ändert, bis im Admin etwas angepasst wird.
+export const defaultMenu: MenuContent = {
+	items: [
+		{ id: 'angebot', titleDe: 'Angebot', titleEn: 'Services', titleFr: 'Offre', target: 'angebot' },
+		{ id: 'about', titleDe: 'Über mich', titleEn: 'About', titleFr: 'À propos', target: 'about' },
+		{ id: 'impulse', titleDe: 'Blog', titleEn: 'Insights', titleFr: 'Impulsions', target: 'impulse' }
+	]
+};
+
+// Menü robust auflösen: unbekannte Ziele verwerfen, Strings säubern, IDs sichern.
+// Eine leere (aber vorhandene) Liste wird respektiert — nur bei fehlendem Content
+// fallen wir auf die Standard-Navigation zurück.
+export function normalizeMenu(raw: unknown): MenuContent {
+	if (raw === null || raw === undefined) return structuredClone(defaultMenu);
+	const saved = Array.isArray((raw as Partial<MenuContent>)?.items)
+		? ((raw as MenuContent).items as Partial<MenuItem>[])
+		: [];
+	const items: MenuItem[] = [];
+	for (const it of saved) {
+		if (!it?.target || !(MENU_TARGET_IDS as string[]).includes(it.target)) continue;
+		items.push({
+			id: typeof it.id === 'string' && it.id ? it.id : crypto.randomUUID(),
+			titleDe: it.titleDe ?? '',
+			titleEn: it.titleEn ?? '',
+			titleFr: it.titleFr ?? '',
+			target: it.target
+		});
+	}
+	return { items };
 }
 
 // ─── Hero ───
