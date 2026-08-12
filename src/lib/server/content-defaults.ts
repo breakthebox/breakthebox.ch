@@ -50,6 +50,7 @@ import type {
 	FaqContent,
 	HeroContent,
 	HeroPreset,
+	WeltenContent,
 	SectionSetting,
 	SectionsContent,
 	MediaContent,
@@ -1054,6 +1055,7 @@ export const defaultBlog: BlogContent = {
 // Feste Keys in der Standard-Reihenfolge. Hero ist fix zuoberst (eigenes
 // System), der Footer fix zuunterst — beide sind hier bewusst nicht dabei.
 export const LANDING_SECTION_KEYS = [
+	'welten',
 	'angebot',
 	'logos',
 	'pillars',
@@ -1069,15 +1071,21 @@ export const LANDING_SECTION_KEYS = [
 ] as const;
 
 // Sektionen, die standardmässig ausgeblendet sind (z.B. die alten Pillars).
-const DEFAULT_HIDDEN_KEYS: readonly string[] = ['pillars'];
+// «Die Essenz» startet aus, damit sie auf der Live-Seite nicht ungefragt
+// auftaucht — sie wird unter Admin → Sektionen eingeschaltet.
+const DEFAULT_HIDDEN_KEYS: readonly string[] = ['pillars', 'welten'];
 
 export const defaultSections: SectionsContent = {
 	sections: LANDING_SECTION_KEYS.map((key) => ({
 		key,
 		visible: !DEFAULT_HIDDEN_KEYS.includes(key),
+		inverted: false,
 		kicker: '',
 		title: '',
-		subtitle: ''
+		subtitle: '',
+		hideKicker: false,
+		hideTitle: false,
+		hideSubtitle: false
 	}))
 };
 
@@ -1095,9 +1103,13 @@ export function normalizeSections(raw: unknown): SectionsContent {
 		out.push({
 			key: s.key,
 			visible: s.visible !== false,
+			inverted: s.inverted === true,
 			kicker: s.kicker ?? '',
 			title: s.title ?? '',
 			subtitle: s.subtitle ?? '',
+			hideKicker: s.hideKicker === true,
+			hideTitle: s.hideTitle === true,
+			hideSubtitle: s.hideSubtitle === true,
 			...(typeof s.ctaPrimary === 'string' ? { ctaPrimary: s.ctaPrimary } : {}),
 			...(typeof s.ctaSecondary === 'string' ? { ctaSecondary: s.ctaSecondary } : {})
 		});
@@ -1107,9 +1119,13 @@ export function normalizeSections(raw: unknown): SectionsContent {
 		const entry: SectionSetting = {
 			key,
 			visible: !DEFAULT_HIDDEN_KEYS.includes(key),
+			inverted: false,
 			kicker: '',
 			title: '',
-			subtitle: ''
+			subtitle: '',
+			hideKicker: false,
+			hideTitle: false,
+			hideSubtitle: false
 		};
 		// An der Standard-Position einfügen: nach der nächsten vorangehenden
 		// Sektion (gemäss Default-Reihenfolge), die bereits in der Liste steht.
@@ -1177,7 +1193,7 @@ export const defaultHero: HeroContent = {
 				sub: 'Wenn Neugier, Urteilskraft und Umsetzungsstärke wirklich zusammenkommen, entsteht etwas, das man nicht oft sieht.',
 				accent: 'Eine Mischung, die trägt.',
 				signature: 'Brigitte Hulliger',
-				ctaLabel: 'Lass uns sprechen',
+				ctaLabel: 'Reden wir',
 				annotations: [
 					{ title: 'Neugier', sub: 'stellt Fragen' },
 					{ title: 'Umsetzungsstärke', sub: 'macht es echt' },
@@ -1203,6 +1219,18 @@ export const defaultHero: HeroContent = {
 				caption: 'Beide Welten.',
 				captionAccent: 'Dieselbe Person.',
 				hint: 'zum Entdecken ziehen'
+			},
+			editorial: {
+				kicker: 'Digitale Urteilskraft · Verwaltungsrat & Geschäftsleitung',
+				title: 'Eine Kombination, die trägt. Gibt es nur selten.',
+				sub: 'Digitale Urteilskraft für Verwaltungsräte und Geschäftsleitungen — mehr als IT: Substanz statt Hype, erprobt statt nachgelesen.',
+				ctaPrimary: 'Reden wir',
+				ctaSecondary: 'Woran das zu prüfen ist',
+				ctaSecondaryTarget: 'stimmen',
+				image: '',
+				imageKicker: '',
+				imageCaption: '',
+				imageMeta: ''
 			}
 		}
 	]
@@ -1217,14 +1245,15 @@ function normalizeHeroPreset(raw: Partial<HeroPreset> | undefined, fallbackId: s
 	return {
 		id: raw?.id || fallbackId,
 		name: raw?.name?.trim() || 'Hero',
-		variant: raw?.variant === 'slider' ? 'slider' : 'classic',
+		variant: raw?.variant === 'slider' || raw?.variant === 'editorial' ? raw.variant : 'classic',
 		classic: { ...d.classic, ...(raw?.classic ?? {}), annotations },
 		slider: {
 			...d.slider,
 			...(raw?.slider ?? {}),
 			left: { ...d.slider.left, ...(raw?.slider?.left ?? {}) },
 			right: { ...d.slider.right, ...(raw?.slider?.right ?? {}) }
-		}
+		},
+		editorial: { ...d.editorial, ...(raw?.editorial ?? {}) }
 	};
 }
 
@@ -1246,6 +1275,42 @@ export function normalizeHero(raw: unknown): HeroContent {
 // Aktives Preset auflösen: Referenz aus dem Theme, sonst das erste.
 export function resolveActiveHero(content: HeroContent, presetId?: string): HeroPreset {
 	return content.presets.find((p) => p.id === presetId) ?? content.presets[0];
+}
+
+// ─── Die Essenz (zwei Welten) ───
+export const defaultWelten: WeltenContent = {
+	left: {
+		kicker: 'Im Gremium',
+		title: 'Die Frage, die im Raum fehlt.',
+		text: 'Betriebswirtschaft auf GL-Niveau, Governance, digitale Urteilskraft. Kein Ja-Sager.',
+		image: '',
+		imageKicker: '',
+		imageCaption: '',
+		imageMeta: '',
+		dark: false
+	},
+	right: {
+		kicker: 'Im Experimentierraum',
+		title: 'Selbst erprobt, nicht nachgeplappert.',
+		text: 'Eigene KI-Systeme, self-hosted, im täglichen Einsatz. Sieht hinter die Fassade.',
+		image: '',
+		imageKicker: '',
+		imageCaption: '',
+		imageMeta: '',
+		dark: true
+	},
+	caption: 'Beide Welten.',
+	captionAccent: 'Dieselbe Person.'
+};
+
+export function normalizeWelten(raw: unknown): WeltenContent {
+	const c = (raw ?? {}) as Partial<WeltenContent>;
+	return {
+		left: { ...defaultWelten.left, ...(c.left ?? {}) },
+		right: { ...defaultWelten.right, ...(c.right ?? {}) },
+		caption: c.caption ?? defaultWelten.caption,
+		captionAccent: c.captionAccent ?? defaultWelten.captionAccent
+	};
 }
 
 // ─── Mediathek ───
@@ -1280,7 +1345,8 @@ export const defaultTheme: ThemeContent = {
 				cream: '#fbf1ec',
 				soft: '#f6d9d5'
 			},
-			fonts: { heading: 'fraunces', body: 'inter', hand: 'shadows' },
+			shape: 'rounded',
+			fonts: { heading: 'fraunces', body: 'inter', hand: 'shadows', kicker: 'body' },
 			heroImage: DEFAULT_HERO_IMAGE,
 			pillarImages: {}
 		}

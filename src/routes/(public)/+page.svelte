@@ -2,8 +2,9 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import { resolveMenuLinks } from '$lib/utils/menu';
-	import type { PillarsContent, AboutContent, ReferencesContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent, HeroPreset, SectionSetting } from '$lib/types/content';
+	import type { PillarsContent, AboutContent, ReferencesContent, AngebotContent, TestimonialsContent, MetricsContent, PartnersContent, KeynotesContent, KeynoteItem, FaqContent, HeroPreset, WeltenContent, SectionSetting } from '$lib/types/content';
 	import HeroSlider from '$lib/components/ui/HeroSlider.svelte';
+	import HeroEditorial from '$lib/components/ui/HeroEditorial.svelte';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
@@ -40,12 +41,16 @@
 		`--navaccent:${headerDark ? mixHex(cHeader, '#ffffff', 0.3) : cPrimary};` +
 		`--navline:${headerDark ? mixHex(cHeader, '#ffffff', 0.82) : mixHex(cSoft, cInk, 0.92)};` +
 		`--serif:${themeFonts.heading.family};--sans:${themeFonts.body.family};--hand:${themeFonts.hand.family};`;
+	// Die Palette der dunklen Bänder (--inv-*) kommt site-weit aus dem Root-Layout.
 	const heroImage = theme?.heroImage || '/fruits/hero.png';
+	// Form des Themes: 'edge' schaltet den Editorial-Look ein (eckig + Haarlinien-Raster).
+	const edge = theme?.shape === 'edge';
 	// Theme-Bild ist die Basis; ein im Pillar gesetztes Bild überschreibt es.
 
 	// Content from DB (with fallback to defaults in server load)
 	const hero: HeroPreset = data.hero;
 	const heroClassic = hero.classic;
+	const welten: WeltenContent = data.welten;
 	const pillars: PillarsContent = data.pillars;
 	const about: AboutContent = data.about;
 	const references: ReferencesContent = data.references;
@@ -59,6 +64,15 @@
 	const sectionCfg: SectionSetting[] = data.sections.sections;
 	const cfg = Object.fromEntries(sectionCfg.map((s) => [s.key, s])) as Record<string, SectionSetting>;
 	const visibleSections = sectionCfg.filter((s) => s.visible);
+	// Benachbarte dunkle Sektionen zu Gruppen bündeln. Das Kontakt-Band ist
+	// immer dunkel, darum zählt es hier mit — sonst bricht der Verlauf davor.
+	const sectionGroups = visibleSections.reduce<{ dark: boolean; items: SectionSetting[] }[]>((acc, s) => {
+		const dark = s.inverted === true || s.key === 'kontakt';
+		const last = acc[acc.length - 1];
+		if (last && last.dark === dark) last.items.push(s);
+		else acc.push({ dark, items: [s] });
+		return acc;
+	}, []);
 
 	// ─── Bühne / Auftritte ───
 	const keynotes: KeynotesContent = data.keynotes;
@@ -281,7 +295,7 @@
 	<meta name="description" content={m.hero_subline()} />
 </svelte:head>
 
-<div class="hbb" style={hbbStyle}>
+<div class="hbb" class:edge style={hbbStyle}>
 	<ScrollProgress />
 	{#snippet socialIcon(platform: string)}
 		{#if platform === 'linkedin'}
@@ -322,6 +336,8 @@
 	<!-- ═══════ HERO (Variante aus Admin: klassisch oder Zwei-Welten-Slider) ═══════ -->
 	{#if hero.variant === 'slider'}
 		<HeroSlider content={hero.slider} />
+	{:else if hero.variant === 'editorial'}
+		<HeroEditorial content={hero.editorial} image={heroImage} />
 	{:else}
 		<header class="hero">
 			<div class="wrap">
@@ -358,15 +374,62 @@
 		</header>
 	{/if}
 
+	<!-- Kopfbereich einer Sektion. Leeres Feld = Standardtext; erst der
+	     «weglassen»-Schalter im Backoffice entfernt die Zeile ganz. -->
+	{#snippet sechead(c: SectionSetting, dKicker: string, dTitle: string, dSub: string)}
+		{@const k = c.hideKicker ? '' : c.kicker || dKicker}
+		{@const t = c.hideTitle ? '' : c.title || dTitle}
+		{@const s = c.hideSubtitle ? '' : c.subtitle || dSub}
+		{#if k || t || s}
+			<div class="sechead reveal">
+				{#if k}<div class="kick">{k}</div>{/if}
+				{#if t}<h2 class="serif">{t}</h2>{/if}
+				{#if s}<p class="sub">{s}</p>{/if}
+			</div>
+		{/if}
+	{/snippet}
+
+	<!-- ═══════ DIE ESSENZ (zwei Welten nebeneinander) ═══════ -->
+	{#snippet sec_welten()}
+	<section class="sec" id="welten" class:inverted={cfg.welten.inverted}>
+		<div class="wrap">
+			{@render sechead(cfg.welten, m.h_welten_label(), m.h_welten_title(), '')}
+			<div class="welten reveal-stagger">
+				{#each [welten.left, welten.right] as world, wi (wi)}
+					<div class="welt reveal" style="--stagger: {wi}">
+						<div class="kick">{world.kicker}</div>
+						<div class="welt-img" class:deep={world.dark}>
+							{#if world.image}
+								<img src={world.image} alt={world.title} loading="lazy" decoding="async" />
+							{/if}
+							<span class="welt-frame" aria-hidden="true"></span>
+							{#if world.imageKicker || world.imageCaption}
+								<div class="welt-lab">
+									{#if world.imageKicker}<b>{world.imageKicker}</b>{/if}
+									{#if world.imageCaption}<span>{world.imageCaption}</span>{/if}
+									{#if world.imageMeta}<i>{world.imageMeta}</i>{/if}
+								</div>
+							{/if}
+						</div>
+						<h3 class="serif">{world.title}</h3>
+						<p>{world.text}</p>
+					</div>
+				{/each}
+			</div>
+			{#if welten.caption || welten.captionAccent}
+				<div class="welten-bridge reveal">
+					<span>{welten.caption} <em>{welten.captionAccent}</em></span>
+				</div>
+			{/if}
+		</div>
+	</section>
+	{/snippet}
+
 	<!-- ═══════ ANGEBOT (an der ehemaligen Pillars-Position) ═══════ -->
 	{#snippet sec_angebot()}
-	<section class="afterhero" id="angebot">
+	<section class="afterhero" id="angebot" class:inverted={cfg.angebot.inverted}>
 		<div class="wrap">
-			<div class="sechead reveal">
-				<div class="kick">{cfg.angebot.kicker || m.h_angebot_label()}</div>
-				<h2 class="serif">{cfg.angebot.title || m.h_angebot_title()}</h2>
-				<p class="sub">{cfg.angebot.subtitle || m.h_angebot_sub()}</p>
-			</div>
+			{@render sechead(cfg.angebot, m.h_angebot_label(), m.h_angebot_title(), m.h_angebot_sub())}
 			{#snippet angebotInner(item: typeof angebot.items[number])}
 				{#if item.image}
 					<div class="acard-img"><img src={item.image} alt="" loading="lazy" decoding="async" /></div>
@@ -404,14 +467,9 @@
 
 	{#snippet sec_logos()}
 	<!-- ═══════ KUNDENLOGOS (Marquee) ═══════ -->
-	<section class="logos-sec" id="logos">
+	<section class="logos-sec" id="logos" class:inverted={cfg.logos.inverted}>
 		<div class="wrap">
-			{#if cfg.logos.title || cfg.logos.subtitle}
-				<div class="sechead reveal">
-					<h2 class="serif">{cfg.logos.title}</h2>
-					{#if cfg.logos.subtitle}<p class="sub">{cfg.logos.subtitle}</p>{/if}
-				</div>
-			{/if}
+			{@render sechead(cfg.logos, '', '', '')}
 			{#snippet logo(client: typeof references.clients[number])}
 				{#if client.logoUrl}
 					{#if client.websiteUrl}
@@ -423,19 +481,7 @@
 					<span class="logo-item logo-text">{client.name}</span>
 				{/if}
 			{/snippet}
-			<div class="strip reveal">
-				<div class="sl">{cfg.logos.kicker || m.h_strip()}</div>
-				<div class="marquee">
-					<div class="marquee-track left">
-						{#each [0, 1] as dup}
-							<div class="marquee-row" aria-hidden={dup === 1}>
-								{#each references.clients as client}{@render logo(client)}{/each}
-							</div>
-						{/each}
-					</div>
-				</div>
-			</div>
-			<!-- Kennzahlen: stille Beleg-Zeile — Zahlen und Logos erzählen dasselbe -->
+			<!-- Kennzahlen: stille Beleg-Zeile — die Zahlen führen, der Logo-Streifen belegt sie. -->
 			{#if metrics.items.length > 0}
 				<div class="metrics-row reveal">
 					{#each metrics.items as metric}
@@ -446,19 +492,28 @@
 					{/each}
 				</div>
 			{/if}
+			<div class="strip reveal">
+				<!-- Beschriftung des Streifens; der Kicker gehört jetzt über den Titel -->
+				<div class="sl">{m.h_strip()}</div>
+				<div class="marquee">
+					<div class="marquee-track left">
+						{#each [0, 1] as dup}
+							<div class="marquee-row" aria-hidden={dup === 1}>
+								{#each references.clients as client}{@render logo(client)}{/each}
+							</div>
+						{/each}
+					</div>
+				</div>
+			</div>
 		</div>
 	</section>
 	{/snippet}
 
 	{#snippet sec_pillars()}
 	<!-- ═══════ PILLARS (Säulen) — standardmässig ausgeblendet ═══════ -->
-	<section class="sec" id="pillars">
+	<section class="sec" id="pillars" class:inverted={cfg.pillars.inverted}>
 		<div class="wrap">
-			<div class="sechead reveal">
-				<div class="kick">{cfg.pillars.kicker || m.h_pillars_label()}</div>
-				<h2 class="serif">{cfg.pillars.title || m.h_pillars_title()}</h2>
-				<p class="sub">{cfg.pillars.subtitle || m.h_pillars_sub()}</p>
-			</div>
+			{@render sechead(cfg.pillars, m.h_pillars_label(), m.h_pillars_title(), m.h_pillars_sub())}
 			{#snippet pillarFront(pillar: PillarsContent['pillars'][number], showArrow: boolean)}
 				{#if pillarImage(pillar)}
 					<div class="pcard-img"><img src={pillarImage(pillar)} alt={pillar.title} loading="lazy" decoding="async" /></div>
@@ -546,7 +601,7 @@
 
 	<!-- ═══════ ÜBER MICH ═══════ -->
 	{#snippet sec_about()}
-	<section class="sec" id="about">
+	<section class="sec" id="about" class:inverted={cfg.about.inverted}>
 		<div class="wrap aboutgrid">
 			<div class="aboutcol reveal">
 				<div class="aboutpf">
@@ -568,10 +623,10 @@
 				{/if}
 			</div>
 			<div class="reveal">
-				<div class="kick">{cfg.about.kicker || m.section_about_label()}</div>
+				{#if !cfg.about.hideKicker}<div class="kick">{cfg.about.kicker || m.section_about_label()}</div>{/if}
 				<!-- Titel gehört dem «Über mich»-Admin — kein Sektions-Override (Doppelbesitz) -->
-				<h2 class="serif about-h2">{about.title}</h2>
-				{#if cfg.about.subtitle}<p class="sub">{cfg.about.subtitle}</p>{/if}
+				{#if !cfg.about.hideTitle}<h2 class="serif about-h2">{about.title}</h2>{/if}
+				{#if !cfg.about.hideSubtitle && cfg.about.subtitle}<p class="sub">{cfg.about.subtitle}</p>{/if}
 				{#each about.texts as text}
 					<p class="about-text">{text}</p>
 				{/each}
@@ -606,13 +661,9 @@
 
 	<!-- ═══════ ABSPRUNG: HALTUNG (MANIFEST) & BEWEIS (EXPERIMENTIERRAUM) ═══════ -->
 	{#snippet sec_haltung()}
-	<section class="sec" id="haltung">
+	<section class="sec" id="haltung" class:inverted={cfg.haltung.inverted}>
 		<div class="wrap">
-			<div class="sechead reveal">
-				<div class="kick">{cfg.haltung.kicker || m.h_leap_label()}</div>
-				<h2 class="serif">{cfg.haltung.title || m.h_leap_title()}</h2>
-				{#if cfg.haltung.subtitle}<p class="sub">{cfg.haltung.subtitle}</p>{/if}
-			</div>
+			{@render sechead(cfg.haltung, m.h_leap_label(), m.h_leap_title(), '')}
 			<div class="leap-grid reveal-stagger">
 				<a class="leap-card leap-dark reveal" style="--stagger: 0" href={localizeHref('/manifest')}>
 					<span class="leap-kick">{m.h_leap_manifest_kick()}</span>
@@ -661,10 +712,10 @@
 					{#if a.desc}<div class="ev-desc">{@html renderMarkdownBlock(a.desc)}</div>{/if}
 					{#if a.tags.length > 0}
 						<div class="ev-tags">
-							{#each a.tags.slice(0, 4) as tag}<span class="ptag">{tag}</span>{/each}
+							{#each a.tags.slice(0, 4) as tag}<span class="ev-tag">{tag}</span>{/each}
 						</div>
 					{/if}
-					{#if a.url}<a class="btn solid ev-cta" href={a.url} target="_blank" rel="noopener noreferrer">{m.h_buehne_cta()} →</a>{/if}
+					{#if a.url}<a class="ev-cta" href={a.url} target="_blank" rel="noopener noreferrer">{m.h_buehne_cta()} →</a>{/if}
 				</div>
 			</article>
 		{/snippet}
@@ -680,13 +731,9 @@
 				{#if withBlog}<span class="past-more">{m.h_buehne_readmore()} →</span>{/if}
 			</div>
 		{/snippet}
-		<section class="sec" id="buehne">
+		<section class="sec" id="buehne" class:inverted={cfg.buehne.inverted}>
 			<div class="wrap">
-				<div class="sechead reveal">
-					<div class="kick">{cfg.buehne.kicker || m.h_buehne_label()}</div>
-					<h2 class="serif">{cfg.buehne.title || m.h_buehne_title()}</h2>
-					<p class="sub">{cfg.buehne.subtitle || m.h_buehne_sub()}</p>
-				</div>
+				{@render sechead(cfg.buehne, m.h_buehne_label(), m.h_buehne_title(), m.h_buehne_sub())}
 
 				<div class="buehne-group reveal">
 					<div class="grouplbl">{m.h_buehne_upcoming()}</div>
@@ -726,33 +773,29 @@
 	<!-- ═══════ NETZWERK / PARTNER ═══════ -->
 	{#snippet sec_netzwerk()}
 	{#if partners.items.length > 0}
-		<section class="sec" id="netzwerk">
+		<section class="sec" id="netzwerk" class:inverted={cfg.netzwerk.inverted}>
 			<div class="wrap">
-				<div class="sechead reveal">
-					<div class="kick">{cfg.netzwerk.kicker || m.h_netzwerk_label()}</div>
-					<h2 class="serif">{cfg.netzwerk.title || m.h_netzwerk_title()}</h2>
-					<p class="sub">{cfg.netzwerk.subtitle || m.h_netzwerk_sub()}</p>
-				</div>
+				{@render sechead(cfg.netzwerk, m.h_netzwerk_label(), m.h_netzwerk_title(), m.h_netzwerk_sub())}
 				<div class="partners reveal-stagger">
 					{#each partners.items as partner, pi}
+						{@const role = partner.role || partner.persons[0]?.expertise || ''}
 						<div class="partner-card reveal" style="--stagger: {pi}">
-							<div class="partner-head">
+							<div class="partner-mark">
 								{#if partner.logo}
 									<img class="partner-logo" src={partner.logo} alt={partner.name} loading="lazy" />
 								{:else}
 									<span class="partner-name">{partner.name}</span>
 								{/if}
-								{#if partner.website}
-									<a class="partner-site" href={partner.website} target="_blank" rel="noopener noreferrer">{m.h_netzwerk_visit()} →</a>
-								{/if}
 							</div>
-							{#if partner.logo}<span class="partner-name partner-name-sub">{partner.name}</span>{/if}
+							{#if role}<div class="partner-role">{role}</div>{/if}
 							{#if partner.persons.length > 0}
 								<div class="partner-persons">
 									{#each partner.persons as person}
 										<div class="partner-person">
 											{#if person.photo}
 												<img class="pp-photo" src={person.photo} alt={person.name} loading="lazy" decoding="async" />
+											{:else}
+												<span class="pp-photo pp-photo-empty" aria-hidden="true"></span>
 											{/if}
 											<div class="pp-text">
 												{#if person.linkedin}
@@ -770,6 +813,9 @@
 									{/each}
 								</div>
 							{/if}
+							{#if partner.website}
+								<a class="partner-site" href={partner.website} target="_blank" rel="noopener noreferrer">{m.h_netzwerk_visit()} →</a>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -780,13 +826,9 @@
 
 	<!-- ═══════ STIMMEN ═══════ -->
 	{#snippet sec_stimmen()}
-	<section class="sec" id="stimmen">
+	<section class="sec" id="stimmen" class:inverted={cfg.stimmen.inverted}>
 		<div class="wrap">
-			<div class="sechead reveal">
-				<div class="kick">{cfg.stimmen.kicker || m.h_stimmen_label()}</div>
-				<h2 class="serif">{cfg.stimmen.title || m.h_stimmen_title()}</h2>
-				<p class="sub">{cfg.stimmen.subtitle || m.h_stimmen_sub()}</p>
-			</div>
+			{@render sechead(cfg.stimmen, m.h_stimmen_label(), m.h_stimmen_title(), m.h_stimmen_sub())}
 			<div class="quotes reveal-stagger">
 				{#each testimonials.items as quote, qi}
 					<div class="qt reveal" style="--stagger: {qi}">
@@ -836,13 +878,9 @@
 
 	<!-- ═══════ FAQ ═══════ -->
 	{#snippet sec_faq()}
-	<section class="sec" id="faq">
+	<section class="sec" id="faq" class:inverted={cfg.faq.inverted}>
 		<div class="wrap faq-container">
-			<div class="sechead reveal">
-				<div class="kick">{cfg.faq.kicker || m.section_faq_label()}</div>
-				<h2 class="serif">{cfg.faq.title || m.section_faq_title()}</h2>
-				{#if cfg.faq.subtitle}<p class="sub">{cfg.faq.subtitle}</p>{/if}
-			</div>
+			{@render sechead(cfg.faq, m.section_faq_label(), m.section_faq_title(), '')}
 			<div class="reveal">
 				<FaqList items={faq.items} firstOpen />
 			</div>
@@ -851,8 +889,21 @@
 	{/snippet}
 
 	<!-- ═══════ SEKTIONEN in konfigurierter Reihenfolge (Admin → Sektionen) ═══════ -->
-	{#each visibleSections as s (s.key)}
-		{#if s.key === 'angebot'}{@render sec_angebot()}
+	<!-- Aufeinanderfolgende dunkle Sektionen laufen als ein Band: der Verlauf
+	     liegt auf der Gruppe, sonst stossen zwei Verläufe an der Kante aneinander. -->
+	{#each sectionGroups as group, gi (gi)}
+		{#if group.dark}
+			<div class="inv-band">
+				{#each group.items as s (s.key)}{@render renderSection(s)}{/each}
+			</div>
+		{:else}
+			{#each group.items as s (s.key)}{@render renderSection(s)}{/each}
+		{/if}
+	{/each}
+
+	{#snippet renderSection(s: SectionSetting)}
+		{#if s.key === 'welten'}{@render sec_welten()}
+		{:else if s.key === 'angebot'}{@render sec_angebot()}
 		{:else if s.key === 'logos'}{@render sec_logos()}
 		{:else if s.key === 'pillars'}{@render sec_pillars()}
 		{:else if s.key === 'tension'}{@render sec_tension()}
@@ -863,9 +914,9 @@
 		{:else if s.key === 'stimmen'}{@render sec_stimmen()}
 		{:else if s.key === 'impulse'}{@render sec_impulse()}
 		{:else if s.key === 'faq'}{@render sec_faq()}
-		{:else if s.key === 'kontakt'}<ContactBand title={cfg.kontakt.title || undefined} text={cfg.kontakt.subtitle || undefined} />
+		{:else if s.key === 'kontakt'}<ContactBand />
 		{/if}
-	{/each}
+	{/snippet}
 
 	<JsonLd data={jsonLdGraph} />
 
@@ -913,7 +964,7 @@
 		text-decoration: none;
 	}
 	.kick {
-		font-family: var(--sans);
+		font-family: var(--ff-kicker);
 		text-transform: uppercase;
 		letter-spacing: 0.2em;
 		font-size: 11.5px;
@@ -923,6 +974,20 @@
 	}
 	.kick-light {
 		color: var(--pink);
+	}
+	/* Alle Label-Zeilen (Kicker, Meta, Tags) tragen die Kicker-Schrift des
+	   Themes — ein Ort statt einer Angabe pro Klasse. */
+	.leap-cta,
+	.astrip .live,
+	.grouplbl,
+	.ev-ev,
+	.ev-datechip .mo,
+	.past-ev,
+	.role-label,
+	.metric-label,
+	.ptag,
+	.acard-link {
+		font-family: var(--ff-kicker);
 	}
 
 	/* ═══════ BUTTONS ═══════ */
@@ -935,7 +1000,7 @@
 		font-size: 13px;
 		letter-spacing: 0.04em;
 		padding: 14px 26px;
-		border-radius: 6px;
+		border-radius: calc(6px * var(--round));
 		cursor: pointer;
 		transition: all 0.2s;
 		text-transform: uppercase;
@@ -1132,6 +1197,127 @@
 		max-width: 600px;
 	}
 
+	/* ═══════ DIE ESSENZ (zwei Welten) ═══════ */
+	/* Zwei gleichwertige Spalten unter einer Kapitel-Linie, darunter die
+	   Klammer-Zeile, die mittig auf der Abschlusslinie sitzt. */
+	.welten {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: clamp(24px, 4vw, 60px);
+		border-top: 1px solid var(--ink);
+		padding-top: 30px;
+	}
+	.welt .kick {
+		margin-bottom: 14px;
+	}
+	.welt-img {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		border-radius: calc(12px * var(--round));
+		background: linear-gradient(160deg, var(--cream2) 0%, var(--pink) 100%);
+		margin-bottom: 20px;
+	}
+	.welt-img.deep {
+		background: linear-gradient(160deg, color-mix(in srgb, var(--red) 72%, #ffffff) 0%, var(--red) 55%, var(--redd) 118%);
+	}
+	.welt-img img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	/* Eingerückter Innenrahmen — dieselbe Bildkante wie im Editorial-Hero. */
+	.welt-frame {
+		position: absolute;
+		inset: 13px;
+		border: 1px solid rgba(255, 255, 255, 0.32);
+		border-radius: calc(6px * var(--round));
+		pointer-events: none;
+		z-index: 1;
+	}
+	.welt-lab {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		z-index: 2;
+		padding: 15px 17px;
+		max-width: 94%;
+	}
+	.welt-lab b {
+		display: block;
+		width: max-content;
+		font-family: var(--ff-kicker);
+		font-size: 9.5px;
+		font-weight: 600;
+		letter-spacing: 0.17em;
+		text-transform: uppercase;
+		color: #fff;
+		background: var(--red);
+		border-radius: calc(3px * var(--round));
+		padding: 5px 9px;
+		margin-bottom: 8px;
+	}
+	.welt-lab span {
+		display: block;
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: 15.5px;
+		line-height: 1.2;
+		color: #fff;
+		text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
+	}
+	.welt-lab i {
+		display: block;
+		font-family: var(--ff-kicker);
+		font-style: normal;
+		font-size: 9.5px;
+		letter-spacing: 0.05em;
+		color: rgba(255, 255, 255, 0.82);
+		margin-top: 6px;
+	}
+	.welt h3 {
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: clamp(19px, 1.8vw, 24px);
+		line-height: 1.14;
+		color: var(--ink);
+		margin-bottom: 10px;
+	}
+	.welt p {
+		font-size: 15.5px;
+		color: var(--dim);
+		max-width: 38ch;
+	}
+	/* Klammer: die Zeile sitzt auf der Linie und verbindet beide Spalten. */
+	.welten-bridge {
+		border-top: 1px solid var(--ink);
+		margin-top: 38px;
+		text-align: center;
+	}
+	.welten-bridge span {
+		display: inline-block;
+		position: relative;
+		top: -12px;
+		background: var(--cream);
+		padding: 0 22px;
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: clamp(17px, 1.7vw, 23px);
+		color: var(--ink);
+	}
+	.welten-bridge em {
+		font-style: normal;
+		color: var(--red);
+	}
+	@media (max-width: 820px) {
+		.welten {
+			grid-template-columns: 1fr;
+			gap: 36px;
+		}
+	}
+
 	/* ═══════ PILLARS (Angebot) ═══════ */
 	.pillars {
 		display: grid;
@@ -1143,7 +1329,7 @@
 	.pcard {
 		background: #fff;
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: calc(12px * var(--round));
 		padding: 30px 28px;
 		box-shadow: 0 20px 44px -34px rgba(120, 20, 40, 0.3);
 		display: flex;
@@ -1172,7 +1358,7 @@
 	}
 	.pcard-flip:focus-visible {
 		box-shadow: 0 0 0 3px var(--red);
-		border-radius: 12px;
+		border-radius: calc(12px * var(--round));
 	}
 	.pcard-flip-inner {
 		position: absolute;
@@ -1245,7 +1431,7 @@
 		width: calc(100% + 56px);
 		height: 150px;
 		margin: -30px -28px 18px;
-		border-radius: 12px 12px 0 0;
+		border-radius: calc(12px * var(--round)) calc(12px * var(--round)) 0 0;
 		overflow: hidden;
 		/* gleicher hellblauer Verlauf wie im Hero */
 		background: linear-gradient(135deg, var(--cream2), var(--pink));
@@ -1311,7 +1497,7 @@
 		font-size: 11px;
 		font-weight: 500;
 		padding: 4px 10px;
-		border-radius: 4px;
+		border-radius: calc(4px * var(--round));
 		background: var(--cream2);
 		color: var(--redd);
 	}
@@ -1324,7 +1510,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		border-radius: 18px;
+		border-radius: calc(18px * var(--round));
 		padding: 44px 42px 38px;
 		min-height: 340px;
 		color: #fff;
@@ -1343,7 +1529,7 @@
 		background: radial-gradient(120% 130% at 82% 0%, color-mix(in srgb, var(--red) 68%, #d9f2f0) 0%, var(--red) 58%, var(--redd) 118%);
 	}
 	.leap-kick {
-		font-family: var(--sans);
+		font-family: var(--ff-kicker);
 		text-transform: uppercase;
 		letter-spacing: 0.18em;
 		font-size: 11px;
@@ -1394,9 +1580,11 @@
 	.strip {
 		padding: 0 0 8px;
 		text-align: center;
+		/* steht neu unter den Kennzahlen */
+		margin-top: 44px;
 	}
 	.strip .sl {
-		font-family: var(--sans);
+		font-family: var(--ff-kicker);
 		text-transform: uppercase;
 		letter-spacing: 0.2em;
 		font-size: 11.5px;
@@ -1634,7 +1822,7 @@
 		display: grid;
 		grid-template-columns: 250px 1fr;
 		border: 1px solid var(--line);
-		border-radius: 14px;
+		border-radius: calc(14px * var(--round));
 		overflow: hidden;
 		background: #fff;
 		box-shadow: 0 22px 46px -36px rgba(120, 20, 40, 0.34);
@@ -1646,7 +1834,11 @@
 	}
 	.ev-img {
 		position: relative;
-		min-height: 220px;
+		/* Oben ausgerichtet statt über die ganze Kartenhöhe gezogen: das Bild
+		   behält sein Format, auch wenn der Text daneben lang wird. */
+		align-self: start;
+		aspect-ratio: 3 / 2;
+		overflow: hidden;
 		background: linear-gradient(135deg, var(--cream2), var(--pink));
 		display: flex;
 		align-items: center;
@@ -1662,7 +1854,7 @@
 		top: 14px;
 		left: 14px;
 		background: #fff;
-		border-radius: 10px;
+		border-radius: calc(10px * var(--round));
 		padding: 8px 13px;
 		text-align: center;
 		box-shadow: 0 8px 18px -12px rgba(16, 52, 74, 0.5);
@@ -1754,20 +1946,47 @@
 	.ev-desc :global(li)::marker {
 		color: var(--red);
 	}
+	/* Zurückhaltend: Themen als gesetzte Zeile, nicht als Chips. */
 	.ev-tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 6px;
-		margin-bottom: 20px;
+		align-items: baseline;
+		gap: 0 10px;
+		margin-bottom: 18px;
 	}
-	.ev-cta {
+	.ev-tag {
+		font-family: var(--ff-kicker);
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.13em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+	.ev-tag:not(:last-child)::after {
+		content: '·';
+		margin-left: 10px;
+	}
+	/* Textlink statt gefülltem Button — der Auftritt selbst trägt die Karte.
+	   Mit Element im Selektor, sonst gewinnt die allgemeine Link-Regel «.hbb a». */
+	.ev-card a.ev-cta {
+		display: inline-block;
 		margin-top: 2px;
+		font-family: var(--ff-kicker);
+		font-size: 10.5px;
+		font-weight: 600;
+		letter-spacing: 0.13em;
+		text-transform: uppercase;
+		color: var(--redd);
+		transition: color 0.2s;
+	}
+	.ev-card a.ev-cta:hover {
+		color: var(--red);
 	}
 
 	/* Vermerk, wenn kein kommender Auftritt ansteht */
 	.ev-empty {
 		border: 1px dashed var(--line);
-		border-radius: 14px;
+		border-radius: calc(14px * var(--round));
 		background: color-mix(in srgb, var(--cream) 55%, #fff);
 		padding: 28px 30px;
 		display: flex;
@@ -1803,7 +2022,7 @@
 		gap: 14px;
 		align-items: center;
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: calc(12px * var(--round));
 		padding: 16px 18px;
 		background: color-mix(in srgb, var(--cream) 55%, #fff);
 		color: inherit;
@@ -1817,7 +2036,7 @@
 	.past-mini {
 		width: 54px;
 		height: 54px;
-		border-radius: 10px;
+		border-radius: calc(10px * var(--round));
 		flex-shrink: 0;
 		background: linear-gradient(135deg, var(--cream2), var(--pink));
 		display: flex;
@@ -1875,7 +2094,8 @@
 			grid-template-columns: 1fr;
 		}
 		.ev-img {
-			min-height: 150px;
+			/* einspaltig: volle Breite, flacheres Format */
+			aspect-ratio: 16 / 9;
 		}
 		.astrip {
 			flex-wrap: wrap;
@@ -1898,7 +2118,7 @@
 	}
 	.aboutpf {
 		position: relative;
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		overflow: hidden;
 		border: 1px solid var(--line);
 		box-shadow: 0 26px 54px -30px rgba(120, 20, 40, 0.4);
@@ -1963,7 +2183,7 @@
 	.acard {
 		background: var(--cream2);
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: calc(12px * var(--round));
 		padding: 26px 28px;
 	}
 	.acard h3 {
@@ -2111,7 +2331,6 @@
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 12px 56px;
-		margin-top: 44px;
 	}
 	.metric {
 		text-align: center;
@@ -2140,52 +2359,64 @@
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 		gap: 20px;
 	}
+	/* Kachel: Bildmarke oben, Kompetenz-Zeile, Personen unten, Link zuunterst. */
 	.partner-card {
 		background: #fff;
 		border: 1px solid var(--line);
-		border-radius: 12px;
-		padding: 28px;
+		border-radius: calc(12px * var(--round));
+		padding: 26px 24px 24px;
 		box-shadow: 0 18px 40px -34px rgba(120, 20, 40, 0.26);
 		display: flex;
 		flex-direction: column;
 	}
-	.partner-head {
+	.partner-mark {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: 14px;
-		margin-bottom: 6px;
+		height: 44px;
+		margin-bottom: 8px;
 	}
 	.partner-logo {
-		height: 40px;
-		max-width: 150px;
+		max-height: 36px;
+		max-width: 100%;
+		width: auto;
 		object-fit: contain;
 	}
 	.partner-name {
 		font-family: var(--serif);
-		font-weight: 600;
-		font-size: 20px;
+		font-weight: 700;
+		font-size: 21px;
+		letter-spacing: -0.02em;
 		color: var(--ink);
 	}
-	.partner-name-sub {
-		font-size: 15px;
-		margin-top: 10px;
+	.partner-role {
+		font-family: var(--ff-kicker);
+		font-size: 9.5px;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--red);
+		margin-bottom: 18px;
 	}
 	.partner-site {
-		flex-shrink: 0;
-		font-size: 12.5px;
+		align-self: flex-start;
+		margin-top: 14px;
+		font-family: var(--ff-kicker);
+		font-size: 9.5px;
 		font-weight: 600;
-		color: var(--red);
+		letter-spacing: 0.13em;
+		text-transform: uppercase;
+		color: var(--redd);
 		transition: color 0.2s;
 	}
 	.partner-site:hover {
-		color: var(--redd);
+		color: var(--red);
 	}
+	/* schiebt Personen und Link an den Kartenfuss — alle Kacheln gleich hoch */
 	.partner-persons {
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
-		margin-top: 18px;
+		margin-top: auto;
 		border-top: 1px solid var(--line);
 		padding-top: 16px;
 	}
@@ -2201,6 +2432,10 @@
 		object-fit: cover;
 		flex-shrink: 0;
 		border: 1px solid var(--line);
+	}
+	/* Platzhalter ohne Foto — hält die Zeilen der Personen bündig. */
+	.pp-photo-empty {
+		background: var(--cream2);
 	}
 	.pp-text {
 		display: flex;
@@ -2246,7 +2481,7 @@
 	.qt {
 		background: #fff;
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: calc(12px * var(--round));
 		padding: 26px;
 		box-shadow: 0 18px 40px -32px rgba(120, 20, 40, 0.28);
 	}
@@ -2320,7 +2555,7 @@
 		color: var(--red);
 		text-decoration: none;
 		border: 1px solid var(--line);
-		border-radius: 999px;
+		border-radius: calc(999px * var(--round));
 		padding: 6px 14px;
 		transition: border-color 0.15s, background 0.15s;
 	}
@@ -2346,7 +2581,7 @@
 		position: relative;
 		width: 100%;
 		padding-bottom: 56.25%;
-		border-radius: 12px;
+		border-radius: calc(12px * var(--round));
 		overflow: hidden;
 		border: 1px solid var(--line);
 		box-shadow: 0 20px 44px -34px rgba(120, 20, 40, 0.3);
@@ -2466,6 +2701,258 @@
 		}
 		section.sec {
 			padding: 50px 0;
+		}
+	}
+
+	/* ═══════ INVERTIERTE SEKTIONEN (Admin → Sektionen) ═══════
+	   Eine invertierte Sektion belegt die Farb-Variablen neu, statt jede Regel
+	   zu doppeln: Fläche wird zur tiefen Markenfarbe, Text hell, Akzente
+	   aufgehellt. Weil Variablen vererbt werden, ziehen auch eingebettete
+	   Komponenten (FAQ-Liste) automatisch mit. */
+	section.inverted {
+		/* Flächen und Linien der Startseite */
+		--cream: var(--inv-bg);
+		--cream2: var(--inv-bg2);
+		--line: rgba(255, 255, 255, 0.18);
+		--ink: #ffffff;
+		--dim: rgba(255, 255, 255, 0.74);
+		--red: var(--inv-lum);
+		--redd: var(--inv-lum);
+		--pink: var(--inv-tint);
+		/* globale Tokens für eingebettete Komponenten */
+		--text-heading: #ffffff;
+		--text-primary: #ffffff;
+		--text-secondary: rgba(255, 255, 255, 0.74);
+		--border: rgba(255, 255, 255, 0.18);
+		--btb-steel: var(--inv-lum);
+		--btb-steel-hover: var(--inv-lum);
+
+		/* Die Fläche trägt die Gruppe (.inv-band), damit der Verlauf über
+		   mehrere aufeinanderfolgende dunkle Sektionen durchläuft. */
+		background: transparent;
+		color: #ffffff;
+		border-bottom-color: rgba(255, 255, 255, 0.18);
+	}
+	/* Das gemeinsame Band: ein Verlauf über die ganze Gruppe. */
+	.inv-band {
+		background: radial-gradient(120% 130% at 80% 0%, var(--inv-top) 0%, var(--inv-bg) 58%, var(--inv-deep) 118%);
+	}
+	/* Innerhalb eines Bandes keine Sektions-Trennlinie — es liest sich als eine Fläche. */
+	.inv-band > section:not(:last-child) {
+		border-bottom: none;
+	}
+	/* Das Kontakt-Band bringt sonst seinen eigenen Verlauf mit. */
+	.inv-band :global(.contactband) {
+		background: none;
+	}
+	/* Ausnahmen: Stellen, die eine Akzentfläche hinter hellem Text tragen —
+	   dort wird die aufgehellte Farbe zur Fläche und der Text dunkel. */
+	section.inverted .about-social:hover {
+		color: var(--inv-bg);
+	}
+	/* Karten sind sonst weisse Flächen — auf dem dunklen Band tragen sie
+	   stattdessen eine ruhige, aufgehellte Fläche. Im eckigen Theme setzen die
+	   Editorial-Regeln weiter unten sie ohnehin auf transparent. */
+	section.inverted .leap-card,
+	section.inverted .pcard,
+	section.inverted .acard,
+	section.inverted .partner-card,
+	section.inverted .qt,
+	section.inverted .ev-card,
+	section.inverted .past-card {
+		background: rgba(255, 255, 255, 0.07);
+		border-color: rgba(255, 255, 255, 0.18);
+	}
+	section.inverted .leap-card {
+		border: 1px solid rgba(255, 255, 255, 0.18);
+	}
+	/* Flächen, die weiss bleiben, brauchen dunkle Schrift. */
+	section.inverted .ev-datechip .d,
+	section.inverted .ev-datechip .mo,
+	section.inverted .about-social {
+		color: var(--inv-bg);
+	}
+	/* Auf dunklem Grund wirken Fotos zu schwer — deshalb eine Spur heller.
+	   Die Angebots-Kacheln behalten dabei ihre Bildgradation. */
+	section.inverted .welt-img img,
+	section.inverted .pcard-img img,
+	section.inverted .ev-img img,
+	section.inverted .aboutpf img,
+	section.inverted .qa-photo {
+		filter: brightness(1.12);
+	}
+	section.inverted .acard-img img {
+		filter: saturate(0.62) contrast(1.05) brightness(1.18);
+	}
+	/* Die Rückblick-Plakette lebt sonst von einer hellen Fläche. */
+	section.inverted .past-mini {
+		background: rgba(255, 255, 255, 0.12);
+		color: #ffffff;
+	}
+	/* Namen und Links im Netzwerk erben ihre Farbe nicht zuverlässig. */
+	section.inverted .pp-name,
+	section.inverted .pp-name-link {
+		color: #ffffff;
+	}
+	section.inverted .partner-site,
+	section.inverted .pp-name-link:hover {
+		color: var(--inv-lum);
+	}
+
+	/* ═══════ EDITORIAL-LOOK (Theme-Form «eckig») ═══════
+	   Die Radien schaltet bereits --round global auf 0. Hier verschwindet der
+	   Karten-Kasten: Karten verlieren Rahmen und Schatten, die Raster tragen die
+	   Trennung als Haarlinie (gap 1px auf Linienfarbe), Bilder bekommen den
+	   eingerückten Innenrahmen. Steht am Ende, damit es die Basisregeln schlägt. */
+	.hbb.edge .acard,
+	.hbb.edge .pcard,
+	.hbb.edge .qt,
+	.hbb.edge .past-card {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+	}
+	.hbb.edge .pcard:not(.pcard-face):hover,
+	.hbb.edge .pcard-flip:hover,
+	.hbb.edge .pcard-flip:hover .pcard-face,
+	.hbb.edge .ev-card:hover,
+	.hbb.edge .past-card-link:hover,
+	.hbb.edge .acard-clickable:hover {
+		transform: none;
+		box-shadow: none;
+	}
+	/* Raster: Spalten, getrennt durch eine senkrechte Haarlinie — keine Kästen,
+	   keine Linie zwischen den Zeilen. Die erste Spalte steht bündig unter der
+	   Überschrift, jede weitere rückt hinter ihre Trennlinie ein.
+	   Die Spaltenzahl ist hier fest, damit «erste Spalte» pro Zeile stimmt. */
+	/* Jede Spalte trägt dasselbe Innenmass, und das Raster wird um genau dieses
+	   Mass nach aussen gezogen. Damit sind alle Spalten exakt gleich breit —
+	   also auch alle Bilder darin — und die erste bzw. letzte Spalte steht
+	   trotzdem bündig zum Satzspiegel. Die Kapitel-Linie bleibt auf Satzbreite. */
+	.hbb.edge .angebot-grid,
+	.hbb.edge .pillars,
+	.hbb.edge .quotes,
+	.hbb.edge .welten {
+		gap: 0;
+		padding-top: 0;
+		background: transparent;
+		border-top: none;
+		position: relative;
+		/* links zusätzlich um die Linienbreite, weil die erste Spalte ihre
+		   (unsichtbare) Trennlinie ebenfalls im Kasten trägt */
+		margin-left: -29px;
+		margin-right: -28px;
+	}
+	.hbb.edge .angebot-grid::before,
+	.hbb.edge .pillars::before,
+	.hbb.edge .quotes::before,
+	.hbb.edge .welten::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 29px;
+		right: 28px;
+		border-top: 1px solid var(--ink);
+	}
+	.hbb.edge .pillars {
+		grid-template-columns: repeat(3, 1fr);
+	}
+	.hbb.edge .angebot-grid > *,
+	.hbb.edge .pillars > *,
+	.hbb.edge .quotes > *,
+	.hbb.edge .welten > * {
+		border-left: 1px solid var(--line);
+		padding: 28px 28px 32px;
+	}
+	.hbb.edge .angebot-grid > :nth-child(3n + 1),
+	.hbb.edge .pillars > :nth-child(3n + 1),
+	.hbb.edge .quotes > :nth-child(3n + 1),
+	.hbb.edge .welten > :first-child {
+		/* Linie nur unsichtbar, nicht entfernt: sonst wäre die erste Spalte
+		   um die Linienbreite breiter als die übrigen (border-box). */
+		border-left-color: transparent;
+	}
+	/* Die Karten trugen ihr Innenmass selbst — jetzt trägt es die Spalte. */
+	.hbb.edge .acard-body {
+		padding: 18px 0 0;
+	}
+	.hbb.edge .pcard-img {
+		width: 100%;
+		margin: 0 0 18px;
+	}
+	.hbb.edge .ev-list {
+		gap: 0;
+		border-top: 1px solid var(--ink);
+	}
+	.hbb.edge .ev-card {
+		border: none;
+		border-bottom: 1px solid var(--line);
+		background: transparent;
+		box-shadow: none;
+	}
+	.hbb.edge .aboutpf {
+		box-shadow: none;
+	}
+	/* Bilder: eingerückter Innenrahmen statt runder Kante. */
+	.hbb.edge .acard-img,
+	.hbb.edge .pcard-img,
+	.hbb.edge .ev-img,
+	.hbb.edge .aboutpf {
+		position: relative;
+	}
+	.hbb.edge .acard-img::after,
+	.hbb.edge .pcard-img::after,
+	.hbb.edge .ev-img::after,
+	.hbb.edge .aboutpf::after {
+		content: '';
+		position: absolute;
+		inset: 11px;
+		border: 1px solid rgba(255, 255, 255, 0.34);
+		pointer-events: none;
+		z-index: 1;
+	}
+	/* Tags: gesetzte Marke statt gefüllter Pille. */
+	.hbb.edge .ptag {
+		background: transparent;
+		border: 1px solid var(--line);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		font-size: 10px;
+	}
+	/* Flip-Karten legen ihre Seiten absolut über die Zelle — das Innenmass
+	   bleibt dort bei den Seiten, sonst läuft die Vorderseite in die Trennlinie. */
+	.hbb.edge .pcard-flip {
+		padding: 0;
+	}
+	@media (max-width: 980px) {
+		/* Einspaltig: die Trennung wandert von der Seite nach oben. */
+		.hbb.edge .angebot-grid,
+		.hbb.edge .pillars,
+		.hbb.edge .quotes,
+		.hbb.edge .welten {
+			margin-left: 0;
+			margin-right: 0;
+		}
+		.hbb.edge .angebot-grid::before,
+		.hbb.edge .pillars::before,
+		.hbb.edge .quotes::before,
+		.hbb.edge .welten::before {
+			left: 0;
+			right: 0;
+		}
+		.hbb.edge .angebot-grid > *,
+		.hbb.edge .pillars > *,
+		.hbb.edge .quotes > *,
+		.hbb.edge .welten > * {
+			border-left: none;
+			border-top: 1px solid var(--line);
+			padding: 28px 0 32px;
+		}
+		.hbb.edge .angebot-grid > :first-child,
+		.hbb.edge .pillars > :first-child,
+		.hbb.edge .quotes > :first-child,
+		.hbb.edge .welten > :first-child {
+			border-top: none;
 		}
 	}
 </style>

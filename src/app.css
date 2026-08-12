@@ -10,6 +10,7 @@
 	--ff-serif: 'Fraunces', Georgia, serif;
 	--ff-sketch: 'Shadows Into Light', cursive;
 	--ff-mono: 'JetBrains Mono', monospace;
+	--ff-kicker: var(--ff-ui);
 
 	/* Brand — Red (Primary) */
 	--btb-steel: #b11e2c;
@@ -62,13 +63,20 @@
 	--shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
 	--shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.07);
 
+	/* Rundungs-Schalter des aktiven Themes: 1 = abgerundet, 0 = eckig.
+	   Alle Radien der öffentlichen Seiten hängen daran (border-radius:
+	   calc(Npx * var(--round))), damit ein Theme die Form site-weit
+	   umstellt, ohne dass jeder Wert doppelt gepflegt wird.
+	   Kreise (50 %) bleiben Kreise — Avatare sind auch im eckigen Look rund. */
+	--round: 1;
+
 	/* Radius */
-	--radius-sm: 8px;
-	--radius-md: 12px;
-	--radius-card: 16px;
-	--radius-card-lg: 20px;
-	--radius-button: 10px;
-	--radius-pill: 9999px;
+	--radius-sm: calc(8px * var(--round));
+	--radius-md: calc(12px * var(--round));
+	--radius-card: calc(16px * var(--round));
+	--radius-card-lg: calc(20px * var(--round));
+	--radius-button: calc(10px * var(--round));
+	--radius-pill: calc(9999px * var(--round));
 
 	/* Spacing */
 	--space-xs: 4px;

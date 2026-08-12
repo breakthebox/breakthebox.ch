@@ -249,7 +249,7 @@
 		gap: 8px;
 		padding: 13px 20px;
 		border: none;
-		border-radius: 999px;
+		border-radius: calc(999px * var(--round));
 		background: var(--btb-steel);
 		color: #fff;
 		font-family: var(--ff-ui);
@@ -279,7 +279,7 @@
 		max-height: calc(100vh - 120px);
 		background: var(--bg-surface);
 		border: 1px solid var(--border);
-		border-radius: 18px;
+		border-radius: calc(18px * var(--round));
 		box-shadow: 0 30px 70px -30px rgba(20, 20, 40, 0.5);
 		display: flex;
 		flex-direction: column;
@@ -336,7 +336,7 @@
 	.mb-msg {
 		max-width: 82%;
 		padding: 10px 13px;
-		border-radius: 14px;
+		border-radius: calc(14px * var(--round));
 		font-size: 0.88rem;
 		line-height: 1.5;
 		white-space: pre-wrap;
@@ -400,7 +400,7 @@
 	.mb-chip {
 		padding: 7px 12px;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: calc(999px * var(--round));
 		background: var(--bg-page);
 		color: var(--text-secondary);
 		font-size: 0.78rem;
@@ -427,7 +427,7 @@
 		min-width: 0;
 		padding: 10px 14px;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: calc(999px * var(--round));
 		background: var(--bg-page);
 		color: var(--text-primary);
 		font-family: var(--ff-ui);

@@ -1,18 +1,19 @@
 <script lang="ts">
-	import type { ThemeContent, ThemeColors, ThemeFontSelection } from '$lib/types/content';
-	import { softFromPrimary } from '$lib/utils/color';
-	import { HEADING_FONTS, BODY_FONTS, HAND_FONTS, DEFAULT_FONTS } from '$lib/config/fonts';
+	import type { ThemeContent, ThemeColors, ThemeFontSelection, Theme } from '$lib/types/content';
+	import { softFromPrimary, mixHex } from '$lib/utils/color';
+	import { HEADING_FONTS, BODY_FONTS, HAND_FONTS, KICKER_FONTS, DEFAULT_FONTS } from '$lib/config/fonts';
 
 	let { data, form } = $props();
 
-	const FALLBACK = { primary: '#b11e2c', primaryDark: '#8e1622', ink: '#2b1a1c', cream: '#fbf1ec', soft: '#f6d9d5', header: '#fbf1ec' };
+	const FALLBACK = { primary: '#b11e2c', primaryDark: '#8e1622', ink: '#2b1a1c', cream: '#fbf1ec', soft: '#f6d9d5', header: '#fbf1ec', band: '#3b2427' };
 
 	// Arbeits-Typen: heroImage/pillarImages sind hier immer gesetzt (nach normalize()).
 	interface WTheme {
 		id: string;
 		name: string;
 		colors: Required<ThemeColors>;
-		fonts: ThemeFontSelection;
+		shape: NonNullable<Theme['shape']>;
+		fonts: Required<ThemeFontSelection>;
 		heroImage: string;
 		heroPresetId: string; // '' = erstes Preset
 		pillarImages: Record<string, string>;
@@ -33,19 +34,24 @@
 				// Bestehende Themes ohne «soft»: helle Fläche aus Primär ableiten.
 				soft: t.colors?.soft ?? softFromPrimary(t.colors?.primary ?? FALLBACK.primary),
 				// Bestehende Themes ohne «header»: Navbar nutzt den Seitenhintergrund.
-				header: t.colors?.header ?? t.colors?.cream ?? FALLBACK.cream
+				header: t.colors?.header ?? t.colors?.cream ?? FALLBACK.cream,
+				// Bestehende Themes ohne «band»: dunkles Band aus Primär dunkel + Text.
+				band: t.colors?.band ?? mixHex(t.colors?.primaryDark ?? FALLBACK.primaryDark, t.colors?.ink ?? FALLBACK.ink, 0.58)
 			},
+			// Bestehende Themes ohne «shape»: abgerundet wie bisher.
+			shape: t.shape === 'edge' ? ('edge' as const) : ('rounded' as const),
 			fonts: {
 				heading: t.fonts?.heading ?? DEFAULT_FONTS.heading,
 				body: t.fonts?.body ?? DEFAULT_FONTS.body,
-				hand: t.fonts?.hand ?? DEFAULT_FONTS.hand
+				hand: t.fonts?.hand ?? DEFAULT_FONTS.hand,
+				kicker: t.fonts?.kicker ?? DEFAULT_FONTS.kicker
 			},
 			heroImage: t.heroImage ?? '',
 			heroPresetId: t.heroPresetId ?? '',
 			pillarImages: t.pillarImages ?? {}
 		}));
 		if (themes.length === 0) {
-			themes.push({ id: 'standard', name: 'Standard', colors: { ...FALLBACK }, fonts: { ...DEFAULT_FONTS }, heroImage: '', heroPresetId: '', pillarImages: {} });
+			themes.push({ id: 'standard', name: 'Standard', colors: { ...FALLBACK }, shape: 'rounded', fonts: { ...DEFAULT_FONTS }, heroImage: '', heroPresetId: '', pillarImages: {} });
 		}
 		const activeId = themes.some((t) => t.id === c.activeId) ? c.activeId : themes[0].id;
 		return { activeId, themes };
@@ -66,7 +72,7 @@
 	}
 
 	function addTheme() {
-		const t: WTheme = { id: genId(), name: 'Neues Theme', colors: { ...FALLBACK }, fonts: { ...DEFAULT_FONTS }, heroImage: '', heroPresetId: '', pillarImages: {} };
+		const t: WTheme = { id: genId(), name: 'Neues Theme', colors: { ...FALLBACK }, shape: 'rounded', fonts: { ...DEFAULT_FONTS }, heroImage: '', heroPresetId: '', pillarImages: {} };
 		content.themes.push(t);
 		selectedId = t.id;
 	}
@@ -172,7 +178,7 @@
 
 				<h3 class="sub">Farben</h3>
 				<div class="colors">
-					{#each [ ['primary','Primär (Buttons, Akzente)'], ['primaryDark','Primär dunkel (Hover)'], ['ink','Text / Überschrift'], ['cream','Hintergrund'], ['header','Header (Navbar-Hintergrund)'], ['soft','Akzent hell (Badges, Tags, Flächen)'] ] as [key, label]}
+					{#each [ ['primary','Primärfarbe — Buttons, Links, Kicker, türkise Karte'], ['primaryDark','Primär dunkel — Hover und unteres Ende der Verläufe'], ['ink','Text und Überschriften — auch die schwarze Karte'], ['cream','Seitenhintergrund'], ['header','Navigation — Hintergrund der Kopfzeile'], ['soft','Akzentfläche hell — Tags, Badges, Bildflächen'], ['band','Dunkles Band — Kontakt-Abschluss und invertierte Sektionen'] ] as [key, label]}
 						<div class="color-field">
 							<span>{label}</span>
 							<div class="color-row">
@@ -183,9 +189,23 @@
 					{/each}
 				</div>
 
+				<h3 class="sub">Form</h3>
+				<div class="shape-picker">
+					<label class="shape-option" class:sel={selected.shape === 'rounded'}>
+						<input type="radio" value="rounded" bind:group={selected.shape} />
+						<strong>Abgerundet</strong>
+						<span>Bilder, Karten und Buttons mit runden Ecken, Karten mit weichem Schatten.</span>
+					</label>
+					<label class="shape-option" class:sel={selected.shape === 'edge'}>
+						<input type="radio" value="edge" bind:group={selected.shape} />
+						<strong>Eckig (Editorial)</strong>
+						<span>Alles rechtwinklig, ohne Schatten: Karten werden zu einem Raster aus Haarlinien, Bilder bekommen einen eingerückten Innenrahmen.</span>
+					</label>
+				</div>
+
 				<h3 class="sub">Schriften</h3>
 				<div class="fonts">
-					{#each [ { label: 'Überschriften', field: 'heading', options: HEADING_FONTS }, { label: 'Fliesstext & UI', field: 'body', options: BODY_FONTS }, { label: 'Handschrift / Akzent', field: 'hand', options: HAND_FONTS } ] as slot (slot.field)}
+					{#each [ { label: 'Überschriften', field: 'heading', options: HEADING_FONTS }, { label: 'Fliesstext & UI', field: 'body', options: BODY_FONTS }, { label: 'Kicker / Label-Zeilen', field: 'kicker', options: KICKER_FONTS }, { label: 'Handschrift / Akzent', field: 'hand', options: HAND_FONTS } ] as slot (slot.field)}
 						<div class="font-field">
 							<span>{slot.label}</span>
 							<select bind:value={selected.fonts[slot.field as keyof ThemeFontSelection]} aria-label={slot.label}>
@@ -410,6 +430,41 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 		gap: 12px;
+	}
+	.shape-picker {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 12px;
+	}
+	.shape-option {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 14px 16px;
+		border: 1.5px solid var(--border);
+		border-radius: var(--radius-md);
+		background: var(--bg-page);
+		cursor: pointer;
+		font-size: 0.82rem;
+		color: var(--text-secondary);
+		transition: border-color 0.15s;
+	}
+	.shape-option.sel {
+		border-color: var(--btb-steel);
+	}
+	.shape-option strong {
+		color: var(--text-heading);
+		font-size: 0.92rem;
+	}
+	.shape-option input {
+		position: absolute;
+		opacity: 0;
+	}
+	@media (max-width: 640px) {
+		.shape-picker {
+			grid-template-columns: 1fr;
+		}
 	}
 	.font-field {
 		display: flex;

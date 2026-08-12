@@ -69,6 +69,9 @@ export interface PartnerPerson {
 export interface Partner {
 	key?: string;
 	name: string;
+	/** Kompetenz-Zeile unter dem Logo («Marketing», «HR und IT-Strategie»).
+	 *  Leer = Expertise der ersten Person. */
+	role?: string;
 	website?: string;
 	logo?: string;
 	persons: PartnerPerson[];
@@ -710,9 +713,15 @@ export interface SeoOptimizationResult {
 export interface SectionSetting {
 	key: string; // fester Sektions-Key der Landing (z.B. 'angebot', 'faq')
 	visible: boolean;
+	inverted?: boolean; // dunkles Band: Fläche in der dunklen Markenfarbe, Text hell
 	kicker: string; // '' = Standardtext
 	title: string; // '' = Standardtext
 	subtitle: string; // '' = Standardtext
+	// Zeile ganz weglassen. Nötig, weil ein leeres Feld «Standardtext» bedeutet
+	// und sich der Kopftext sonst nicht entfernen liesse.
+	hideKicker?: boolean;
+	hideTitle?: boolean;
+	hideSubtitle?: boolean;
 	ctaPrimary?: string; // nur 'haltung': Link-Label linke Karte (Manifest)
 	ctaSecondary?: string; // nur 'haltung': Link-Label rechte Karte (Experimentierraum)
 }
@@ -760,17 +769,52 @@ export interface HeroSlider {
 	hint: string; // «zum Entdecken ziehen»
 }
 
+/** Editorial-Hero: Split — Text links, vollflächiges Bild rechts. */
+export interface HeroEditorial {
+	kicker: string; // Zeile über der Headline
+	title: string; // Headline (Zeilenumbrüche werden übernommen)
+	sub: string; // Positionierungszeile
+	ctaPrimary: string; // Label des gefüllten Buttons (führt zum Kontakt)
+	ctaSecondary: string; // Label des ruhigen Buttons (leer = nur ein CTA)
+	ctaSecondaryTarget: string; // MenuTarget.id für den zweiten Button
+	image?: string; // Hero-Bild; leer = Bild aus dem aktiven Theme
+	imageKicker: string; // Marke über der Bildunterschrift (leer = keine)
+	imageCaption: string; // Bildunterschrift (leer = keine)
+	imageMeta: string; // Zusatzzeile unter der Bildunterschrift
+}
+
 /** Ein benannter Hero (Variante + Inhalte). Themes referenzieren Presets per id. */
 export interface HeroPreset {
 	id: string;
 	name: string;
-	variant: 'classic' | 'slider';
+	variant: 'classic' | 'slider' | 'editorial';
 	classic: HeroClassic;
 	slider: HeroSlider;
+	editorial: HeroEditorial;
 }
 
 export interface HeroContent {
 	presets: HeroPreset[];
+}
+
+// ─── Die Essenz (zwei Welten nebeneinander) ───
+/** Eine der zwei Welten: Bild mit Bildmarke, darunter Titel und Text. */
+export interface WeltenWorld {
+	kicker: string; // «Im Gremium»
+	title: string;
+	text: string;
+	image?: string; // leer = Farbverlauf
+	imageKicker: string; // Marke im Bild (leer = keine)
+	imageCaption: string; // Bildunterschrift im Bild (leer = keine)
+	imageMeta: string; // Zusatzzeile unter der Bildunterschrift
+	dark: boolean; // Bildfläche in Akzentfarbe statt in Sandton
+}
+
+export interface WeltenContent {
+	left: WeltenWorld;
+	right: WeltenWorld;
+	caption: string; // Klammer-Zeile unter beiden Welten («Beide Welten.»)
+	captionAccent: string; // Akzentteil der Klammer («Dieselbe Person.»)
 }
 
 // ─── Theme ───
@@ -781,6 +825,7 @@ export interface ThemeColors {
 	cream: string; // Seitenhintergrund
 	soft?: string; // Helle Akzentfläche — Badges, Tags, Banner (leer = aus Primär abgeleitet)
 	header?: string; // Navbar-Hintergrund (leer = Seitenhintergrund); Textfarben werden nach Kontrast abgeleitet
+	band?: string; // Dunkles Band — Kontakt-Abschluss und invertierte Sektionen (leer = aus Primär dunkel + Text abgeleitet)
 }
 
 /** Ein hochgeladenes Bild in der gemeinsamen Bibliothek. */
@@ -800,12 +845,16 @@ export interface ThemeFontSelection {
 	heading: string;
 	body: string;
 	hand: string;
+	kicker?: string; // Kicker/Label-Zeilen; fehlt = Fliesstext-Schrift
 }
 
 export interface Theme {
 	id: string;
 	name: string;
 	colors: ThemeColors;
+	/** 'rounded' = abgerundete Bilder, Karten und Buttons (Standard);
+	 *  'edge' = eckig, mit Haarlinien-Raster statt Karten-Kästen. */
+	shape?: 'rounded' | 'edge';
 	fonts?: ThemeFontSelection; // fehlt = Standard-Fonts (Fraunces/Inter/Shadows)
 	heroImage?: string; // URL aus der Bibliothek; leer = Standard-Hero
 	heroPresetId?: string; // Hero-Preset für dieses Theme; leer = erstes Preset
@@ -854,6 +903,7 @@ export type SectionKey =
 	| 'keynotespage'
 	| 'faq'
 	| 'hero'
+	| 'welten'
 	| 'sections'
 	| 'media'
 	| 'menu'
@@ -878,6 +928,7 @@ export type SectionContent =
 	| KeynotesPageContent
 	| FaqContent
 	| HeroContent
+	| WeltenContent
 	| SectionsContent
 	| MediaContent
 	| MenuContent

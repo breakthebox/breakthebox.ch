@@ -411,7 +411,7 @@
 	.sit {
 		background: var(--tf-surface);
 		border: 1px solid var(--tf-line);
-		border-radius: 14px;
+		border-radius: calc(14px * var(--round));
 		padding: 22px 24px;
 	}
 	.sit .q {
@@ -454,7 +454,7 @@
 		border: 1px solid var(--tf-line);
 		/* Akzent-Leiste oben; nickt zur Treppe (dicker mit jeder Stufe) */
 		border-top: calc(3px + var(--i) * 2px) solid var(--tf-accent);
-		border-radius: 4px 4px 16px 16px;
+		border-radius: calc(4px * var(--round)) calc(4px * var(--round)) calc(16px * var(--round)) calc(16px * var(--round));
 		overflow: hidden;
 		box-shadow: var(--shadow-card);
 	}
@@ -482,7 +482,7 @@
 		text-transform: uppercase;
 		color: var(--tf-accent-strong);
 		background: var(--btb-steel-subtle);
-		border-radius: 100px;
+		border-radius: calc(100px * var(--round));
 		padding: 5px 12px;
 		white-space: nowrap;
 	}
@@ -587,10 +587,10 @@
 	.impact {
 		padding: 64px 0;
 		background: radial-gradient(
-			120% 130% at 82% 0%,
-			color-mix(in srgb, var(--tf-accent) 68%, #d9f2f0) 0%,
-			var(--tf-accent) 58%,
-			var(--tf-accent-strong) 118%
+			120% 130% at 80% 0%,
+			var(--inv-top) 0%,
+			var(--inv-bg) 58%,
+			var(--inv-deep) 118%
 		);
 		color: #fff;
 	}
@@ -621,7 +621,7 @@
 	.case {
 		border-left: 3px solid var(--tf-accent);
 		background: var(--tf-surface);
-		border-radius: 0 16px 16px 0;
+		border-radius: 0 calc(16px * var(--round)) calc(16px * var(--round)) 0;
 		padding: 26px 30px;
 		margin-bottom: 18px;
 	}
@@ -661,7 +661,7 @@
 		letter-spacing: 0.08em;
 		color: var(--tf-accent-strong);
 		background: var(--tf-accent-soft);
-		border-radius: 100px;
+		border-radius: calc(100px * var(--round));
 		padding: 2px 10px;
 		margin-left: 8px;
 		vertical-align: 1px;
@@ -672,7 +672,7 @@
 		align-items: center;
 		background: var(--tf-ink);
 		color: var(--tf-paper);
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		padding: 24px 28px;
 	}
 	.mgcard svg {
@@ -698,7 +698,7 @@
 		font-weight: 600;
 		font-size: 0.85rem;
 		padding: 12px 20px;
-		border-radius: 10px;
+		border-radius: calc(10px * var(--round));
 		transition: background 0.15s;
 	}
 	.mgcard a:hover {
@@ -715,7 +715,7 @@
 		display: flex;
 		flex-direction: column;
 		border: 1px solid var(--tf-line);
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		padding: 28px 26px;
 		background: var(--tf-surface);
 		box-shadow: var(--shadow-card);
@@ -785,7 +785,7 @@
 			var(--tf-ink) 60%,
 			#14090b 118%
 		);
-		border-radius: 18px;
+		border-radius: calc(18px * var(--round));
 		padding: 34px 34px 30px;
 		box-shadow: 0 26px 54px -36px rgba(10, 8, 8, 0.45);
 	}

@@ -8,8 +8,9 @@
 
 	// Anzeige-Infos pro Sektions-Key (Reihenfolge kommt aus content.sections)
 	const META: Record<string, { label: string; desc: string; titleLockedHint?: string }> = {
+		welten: { label: 'Die Essenz', desc: 'Die zwei Welten nebeneinander mit Klammer-Zeile — Inhalte unter «Die Essenz» pflegen' },
 		angebot: { label: 'Angebot', desc: 'Angebots-Kacheln (direkt nach dem Hero)' },
-		logos: { label: 'Kundenlogos & Kennzahlen', desc: 'Logo-Marquee mit stiller Kennzahlen-Zeile — Inhalte unter «Kundenlogos» bzw. «Kennzahlen» pflegen' },
+		logos: { label: 'Kundenlogos & Kennzahlen', desc: 'Logo-Marquee mit stiller Kennzahlen-Zeile — Inhalte unter «Kundenlogos» bzw. «Kennzahlen» pflegen. Kicker und Titel sind hier optional: leer lassen zeigt nur den Streifen.' },
 		pillars: { label: 'Pillars (Säulen)', desc: 'Die früheren Säulen-Karten mit Flip/Beispielen — Inhalte unter «Pillars» pflegen' },
 		tension: { label: 'Klartext-Band', desc: 'Dunkles Band mit These und Text' },
 		about: { label: 'Über mich', desc: 'Porträt, Werdegang, Qualifikationen, Video-CV', titleLockedHint: 'Der Titel wird unter «Über mich» gepflegt.' },
@@ -19,8 +20,12 @@
 		stimmen: { label: 'Stimmen', desc: 'Testimonials' },
 		impulse: { label: 'Impulse-Band', desc: 'Dunkles Band mit Denkanstoss' },
 		faq: { label: 'Häufige Fragen', desc: 'FAQ-Liste' },
-		kontakt: { label: 'Kontakt-Band', desc: 'Abschluss-Band mit E-Mail und Telefon (Kicker ohne Wirkung)' }
+		kontakt: { label: 'Kontakt-Band', desc: 'Dunkles Abschluss-Band mit Mail, Telefon und LinkedIn — steht auch auf allen Unterseiten' }
 	};
+
+	// Sektionen, die als dunkles Band laufen können. Klartext- und Impulse-Band
+	// sind bereits dunkle Bänder, das Kontakt-Band bringt seine Farbe selbst mit.
+	const INVERTIBLE = ['welten', 'angebot', 'logos', 'pillars', 'about', 'haltung', 'buehne', 'netzwerk', 'stimmen', 'faq'];
 
 	let expanded = $state<string | null>(null);
 	function toggleExpand(key: string) {
@@ -88,7 +93,7 @@
 			Zurück zum Dashboard
 		</a>
 		<h1>Sektionen</h1>
-		<p class="page-subtitle">Reihenfolge (ziehen oder ↑↓), Sichtbarkeit und Kopftexte der Startseiten-Sektionen. Der Hero bleibt fix zuoberst, der Footer fix zuunterst. Die Textfelder zeigen die aktuellen Texte — leeres Feld heisst: die Sektion hat dort keinen Text.</p>
+		<p class="page-subtitle">Reihenfolge (ziehen oder ↑↓), Sichtbarkeit und Kopftexte der Startseiten-Sektionen. Der Hero bleibt fix zuoberst, der Footer fix zuunterst. Ein leeres Textfeld zeigt den Standardtext der Sektion; «weglassen» entfernt die Zeile ganz.</p>
 	</div>
 
 	{#if showSuccess}<div class="toast toast-success">Änderungen erfolgreich gespeichert.</div>{/if}
@@ -135,22 +140,42 @@
 					</div>
 					{#if expanded === section.key}
 						<div class="fields">
+							{#if INVERTIBLE.includes(section.key)}
+								<label class="inv-toggle">
+									<input type="checkbox" bind:checked={section.inverted} />
+									<span class="inv-swatch" class:on={section.inverted} aria-hidden="true"></span>
+									<span>
+										<strong>Invertiert (dunkles Band)</strong>
+										<span class="inv-desc">Fläche in der dunklen Markenfarbe, Text und Linien hell — für Abschnitte, die Gewicht bekommen sollen.</span>
+									</span>
+								</label>
+							{/if}
 							<div class="field">
-								<label class="field-label" for="kick-{section.key}">Keywords / Kicker (kleine Zeile über dem Titel)</label>
-								<input id="kick-{section.key}" type="text" class="field-input" bind:value={section.kicker} placeholder="(kein Text)" />
+								<div class="field-head">
+									<label class="field-label" for="kick-{section.key}">Keywords / Kicker (kleine Zeile über dem Titel)</label>
+									<label class="omit"><input type="checkbox" bind:checked={section.hideKicker} /> weglassen</label>
+								</div>
+								<input id="kick-{section.key}" type="text" class="field-input" bind:value={section.kicker} placeholder="(Standardtext)" disabled={section.hideKicker} />
 							</div>
 							<div class="field">
-								<label class="field-label" for="title-{section.key}">Titel</label>
+								<div class="field-head">
+									<label class="field-label" for="title-{section.key}">Titel</label>
+									<label class="omit"><input type="checkbox" bind:checked={section.hideTitle} /> weglassen</label>
+								</div>
 								{#if META[section.key]?.titleLockedHint}
 									<p class="field-note">{META[section.key].titleLockedHint}</p>
 								{:else}
-									<input id="title-{section.key}" type="text" class="field-input" bind:value={section.title} placeholder="(kein Text)" />
+									<input id="title-{section.key}" type="text" class="field-input" bind:value={section.title} placeholder="(Standardtext)" disabled={section.hideTitle} />
 								{/if}
 							</div>
 							<div class="field">
-								<label class="field-label" for="sub-{section.key}">Subtitel</label>
-								<input id="sub-{section.key}" type="text" class="field-input" bind:value={section.subtitle} placeholder="(kein Text)" />
+								<div class="field-head">
+									<label class="field-label" for="sub-{section.key}">Subtitel</label>
+									<label class="omit"><input type="checkbox" bind:checked={section.hideSubtitle} /> weglassen</label>
+								</div>
+								<input id="sub-{section.key}" type="text" class="field-input" bind:value={section.subtitle} placeholder="(Standardtext)" disabled={section.hideSubtitle} />
 							</div>
+							<p class="field-note">Leeres Feld zeigt den Standardtext. «Weglassen» entfernt die Zeile ganz.</p>
 							{#if section.key === 'haltung'}
 								<div class="field">
 									<label class="field-label" for="cta1-{section.key}">Link-Label linke Karte (Manifest)</label>
@@ -364,6 +389,40 @@
 		padding-top: 14px;
 		border-top: 1px dashed var(--border);
 	}
+	.inv-toggle {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		cursor: pointer;
+	}
+	.inv-toggle input {
+		margin-top: 4px;
+		flex-shrink: 0;
+	}
+	.inv-toggle strong {
+		display: block;
+		color: var(--text-heading);
+		font-size: 0.88rem;
+	}
+	.inv-desc {
+		display: block;
+		margin-top: 2px;
+	}
+	.inv-swatch {
+		width: 22px;
+		height: 22px;
+		flex-shrink: 0;
+		margin-top: 2px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		background: var(--bg-page);
+	}
+	.inv-swatch.on {
+		background: var(--btb-teal-dark);
+		border-color: var(--btb-teal-dark);
+	}
 	.field {
 		display: flex;
 		flex-direction: column;
@@ -373,6 +432,28 @@
 		font-size: 0.82rem;
 		font-weight: 600;
 		color: var(--text-secondary);
+	}
+	.field-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.omit {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		flex-shrink: 0;
+		font-size: 0.78rem;
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+	.omit:hover {
+		color: var(--btb-steel);
+	}
+	.field-input:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
 	}
 	.field-note {
 		font-size: 0.82rem;

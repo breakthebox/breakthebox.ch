@@ -1,13 +1,13 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getSectionContent, saveSectionContent } from '$lib/server/db/queries/content';
-import { normalizeHero } from '$lib/server/content-defaults';
-import type { HeroContent } from '$lib/types/content';
+import { normalizeWelten } from '$lib/server/content-defaults';
+import type { WeltenContent } from '$lib/types/content';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
-	const content = await getSectionContent<HeroContent>('hero');
+	const content = await getSectionContent<WeltenContent>('welten');
 	return {
-		content: normalizeHero(content)
+		content: normalizeWelten(content)
 	};
 };
 
@@ -21,15 +21,18 @@ export const actions: Actions = {
 		}
 
 		try {
-			const content = normalizeHero(JSON.parse(json));
+			const content = normalizeWelten(JSON.parse(json));
 
-			for (const p of content.presets) {
-				if (!p.classic.titleLine1.trim() || !p.slider.titleLine1.trim() || !p.editorial.title.trim()) {
-					return fail(400, { error: `Die Headline darf nicht leer sein («${p.name}»).` });
+			for (const [label, world] of [
+				['Linke Welt', content.left],
+				['Rechte Welt', content.right]
+			] as const) {
+				if (!world.title.trim()) {
+					return fail(400, { error: `Der Titel darf nicht leer sein (${label}).` });
 				}
 			}
 
-			await saveSectionContent('hero', content, locals.user?.id);
+			await saveSectionContent('welten', content, locals.user?.id);
 			return { success: true };
 		} catch {
 			return fail(400, { error: 'Ungültiges JSON-Format.' });

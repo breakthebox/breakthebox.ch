@@ -431,7 +431,7 @@
 		flex-direction: column;
 		background: var(--kn-surface);
 		border: 1px solid var(--kn-line);
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		overflow: hidden;
 		box-shadow: var(--shadow-card);
 	}
@@ -541,7 +541,7 @@
 		font-size: 0.72rem;
 		color: var(--kn-graphite);
 		border: 1px solid var(--kn-line);
-		border-radius: 100px;
+		border-radius: calc(100px * var(--round));
 		padding: 4px 12px;
 		background: var(--bg-section-alt);
 	}
@@ -560,10 +560,10 @@
 	.usp {
 		padding: 60px 0;
 		background: radial-gradient(
-			120% 130% at 82% 0%,
-			color-mix(in srgb, var(--kn-accent) 68%, #d9f2f0) 0%,
-			var(--kn-accent) 58%,
-			var(--kn-accent-strong) 118%
+			120% 130% at 80% 0%,
+			var(--inv-top) 0%,
+			var(--inv-bg) 58%,
+			var(--inv-deep) 118%
 		);
 		color: #fff;
 	}
@@ -593,7 +593,7 @@
 		margin-top: 22px;
 		padding: 16px 20px;
 		border: 1px dashed rgba(255, 255, 255, 0.4);
-		border-radius: 14px;
+		border-radius: calc(14px * var(--round));
 		max-width: 560px;
 		font-size: 0.85rem;
 		line-height: 1.55;
@@ -610,7 +610,7 @@
 		background: var(--kn-surface);
 		border: 1px solid var(--kn-line);
 		border-top: 3px solid var(--kn-accent);
-		border-radius: 4px 4px 16px 16px;
+		border-radius: calc(4px * var(--round)) calc(4px * var(--round)) calc(16px * var(--round)) calc(16px * var(--round));
 		padding: 22px 24px;
 		box-shadow: var(--shadow-card);
 	}
@@ -724,7 +724,7 @@
 		background: var(--kn-surface);
 		border: 1px solid var(--kn-line);
 		border-left: 3px solid var(--kn-accent);
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		padding: 22px 26px;
 		box-shadow: var(--shadow-card);
 	}
@@ -733,7 +733,7 @@
 		align-self: stretch;
 		min-height: 132px;
 		object-fit: cover;
-		border-radius: 10px;
+		border-radius: calc(10px * var(--round));
 		flex-shrink: 0;
 	}
 	.next-info {
@@ -788,7 +788,7 @@
 		font-size: 0.72rem;
 		color: var(--kn-graphite);
 		border: 1px solid var(--kn-line);
-		border-radius: 100px;
+		border-radius: calc(100px * var(--round));
 		padding: 3px 11px;
 		background: var(--bg-section-alt);
 	}
@@ -807,7 +807,7 @@
 		width: 46px;
 		height: 46px;
 		object-fit: cover;
-		border-radius: 8px;
+		border-radius: calc(8px * var(--round));
 		flex-shrink: 0;
 	}
 	.prow .d {
@@ -839,7 +839,7 @@
 		gap: 16px;
 	}
 	.ctacard {
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		padding: 30px 32px;
 	}
 	.ctacard.dark {
@@ -885,10 +885,10 @@
 	.postevent {
 		padding: 60px 0;
 		background: radial-gradient(
-			120% 130% at 82% 0%,
-			color-mix(in srgb, var(--kn-accent) 68%, #d9f2f0) 0%,
-			var(--kn-accent) 58%,
-			var(--kn-accent-strong) 118%
+			120% 130% at 80% 0%,
+			var(--inv-top) 0%,
+			var(--inv-bg) 58%,
+			var(--inv-deep) 118%
 		);
 		color: #fff;
 	}
@@ -903,7 +903,7 @@
 	}
 	.pe-card {
 		border: 1px solid rgba(255, 255, 255, 0.15);
-		border-radius: 14px;
+		border-radius: calc(14px * var(--round));
 		padding: 20px 22px;
 		text-decoration: none;
 		color: #fff;

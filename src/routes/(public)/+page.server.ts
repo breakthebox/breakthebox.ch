@@ -17,6 +17,7 @@ import {
 	defaultFaq,
 	normalizeHero,
 	resolveActiveHero,
+	normalizeWelten,
 	normalizeSections
 } from '$lib/server/content-defaults';
 import type {
@@ -39,6 +40,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 		// Welcher Hero lädt, bestimmt das aktive Theme (heroPresetId).
 		hero: resolveActiveHero(normalizeHero(allContent.hero), parentData.theme?.heroPresetId),
 		sections: normalizeSections(allContent.sections),
+		welten: normalizeWelten(allContent.welten),
 		pillars: { ...defaultPillars, ...((allContent.pillars as Partial<PillarsContent>) ?? {}) },
 		about: normalizeAbout(allContent.about),
 		references: { ...defaultReferences, ...((allContent.references as Partial<ReferencesContent>) ?? {}) },

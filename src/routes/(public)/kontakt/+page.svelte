@@ -24,7 +24,7 @@
 	<section class="hero">
 		<div class="wrap">
 			<div class="kick">Kontakt</div>
-			<h1>Lass uns sprechen.</h1>
+			<h1>Reden wir.</h1>
 			<p class="intro">
 				Ob Transformations-Mandat, Verwaltungsrat oder Keynote — das Erstgespräch ist unkompliziert und kostenlos. Ich freue mich auf das Gespräch.
 			</p>

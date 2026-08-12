@@ -153,7 +153,7 @@
 		background: var(--color-surface-alt, var(--text-heading));
 		color: var(--color-code-text, var(--border));
 		padding: 1.25rem;
-		border-radius: 0.5rem;
+		border-radius: calc(0.5rem * var(--round));
 		overflow-x: auto;
 		margin: 1.5rem 0;
 		font-size: 0.875rem;
@@ -176,7 +176,7 @@
 
 	.blog-image :global(img) {
 		width: 100%;
-		border-radius: 0.5rem;
+		border-radius: calc(0.5rem * var(--round));
 	}
 
 	.blog-image.with-border :global(img) {
@@ -191,7 +191,7 @@
 	.blog-image.with-background {
 		background: var(--color-surface-hover, var(--bg-elevated));
 		padding: 1rem;
-		border-radius: 0.75rem;
+		border-radius: calc(0.75rem * var(--round));
 	}
 
 	.blog-image :global(figcaption) {
@@ -207,7 +207,7 @@
 		background: var(--color-primary, var(--btb-teal));
 		color: white !important;
 		text-decoration: none !important;
-		border-radius: 0.375rem;
+		border-radius: calc(0.375rem * var(--round));
 		font-weight: 500;
 		transition: opacity 0.2s;
 	}

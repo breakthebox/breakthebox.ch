@@ -331,10 +331,10 @@
 	.chair {
 		padding: 60px 0;
 		background: radial-gradient(
-			120% 130% at 82% 0%,
-			color-mix(in srgb, var(--gov-accent) 68%, #d9f2f0) 0%,
-			var(--gov-accent) 58%,
-			var(--gov-accent-strong) 118%
+			120% 130% at 80% 0%,
+			var(--inv-top) 0%,
+			var(--inv-bg) 58%,
+			var(--inv-deep) 118%
 		);
 		color: #fff;
 	}
@@ -373,7 +373,7 @@
 		background: var(--gov-surface);
 		border: 1px solid var(--gov-line);
 		border-top: 3px solid var(--gov-accent);
-		border-radius: 4px 4px 16px 16px;
+		border-radius: calc(4px * var(--round)) calc(4px * var(--round)) calc(16px * var(--round)) calc(16px * var(--round));
 		overflow: hidden;
 		box-shadow: var(--shadow-card);
 	}
@@ -443,7 +443,7 @@
 	.mrow.hot {
 		background: var(--gov-surface);
 		border: 1px solid var(--gov-accent);
-		border-radius: 10px;
+		border-radius: calc(10px * var(--round));
 		font-weight: 600;
 		margin-bottom: 2px;
 	}
@@ -463,7 +463,7 @@
 	.pip {
 		width: 22px;
 		height: 8px;
-		border-radius: 100px;
+		border-radius: calc(100px * var(--round));
 		background: var(--gov-line);
 	}
 	.pip.on {
@@ -483,7 +483,7 @@
 	}
 	.fact {
 		border: 1px solid var(--gov-line);
-		border-radius: 12px;
+		border-radius: calc(12px * var(--round));
 		background: var(--gov-surface);
 		padding: 14px 16px;
 		box-shadow: var(--shadow-card);
@@ -515,7 +515,7 @@
 		gap: 18px;
 		background: var(--gov-surface);
 		border: 1px solid var(--gov-line);
-		border-radius: 13px;
+		border-radius: calc(13px * var(--round));
 		padding: 16px 20px;
 		flex-wrap: wrap;
 		box-shadow: var(--shadow-card);
@@ -564,7 +564,7 @@
 	.principle {
 		border-left: 3px solid var(--gov-accent);
 		background: var(--bg-section-alt);
-		border-radius: 0 14px 14px 0;
+		border-radius: 0 calc(14px * var(--round)) calc(14px * var(--round)) 0;
 		padding: 22px 26px;
 	}
 	.principle-title {
@@ -621,7 +621,7 @@
 		gap: 16px;
 	}
 	.ctacard {
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		padding: 30px 32px;
 	}
 	.ctacard.dark {

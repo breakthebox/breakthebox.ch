@@ -30,10 +30,17 @@
 	let ink = $derived(safeColor(tc?.ink, '#2b1a1c'));
 	let cream = $derived(safeColor(tc?.cream, '#fbf1ec'));
 	let soft = $derived(safeColor(tc?.soft, softFromPrimary(primary)));
+	// Fläche der dunklen Bänder. Leer = wie bisher aus Primär dunkel und Text
+	// gemischt, damit bestehende Themes unverändert aussehen.
+	let band = $derived(safeColor(tc?.band, mixHex(primaryDark, ink, 0.58)));
 	let primaryRgb = $derived(hexToRgb(primary));
 	// Schriften des aktiven Themes (Keys → Registry; unbekannt = Standard).
 	let fonts = $derived(resolveFonts(data.theme?.fonts));
 	let fontsHref = $derived(googleFontsUrl(data.theme?.fonts));
+	// Form des aktiven Themes: 'edge' setzt alle Radien auf 0 und nimmt den
+	// Karten-Schatten weg (Editorial-Look). Das Backoffice hebt das wieder auf.
+	let edge = $derived(data.theme?.shape === 'edge');
+	let shapeCss = $derived(edge ? `--round:0;--shadow-card:none;--shadow-card-hover:none;` : '');
 	// ─── Web-Analyse (Umami Cloud, cookielos) ───
 	// Nur aktiv, wenn PUBLIC_UMAMI_WEBSITE_ID gesetzt ist (in Production). Kein Consent nötig
 	// (keine Cookies, keine personenbezogenen Daten). In Dev bleibt die Variable leer → aus.
@@ -51,6 +58,14 @@
 			`--border:${mixHex(soft, ink, 0.92)};` +
 			`--text-secondary:${mixHex(ink, cream, 0.55)};--text-muted:${mixHex(ink, cream, 0.32)};` +
 			`--ff-serif:${fonts.heading.family};--ff-ui:${fonts.body.family};--ff-sketch:${fonts.hand.family};` +
+			`--ff-kicker:${fonts.kicker.family};` +
+			// Palette für dunkle Bänder (invertierte Sektionen, Kontakt-Band):
+			// tiefe Markenfarbe als Fläche, aufgehellte Primärfarbe als Akzent.
+			`--inv-bg:${band};--inv-bg2:${mixHex(band, '#000000', 0.94)};` +
+			// heller bzw. tiefer Ton für den leichten Verlauf über den Bändern
+			`--inv-top:${mixHex(band, '#ffffff', 0.86)};--inv-deep:${mixHex(band, '#000000', 0.86)};` +
+			`--inv-lum:${mixHex(primary, '#ffffff', 0.55)};--inv-tint:${mixHex(primary, '#ffffff', 0.32)};` +
+			shapeCss +
 			`--bg-page:${cream};--text-heading:${ink};--text-primary:${ink};}`
 	);
 

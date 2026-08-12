@@ -261,7 +261,7 @@
 		opacity: 0;
 	}
 	.world-kick {
-		font-family: var(--sans);
+		font-family: var(--ff-kicker);
 		text-transform: uppercase;
 		letter-spacing: 0.18em;
 		font-size: 11px;
@@ -338,7 +338,7 @@
 		top: calc(50% + 44px);
 		transform: translateX(-50%);
 		z-index: 3;
-		font-family: var(--sans);
+		font-family: var(--ff-kicker);
 		text-transform: uppercase;
 		letter-spacing: 0.16em;
 		font-size: 10.5px;
@@ -363,7 +363,7 @@
 	.m-card {
 		position: relative;
 		margin: 0 16px;
-		border-radius: 14px;
+		border-radius: calc(14px * var(--round));
 		min-height: 220px;
 		padding: 22px 20px;
 		display: flex;

@@ -62,6 +62,11 @@
 		display: flex;
 		flex-direction: column;
 		background: var(--bg-page);
+		/* Das Backoffice folgt der Form des Themes nicht — ein eckiges Theme
+		   soll die Website ändern, nicht die Bedienoberfläche. */
+		--round: 1;
+		--shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+		--shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.07);
 	}
 
 	/* ═══════ ADMIN NAV ═══════ */

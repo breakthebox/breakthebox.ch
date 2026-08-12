@@ -255,12 +255,12 @@
 
 	/* Roter Abschluss-Banner */
 	.closing {
-		background: radial-gradient(120% 130% at 82% 0%, color-mix(in srgb, var(--btb-steel) 68%, #d9f2f0) 0%, var(--btb-steel) 58%, var(--btb-steel-hover) 118%);
+		background: radial-gradient(120% 130% at 80% 0%, var(--inv-top) 0%, var(--inv-bg) 58%, var(--inv-deep) 118%);
 		color: #fff;
 		padding: 110px 34px;
 	}
 	.closing .kick-light {
-		color: #ffd9d4;
+		color: var(--inv-lum);
 	}
 	.closing h2 {
 		font-family: var(--ff-serif);

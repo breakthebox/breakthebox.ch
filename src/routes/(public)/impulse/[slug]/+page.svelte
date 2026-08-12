@@ -215,7 +215,7 @@
 		font-size: 0.88em;
 		background: var(--bg-elevated);
 		padding: 2px 6px;
-		border-radius: 3px;
+		border-radius: calc(3px * var(--round));
 	}
 	.prose :global(pre) {
 		background: var(--bg-elevated);

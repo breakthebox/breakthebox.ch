@@ -142,7 +142,7 @@
 		letter-spacing: -0.01em;
 	}
 	.brand-c {
-		font-family: var(--ff-ui);
+		font-family: var(--ff-kicker);
 		font-weight: 600;
 		font-size: 10px;
 		letter-spacing: 0.22em;
@@ -180,7 +180,7 @@
 		font-size: 13px;
 		letter-spacing: 0.04em;
 		padding: 14px 26px;
-		border-radius: 6px;
+		border-radius: calc(6px * var(--round));
 		cursor: pointer;
 		transition: all 0.2s;
 		text-transform: uppercase;

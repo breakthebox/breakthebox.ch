@@ -17,9 +17,10 @@ export interface ThemeFonts {
 	heading: string; // key aus HEADING_FONTS
 	body: string; // key aus BODY_FONTS
 	hand: string; // key aus HAND_FONTS
+	kicker: string; // key aus KICKER_FONTS
 }
 
-export const DEFAULT_FONTS: ThemeFonts = { heading: 'fraunces', body: 'inter', hand: 'shadows' };
+export const DEFAULT_FONTS: ThemeFonts = { heading: 'fraunces', body: 'inter', hand: 'shadows', kicker: 'body' };
 
 export const HEADING_FONTS: FontOption[] = [
 	{ key: 'fraunces', label: 'Fraunces (Standard)', family: "'Fraunces', Georgia, serif" },
@@ -47,25 +48,39 @@ export const HAND_FONTS: FontOption[] = [
 	{ key: 'marker', label: 'Permanent Marker', family: "'Permanent Marker', cursive", gf: 'Permanent+Marker' }
 ];
 
+// Kicker = die kleinen Label-Zeilen über den Überschriften (Sektionen, Karten,
+// Bildunterschriften). «Wie Fliesstext» ist der bisherige Zustand und Standard;
+// eine Mono- oder Grotesk-Schrift gibt dem Editorial-Look seine Kante.
+export const KICKER_FONTS: FontOption[] = [
+	{ key: 'body', label: 'Wie Fliesstext (Standard)', family: '' },
+	{ key: 'jetbrains', label: 'JetBrains Mono', family: "'JetBrains Mono', Consolas, monospace" },
+	{ key: 'ibm-plex-mono', label: 'IBM Plex Mono', family: "'IBM Plex Mono', Consolas, monospace", gf: 'IBM+Plex+Mono:wght@400;500;600' },
+	{ key: 'space-mono', label: 'Space Mono', family: "'Space Mono', Consolas, monospace", gf: 'Space+Mono:wght@400;700' },
+	{ key: 'archivo', label: 'Archivo (Grotesk)', family: "'Archivo', system-ui, sans-serif", gf: 'Archivo:wght@500;600;700' },
+	{ key: 'space-grotesk', label: 'Space Grotesk', family: "'Space Grotesk', system-ui, sans-serif", gf: 'Space+Grotesk:wght@500;600;700' }
+];
+
 function pick(list: FontOption[], key: string | undefined, fallbackKey: string): FontOption {
 	return list.find((f) => f.key === key) ?? list.find((f) => f.key === fallbackKey)!;
 }
 
 /** Gewählte Fonts robust auflösen (unbekannte Keys → Standard). */
 export function resolveFonts(fonts: Partial<ThemeFonts> | undefined) {
+	const body = pick(BODY_FONTS, fonts?.body, DEFAULT_FONTS.body);
+	const kicker = pick(KICKER_FONTS, fonts?.kicker, DEFAULT_FONTS.kicker);
 	return {
 		heading: pick(HEADING_FONTS, fonts?.heading, DEFAULT_FONTS.heading),
-		body: pick(BODY_FONTS, fonts?.body, DEFAULT_FONTS.body),
-		hand: pick(HAND_FONTS, fonts?.hand, DEFAULT_FONTS.hand)
+		body,
+		hand: pick(HAND_FONTS, fonts?.hand, DEFAULT_FONTS.hand),
+		// «Wie Fliesstext» hat keine eigene Familie — dann gilt die Fliesstext-Schrift.
+		kicker: kicker.family ? kicker : body
 	};
 }
 
 /** Google-Fonts-URL für alle Nicht-Standard-Fonts; null, wenn nichts nachzuladen ist. */
 export function googleFontsUrl(fonts: Partial<ThemeFonts> | undefined): string | null {
 	const resolved = resolveFonts(fonts);
-	const specs = [resolved.heading, resolved.body, resolved.hand]
-		.filter((f) => f.gf)
-		.map((f) => `family=${f.gf}`);
+	const specs = [...new Set([resolved.heading, resolved.body, resolved.hand, resolved.kicker].filter((f) => f.gf).map((f) => `family=${f.gf}`))];
 	if (specs.length === 0) return null;
 	return `https://fonts.googleapis.com/css2?${specs.join('&')}&display=swap`;
 }

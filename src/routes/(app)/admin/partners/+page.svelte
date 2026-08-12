@@ -16,6 +16,7 @@
 		content.items.push({
 			key: 'partner-' + (content.items.length + 1),
 			name: '',
+			role: '',
 			website: '',
 			logo: '',
 			persons: []
@@ -89,6 +90,7 @@
 					>
 						<div class="field-row">
 						<div class="field"><label class="field-label" for="pn-{i}">Firmenname</label><input id="pn-{i}" type="text" class="field-input" bind:value={partner.name} /></div>
+						<div class="field"><label class="field-label" for="pr-{i}">Kompetenz (Zeile unter dem Logo)</label><input id="pr-{i}" type="text" class="field-input" bind:value={partner.role} placeholder="z.B. Marketing — leer = Expertise der ersten Person" /></div>
 						<div class="field"><label class="field-label" for="pw-{i}">Website</label><input id="pw-{i}" type="text" class="field-input" bind:value={partner.website} placeholder="https://…" /></div>
 					</div>
 					<ImageUpload bind:value={partner.logo} section="partner-logo-{i}" label="Logo" />

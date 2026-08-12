@@ -200,7 +200,7 @@
 		margin-top: 22px;
 		padding: 9px 18px;
 		border: 1.5px dashed color-mix(in srgb, var(--imp-accent) 45%, transparent);
-		border-radius: 100px;
+		border-radius: calc(100px * var(--round));
 		font-family: var(--ff-ui);
 		font-size: 0.75rem;
 		font-weight: 600;
@@ -219,7 +219,7 @@
 		background: var(--bg-surface);
 		border: 1px solid var(--imp-line);
 		border-left: 4px solid var(--imp-accent);
-		border-radius: 16px;
+		border-radius: calc(16px * var(--round));
 		overflow: hidden;
 		text-decoration: none;
 		color: var(--text-primary);
@@ -301,7 +301,7 @@
 		font-size: 0.68rem;
 		color: var(--imp-graphite);
 		border: 1px solid var(--imp-line);
-		border-radius: 100px;
+		border-radius: calc(100px * var(--round));
 		padding: 3px 11px;
 		background: var(--bg-section-alt);
 	}
@@ -342,7 +342,7 @@
 	.post-thumb {
 		width: 108px;
 		aspect-ratio: 4 / 3;
-		border-radius: 10px;
+		border-radius: calc(10px * var(--round));
 		overflow: hidden;
 		border: 1px solid var(--imp-line);
 	}
@@ -400,7 +400,7 @@
 	.why {
 		border-left: 3px solid var(--imp-accent);
 		background: var(--bg-section-alt);
-		border-radius: 0 14px 14px 0;
+		border-radius: 0 calc(14px * var(--round)) calc(14px * var(--round)) 0;
 		padding: 20px 24px;
 	}
 	.why b {

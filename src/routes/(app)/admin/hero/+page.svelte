@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HeroContent, HeroPreset } from '$lib/types/content';
+	import { MENU_TARGETS } from '$lib/config/menu-targets';
 	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
 
 	let { data, form } = $props();
@@ -8,6 +9,11 @@
 	let showSuccess = $state(false);
 
 	const ANNO_POS = ['oben rechts', 'rechts', 'unten'];
+	const VARIANT_LABEL: Record<HeroPreset['variant'], string> = {
+		classic: 'Klassisch',
+		slider: 'Zwei Welten',
+		editorial: 'Editorial'
+	};
 
 	// ─── Preset-Verwaltung: welcher Hero lädt, bestimmt das Theme (Admin → Themes) ───
 	let selectedId = $state(content.presets[0]?.id ?? '');
@@ -85,7 +91,7 @@
 					<div class="preset-row" class:sel={selectedId === p.id}>
 						<button type="button" class="preset-name-btn" onclick={() => (selectedId = p.id)}>
 							{p.name || 'Unbenannt'}
-							<span class="preset-variant">{p.variant === 'slider' ? 'Zwei Welten' : 'Klassisch'}</span>
+							<span class="preset-variant">{VARIANT_LABEL[p.variant]}</span>
 						</button>
 						<button type="button" class="icon-btn icon-btn-danger" onclick={() => deletePreset(p.id)} aria-label="Hero löschen">&times;</button>
 					</div>
@@ -111,6 +117,11 @@
 					<input type="radio" name="variant" value="slider" bind:group={sel.variant} />
 					<strong>Zwei Welten (Slider)</strong>
 					<span>Headline oben, darunter ein interaktives Panel: zwei Welten, per Trenner zum Entdecken ziehbar.</span>
+				</label>
+				<label class="variant-option" class:sel={sel.variant === 'editorial'}>
+					<input type="radio" name="variant" value="editorial" bind:group={sel.variant} />
+					<strong>Editorial</strong>
+					<span>Zweigeteilt: Kicker, grosse Headline und zwei Buttons links, vollflächiges Bild rechts bis an den Seitenrand.</span>
 				</label>
 			</div>
 		</div>
@@ -169,7 +180,7 @@
 					</div>
 				{/each}
 			</div>
-		{:else}
+		{:else if sel.variant === 'slider'}
 			<!-- ─── Slider ─── -->
 			<div class="item-card">
 				<h2 class="card-title">Headline</h2>
@@ -233,6 +244,71 @@
 					<div class="field">
 						<label class="field-label" for="s-hint">Hinweis am Slider-Griff (leer = keiner)</label>
 						<input id="s-hint" type="text" class="field-input" bind:value={sel.slider.hint} />
+					</div>
+				</div>
+			</div>
+		{:else}
+			<!-- ─── Editorial ─── -->
+			<div class="item-card">
+				<h2 class="card-title">Texte</h2>
+				<div class="field">
+					<label class="field-label" for="e-kick">Kicker (Zeile über der Headline, leer = keine)</label>
+					<input id="e-kick" type="text" class="field-input" bind:value={sel.editorial.kicker} />
+				</div>
+				<div class="field">
+					<label class="field-label" for="e-title">Headline (Zeilenumbrüche werden übernommen)</label>
+					<textarea id="e-title" class="field-textarea" rows="2" bind:value={sel.editorial.title}></textarea>
+				</div>
+				<div class="field">
+					<label class="field-label" for="e-sub">Positionierungszeile</label>
+					<textarea id="e-sub" class="field-textarea" rows="3" bind:value={sel.editorial.sub}></textarea>
+				</div>
+			</div>
+
+			<div class="item-card">
+				<h2 class="card-title">Buttons</h2>
+				<div class="field-row">
+					<div class="field">
+						<label class="field-label" for="e-cta1">Erster Button (führt zum Kontakt)</label>
+						<input id="e-cta1" type="text" class="field-input" bind:value={sel.editorial.ctaPrimary} />
+					</div>
+					<div class="field">
+						<label class="field-label" for="e-cta2">Zweiter Button (leer = nur ein Button)</label>
+						<input id="e-cta2" type="text" class="field-input" bind:value={sel.editorial.ctaSecondary} />
+					</div>
+					<div class="field">
+						<label class="field-label" for="e-cta2t">Ziel des zweiten Buttons</label>
+						<select id="e-cta2t" class="field-input" bind:value={sel.editorial.ctaSecondaryTarget}>
+							{#each MENU_TARGETS as t (t.id)}
+								<option value={t.id}>{t.labelDe}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="item-card">
+				<h2 class="card-title">Bild</h2>
+				<p class="hint">Bevorzugtes Format: Hochformat oder Quadrat (z.B. 1200 × 1400 px) — das Bild füllt die rechte Hälfte vollflächig. Leer = Bild aus dem aktiven <a href="/admin/themes">Theme</a>.</p>
+				{#if sel.editorial.image}
+					<div class="img-preview">
+						<img src={sel.editorial.image} alt="Hero" />
+						<button type="button" class="img-remove" onclick={() => (sel.editorial.image = '')}>Bild entfernen</button>
+					</div>
+				{/if}
+				<ImageUpload bind:value={sel.editorial.image} section="hero" label="Bild hochladen" />
+				<div class="field-row">
+					<div class="field">
+						<label class="field-label" for="e-ik">Marke am Bild (leer = keine)</label>
+						<input id="e-ik" type="text" class="field-input" bind:value={sel.editorial.imageKicker} />
+					</div>
+					<div class="field">
+						<label class="field-label" for="e-ic">Bildunterschrift (leer = keine)</label>
+						<input id="e-ic" type="text" class="field-input" bind:value={sel.editorial.imageCaption} />
+					</div>
+					<div class="field">
+						<label class="field-label" for="e-im">Zusatzzeile</label>
+						<input id="e-im" type="text" class="field-input" bind:value={sel.editorial.imageMeta} />
 					</div>
 				</div>
 			</div>
@@ -408,7 +484,7 @@
 	}
 	.variant-picker {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(3, 1fr);
 		gap: 12px;
 	}
 	.variant-option {

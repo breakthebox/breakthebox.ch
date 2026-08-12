@@ -21,7 +21,8 @@ export const adminNavGroups: AdminNavGroup[] = [
 		label: 'Startseite',
 		items: [
 			{ id: 'sections', title: 'Sektionen', description: 'Reihenfolge, Sichtbarkeit und Kopftexte der Startseiten-Sektionen' },
-			{ id: 'hero', title: 'Hero', description: 'Startseiten-Hero — Variante (klassisch oder Zwei-Welten-Slider) und Texte' },
+			{ id: 'hero', title: 'Hero', description: 'Startseiten-Hero — Variante (klassisch, Zwei-Welten-Slider oder Editorial) und Texte' },
+			{ id: 'welten', title: 'Die Essenz', description: 'Die zwei Welten nebeneinander — Gremium und Experimentierraum' },
 			{ id: 'pillars', title: 'Pillars', description: 'Pillar-Karten — Anzahl, Reihenfolge und Inhalte' },
 			{ id: 'angebot', title: 'Angebot', description: 'Angebots-Kacheln der Landing-Section «Angebot»' },
 			{ id: 'about', title: 'Über mich', description: 'Texte, Qualifikationen und Rollen' },
