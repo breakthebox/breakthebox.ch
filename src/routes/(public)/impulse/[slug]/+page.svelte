@@ -8,7 +8,7 @@
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
-	import { env } from '$env/dynamic/public';
+	import { SITE_URL } from '$lib/config/site';
 	import BlockRenderer from '$lib/components/blog/BlockRenderer.svelte';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import { buildArticle, buildBreadcrumb, buildGraph } from '$lib/utils/schema';
@@ -20,8 +20,9 @@
 	let renderedContent = $derived(data.renderedContent);
 	let contentBlocks = $derived(data.post.contentBlocks as BlogContentBlocks | null);
 
-	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
 	let pageUrl = $derived(SITE_URL + page.url.pathname);
+	// Klartext-Variante für LLM-Crawler (siehe /impulse/[slug].md).
+	let markdownUrl = $derived(`${pageUrl}.md`);
 	let plainText = $derived((renderedContent ?? '').replace(/<[^>]+>/g, ' '));
 	let minutes = $derived(readingTimeMinutes(plainText || post.excerpt));
 
@@ -70,9 +71,7 @@
 </script>
 
 <svelte:head>
-	<title>{post.metaTitle || post.title} — Brigitte Hulliger | Break the Box</title>
-	<meta name="description" content={post.metaDescription || post.excerpt || ''} />
-	<!-- OG/Twitter/article-Tags werden zentral im Root-Layout aus `data.meta` gesetzt. -->
+	<link rel="alternate" type="text/markdown" href={markdownUrl} title="Beitrag als Markdown" />
 </svelte:head>
 
 <JsonLd data={schemaGraph} />

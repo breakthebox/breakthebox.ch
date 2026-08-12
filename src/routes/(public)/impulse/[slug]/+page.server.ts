@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { getBlogPostBySlug } from '$lib/server/db/queries/blog';
 import { renderMarkdownBlock } from '$lib/utils/markdown';
 import { error } from '@sveltejs/kit';
+import { pageTitle } from '$lib/config/site';
 import type { PageMeta } from '$lib/types/seo';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -15,7 +16,9 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	// Blogposts nutzen ihr eigenes Beitragsbild als OG-Image (Fallback: Standard-OG-Bild im Layout).
 	const meta: PageMeta = {
-		title: post.metaTitle || post.title,
+		title: pageTitle(post.metaTitle || post.title),
+		// Social-Vorschauen zeigen den Beitragstitel ohne Site-Suffix.
+		ogTitle: post.metaTitle || post.title,
 		description: post.metaDescription || post.excerpt || '',
 		image: post.ogImage || post.headerImage || null,
 		type: 'article',

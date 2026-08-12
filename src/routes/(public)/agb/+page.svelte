@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
 	import { page } from '$app/state';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
 	import { resolveMenuLinks } from '$lib/utils/menu';
@@ -12,11 +11,6 @@
 		resolveMenuLinks(data.menu, { currentPath: page.url.pathname, isHome: false })
 	);
 </script>
-
-<svelte:head>
-	<title>Allgemeine Geschäftsbedingungen — Brigitte Hulliger | Break the Box</title>
-	<meta name="description" content={m.meta_agb_description()} />
-</svelte:head>
 
 <SiteNav theme={data.theme} links={navLinks} subtitle="AGB" />
 

@@ -145,6 +145,25 @@
 			</span>
 		{/if}
 
+		<!-- Zitierfähigkeit für generative Suchmaschinen (ChatGPT, Perplexity, AI Overviews) -->
+		{#if seoResult?.geoScore != null}
+			<div class="ai-block-header geo-header">
+				<span>{m.blog_ai_geo_score()}</span>
+				<span class="score-badge" style="background: {scoreColor(seoResult.geoScore)}">
+					{seoResult.geoScore}/100
+				</span>
+			</div>
+			<div class="score-bar-track">
+				<div
+					class="score-bar-fill"
+					style="width: {seoResult.geoScore}%; background: {scoreColor(seoResult.geoScore)}"
+				></div>
+			</div>
+			<span class="score-label" style="color: {scoreColor(seoResult.geoScore)}">
+				{scoreLabel(seoResult.geoScore)}
+			</span>
+		{/if}
+
 		<button
 			class="ai-btn"
 			onclick={analyzeSeo}
@@ -253,6 +272,11 @@
 		font-size: 0.8125rem;
 		font-weight: 500;
 		margin-bottom: 0.5rem;
+	}
+
+	/* Zweiter Wert im selben Block — braucht Luft zum SEO-Score darüber. */
+	.geo-header {
+		margin-top: 0.875rem;
 	}
 
 	.score-badge {

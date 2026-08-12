@@ -3,8 +3,15 @@
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { PUBLIC_LOCALES, DEFAULT_LOCALE, HREFLANG, localizedPath } from '$lib/config/locales';
+	import { SITE_URL, SITE_NAME } from '$lib/config/site';
 	import { buildSiteIdentity } from '$lib/config/site-identity';
-	import { buildPerson, buildOrganization, buildWebSite, buildGraph } from '$lib/utils/schema';
+	import {
+		buildPerson,
+		buildOrganization,
+		buildAffiliations,
+		buildWebSite,
+		buildGraph
+	} from '$lib/utils/schema';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
 	import { safeColor, mixHex, softFromPrimary } from '$lib/utils/color';
 	import { resolveFonts, googleFontsUrl } from '$lib/config/fonts';
@@ -69,15 +76,14 @@
 			`--bg-page:${cream};--text-heading:${ink};--text-primary:${ink};}`
 	);
 
-	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
-	const SITE_NAME = 'Break the Box';
 	// ?v= bustet die Vorschau-Caches der Messenger/Social-Scraper bei Neugestaltung
-	const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg?v=2`;
+	const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg?v=3`;
 
 	const identity = buildSiteIdentity(SITE_URL);
 	const baseGraph = buildGraph([
 		buildPerson(identity),
 		buildOrganization(identity),
+		...buildAffiliations(identity),
 		buildWebSite(identity)
 	]);
 
@@ -90,7 +96,7 @@
 
 	// Per-page overrides come from the route's `load` as `meta`; otherwise site defaults.
 	let meta = $derived(((page.data as { meta?: PageMeta })?.meta ?? {}) as PageMeta);
-	let ogTitle = $derived(meta.title ?? `${SITE_NAME} — ${identity.personName}`);
+	let ogTitle = $derived(meta.ogTitle ?? meta.title ?? `${SITE_NAME} — ${identity.personName}`);
 	let ogDescription = $derived(meta.description ?? m.hero_subline());
 	let ogType = $derived(meta.type ?? 'website');
 	let ogImage = $derived(absoluteImage(meta.image));
@@ -122,6 +128,13 @@
 	{/if}
 	{#if fontsHref}
 		<link rel="stylesheet" href={fontsHref} />
+	{/if}
+	<!-- Nur wenn die Route `meta` liefert; Admin- und Auth-Seiten setzen ihren Titel lokal. -->
+	{#if meta.title}
+		<title>{meta.title}</title>
+	{/if}
+	{#if meta.description}
+		<meta name="description" content={meta.description} />
 	{/if}
 	<link rel="canonical" href={canonical} />
 	{#each alternates as alt}

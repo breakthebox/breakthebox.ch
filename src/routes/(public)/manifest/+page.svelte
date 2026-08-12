@@ -7,6 +7,9 @@
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { SITE_URL } from '$lib/config/site';
+	import { buildPageBreadcrumb } from '$lib/utils/schema';
 	import type { ManifestContent } from '$lib/types/content';
 
 	let { data } = $props();
@@ -59,12 +62,11 @@
 			activeIo.disconnect();
 		};
 	});
+
+	const breadcrumbJsonLd = buildPageBreadcrumb(SITE_URL, 'Manifest', '/manifest');
 </script>
 
-<svelte:head>
-	<title>{m.manifest_page_title()} — Brigitte Hulliger | Break the Box</title>
-	<meta name="description" content={manifest.subtitle} />
-</svelte:head>
+<JsonLd data={breadcrumbJsonLd} />
 
 <div class="mani">
 	<ScrollProgress />

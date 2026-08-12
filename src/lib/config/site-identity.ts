@@ -23,10 +23,60 @@ export function buildSiteIdentity(siteUrl: string): SiteIdentity {
 		personKnowsAbout: [
 			'IT-Strategie',
 			'IT-Governance',
+			'Digital Governance',
 			'Digitalisierung',
 			'Künstliche Intelligenz',
 			'Digitale Transformation',
-			'Innovation Management'
+			'Digital Transformation',
+			'Innovation Management',
+			'Verwaltungsrat',
+			'Board'
+		],
+		// Hochschule und Mandate — Ziel der alumniOf/memberOf/worksFor-Referenzen.
+		personAffiliations: [
+			{
+				id: 'bfh',
+				name: 'Berner Fachhochschule BFH',
+				url: 'https://www.bfh.ch',
+				alumniOf: true,
+				memberOf: true,
+				worksFor: true
+			},
+			{
+				id: 'gvb',
+				name: 'GVB Gebäudeversicherung Bern',
+				url: 'https://www.gvb.ch',
+				memberOf: true,
+				worksFor: true
+			},
+			{
+				id: 'nexplore',
+				name: 'Nexplore AG',
+				url: 'https://www.nexplore.ch',
+				memberOf: true,
+				worksFor: true
+			}
+		],
+		// Abschlüsse als E-E-A-T-Signal. `issuerId` verweist auf eine Affiliation.
+		personCredentials: [
+			{
+				name: 'Executive Master of Business Administration (EMBA) in Innovative Business Creation',
+				credentialCategory: 'degree',
+				educationalLevel: 'Master',
+				year: '2024',
+				issuerId: 'bfh'
+			},
+			{
+				name: 'Bachelor of Science in Computer Science, with Specialization in Computer Perception and Virtual Reality',
+				credentialCategory: 'degree',
+				educationalLevel: 'Bachelor',
+				year: '2009'
+			},
+			{
+				name: 'Certified Board Member',
+				credentialCategory: 'certification',
+				year: '2025'
+			}
 		],
 		orgName: 'Break the Box GmbH',
 		orgLogo: `${cleanUrl}/logo.webp`,
@@ -37,8 +87,14 @@ export function buildSiteIdentity(siteUrl: string): SiteIdentity {
 		],
 		orgCountry: 'CH',
 		orgLocality: 'Kirchberg',
+		orgRegion: 'BE',
 		orgPostalCode: '3422',
 		orgStreetAddress: 'Mülibüüne 4',
+		// Koordinaten der Geschäftsadresse (OpenStreetMap-Geocoding).
+		orgLatitude: 47.0924981,
+		orgLongitude: 7.5765547,
+		orgTelephone: '+41763092088',
+		orgEmail: 'info@breakthebox.ch',
 		orgAreaServed: ['Schweiz', 'Deutschland', 'Österreich'],
 		orgServices: [
 			{

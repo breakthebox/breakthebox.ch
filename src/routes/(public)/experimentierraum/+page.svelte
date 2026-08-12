@@ -9,6 +9,9 @@
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { SITE_URL } from '$lib/config/site';
+	import { buildPageBreadcrumb } from '$lib/utils/schema';
 	import MissBizzyChat from '$lib/components/ui/MissBizzyChat.svelte';
 	import type { ExperimentierraumContent } from '$lib/types/content';
 
@@ -62,15 +65,11 @@
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
 	});
+
+	const breadcrumbJsonLd = buildPageBreadcrumb(SITE_URL, 'Experimentierraum', '/experimentierraum');
 </script>
 
-<svelte:head>
-	<title>Experimentierraum — Brigitte Hulliger | Break the Box</title>
-	<meta
-		name="description"
-		content="Die Werkstatt statt Portfolio: eigene Plattformen, KI-Agenten und Infrastruktur — self-hosted, nicht kommerziell, ehrlich dokumentiert. Ich empfehle nichts, was ich nicht selbst gebaut habe."
-	/>
-</svelte:head>
+<JsonLd data={breadcrumbJsonLd} />
 
 <!-- Pixel-Filter (Easter-Egg / Hover) -->
 <svg width="0" height="0" style="position: absolute" aria-hidden="true">

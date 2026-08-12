@@ -10,7 +10,10 @@ import {
 	defaultExperimentierraum,
 	mergeContent
 } from '$lib/server/content-defaults';
+import { pageTitle } from '$lib/config/site';
+import * as m from '$lib/paraglide/messages.js';
 import type { ManifestContent, ExperimentierraumContent } from '$lib/types/content';
+import type { PageMeta } from '$lib/types/seo';
 
 const VR_PATTERN = /verwaltungsrä|vizepräsident|aufsichts|präsident|\bvr\b|gremium/i;
 
@@ -39,10 +42,16 @@ export const load: PageServerLoad = async () => {
 	const vrRolesFiltered = about.roles.filter((r) => VR_PATTERN.test(r.title));
 	const vrRoles = vrRolesFiltered.length > 0 ? vrRolesFiltered : about.roles;
 
+	const meta: PageMeta = {
+		title: pageTitle(m.manifest_page_title()),
+		description: manifest.subtitle
+	};
+
 	return {
 		manifest,
 		platforms,
 		vrRoles,
-		qualifications: about.qualifications
+		qualifications: about.qualifications,
+		meta
 	};
 };

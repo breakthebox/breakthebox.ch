@@ -80,17 +80,29 @@ export async function analyzeSeoScore(
 	const hasHeadings = blocks.blocks.some((b) => b.type === 'header');
 	const hasLists = blocks.blocks.some((b) => b.type === 'list');
 
-	const systemPrompt = `Du bist ein SEO-Analyst. Bewerte den SEO-Score eines Blogposts auf einer Skala von 0–100.
+	// GEO-Signale: Sprachmodelle zitieren den Einstieg und die Zwischentitel.
+	const firstParagraph = stripHtml(
+		(blocks.blocks.find((b) => b.type === 'paragraph')?.data as { text?: string })?.text ?? ''
+	).trim();
+	const headings = blocks.blocks
+		.filter((b) => b.type === 'header')
+		.map((b) => stripHtml((b.data as { text?: string }).text ?? '').trim())
+		.filter(Boolean);
+
+	const systemPrompt = `Du bist SEO- und GEO-Analyst. Bewerte einen Blogpost mit zwei getrennten Werten:
+"score" für klassische Suchmaschinen-Optimierung und "geoScore" für Zitierfähigkeit
+in generativen Suchmaschinen (ChatGPT, Perplexity, Google AI Overviews).
 
 Antworte ausschliesslich als JSON-Objekt im folgenden Format:
 {
   "score": <number 0-100>,
+  "geoScore": <number 0-100>,
   "suggestions": [
-    { "type": "title|content|meta|structure|keywords", "message": "<konkreter Verbesserungsvorschlag>", "priority": "high|medium|low" }
+    { "type": "title|content|meta|structure|keywords|geo", "message": "<konkreter Verbesserungsvorschlag>", "priority": "high|medium|low" }
   ]
 }
 
-Bewertungskriterien:
+SEO-Bewertungskriterien ("score"):
 - Titel-Qualität (Länge, Keywords, Ansprechend) — 20 Punkte
 - Meta-Beschreibung (Vorhanden, Länge 140-160 Zeichen) — 15 Punkte
 - Inhaltslänge (mind. 300 Wörter ideal, 600+ optimal) — 20 Punkte
@@ -99,7 +111,22 @@ Bewertungskriterien:
 - Lesbarkeit (Satzlänge, Absatzlänge) — 10 Punkte
 - Interne/externe Links — 10 Punkte
 
-Verwende Schweizer Rechtschreibung (ss statt ß). Maximal 5 Vorschläge.`;
+GEO-Bewertungskriterien ("geoScore") — entscheidend ist, ob ein Sprachmodell
+einen Abschnitt wörtlich als Antwort zitieren kann:
+- Antwort zuerst: Beantwortet der erste Absatz die Frage aus dem Titel bereits
+  vollständig und eigenständig, ohne Vorgeplänkel? — 25 Punkte
+- Zitierfähige Passagen: Gibt es in sich geschlossene Abschnitte von 40–60 Wörtern,
+  die ohne umgebenden Kontext verständlich bleiben? — 20 Punkte
+- Frage-Antwort-Struktur: Sind Zwischenüberschriften als echte Fragen oder klare
+  Aussagen formuliert statt als Wortspiele? — 15 Punkte
+- Benannte Entitäten: Werden Personen, Organisationen, Normen, Orte und Werkzeuge
+  ausgeschrieben statt umschrieben ("OR 716a" statt "die gesetzliche Grundlage")? — 15 Punkte
+- Konkrete Belege: Zahlen, Daten, Beispiele und Erfahrungen aus erster Hand
+  statt allgemeiner Aussagen — 15 Punkte
+- Eigenständigkeit: Versteht man den Beitrag ohne die übrige Website? — 10 Punkte
+
+Gib mindestens einen Vorschlag vom Typ "geo", wenn geoScore unter 80 liegt.
+Verwende Schweizer Rechtschreibung (ss statt ß). Maximal 6 Vorschläge.`;
 
 	const userMessage = `Titel: ${title}
 Meta-Titel: ${metaTitle ?? '(nicht gesetzt)'}
@@ -108,6 +135,8 @@ Wortanzahl: ${wordCount}
 Bilder: ${hasImages ? 'Ja' : 'Nein'}
 Überschriften: ${hasHeadings ? 'Ja' : 'Nein'}
 Listen: ${hasLists ? 'Ja' : 'Nein'}
+Erster Absatz (${firstParagraph.split(/\s+/).filter(Boolean).length} Wörter): ${firstParagraph || '(keiner)'}
+Zwischenüberschriften: ${headings.length ? headings.join(' | ') : '(keine)'}
 
 Inhalt (Auszug):
 ${plainText.slice(0, 3000)}`;
