@@ -2766,6 +2766,21 @@
 	section.inverted .leap-card {
 		border: 1px solid rgba(255, 255, 255, 0.18);
 	}
+	/* Kundenlogos sind dunkle Bildmarken — auf dem dunklen Band werden sie
+	   als helle Silhouette gezeichnet, sonst verschwinden sie darin. */
+	section.inverted .logo-item img {
+		filter: brightness(0) invert(1);
+		opacity: 0.72;
+	}
+	section.inverted .logo-item:hover img {
+		filter: brightness(0) invert(1);
+		opacity: 1;
+	}
+	/* Das LinkedIn-Blau trägt auf dunklem Grund nicht. */
+	section.inverted .qa-author-link svg,
+	section.inverted .pp-name-link svg {
+		color: #ffffff;
+	}
 	/* Flächen, die weiss bleiben, brauchen dunkle Schrift. */
 	section.inverted .ev-datechip .d,
 	section.inverted .ev-datechip .mo,
