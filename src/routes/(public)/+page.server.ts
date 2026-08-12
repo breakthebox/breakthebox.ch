@@ -30,9 +30,16 @@ import type {
 	KeynotesContent,
 	FaqContent
 } from '$lib/types/content';
+import * as m from '$lib/paraglide/messages.js';
+import type { PageMeta } from '$lib/types/seo';
+
+// Startseite: eigener Titel statt `pageTitle()`, weil die Marke hier vorne steht.
+const PAGE_TITLE = 'Brigitte Hulliger — IT-Strategie, Verwaltungsrat & KI | Break the Box';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	const [parentData, allContent] = await Promise.all([parent(), getAllContent()]);
+
+	const meta: PageMeta = { title: PAGE_TITLE, description: m.hero_subline() };
 
 	// Merge mit Defaults, damit unvollständige/ältere DB-Einträge nicht crashen,
 	// wenn die Public-Seite verschachtelte Felder (z.B. .items, .clients) dereferenziert.
@@ -50,6 +57,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 		partners: { ...defaultPartners, ...((allContent.partners as Partial<PartnersContent>) ?? {}) },
 		keynotes: { ...defaultKeynotes, ...((allContent.keynotes as Partial<KeynotesContent>) ?? {}) },
 		faq: { ...defaultFaq, ...((allContent.faq as Partial<FaqContent>) ?? {}) },
-		theme: parentData.theme
+		theme: parentData.theme,
+		meta
 	};
 };

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { env } from '$env/dynamic/public';
+	import { SITE_URL } from '$lib/config/site';
 	import { resolveMenuLinks } from '$lib/utils/menu';
 	import { renderMarkdown } from '$lib/utils/markdown';
 	import SiteNav from '$lib/components/ui/SiteNav.svelte';
@@ -9,15 +9,17 @@
 	import FaqList from '$lib/components/ui/FaqList.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
-	import { buildFaqPage } from '$lib/utils/schema';
+	import { buildFaqPage, buildGraph, buildPageBreadcrumb } from '$lib/utils/schema';
 	import type { TransformationContent } from '$lib/types/content';
 
 	let { data } = $props();
 	const c: TransformationContent = data.content;
 
 	// FAQ als strukturierte Daten (GEO/SEO) — kanonische deutsche URL.
-	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
-	const faqJsonLd = buildFaqPage(SITE_URL + '/transformation', c.faq.items);
+	const jsonLdGraph = buildGraph([
+		buildFaqPage(SITE_URL + '/transformation', c.faq.items),
+		buildPageBreadcrumb(SITE_URL, 'Transformation', '/transformation')
+	]);
 
 	// Nav-Links aus der admin-verwalteten Menü-Liste (site-weit, eine Quelle).
 	const navLinks = $derived(
@@ -29,15 +31,7 @@
 	let bannerDismissed = $state(false);
 </script>
 
-<svelte:head>
-	<title>Transformation — Brigitte Hulliger | Break the Box</title>
-	<meta
-		name="description"
-		content="Transformation, die trägt — IT-, Digital- und KI-Strategie in Stufen, die einzeln bestehen. Für Geschäftsleitungen und Verwaltungsräte."
-	/>
-</svelte:head>
-
-<JsonLd data={faqJsonLd} />
+<JsonLd data={jsonLdGraph} />
 
 <div class="tf">
 	<ScrollProgress />

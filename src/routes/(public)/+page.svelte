@@ -11,9 +11,11 @@
 	import FaqList from '$lib/components/ui/FaqList.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
 	import { renderMarkdown, renderMarkdownBlock } from '$lib/utils/markdown';
-	import { env } from '$env/dynamic/public';
+	import { SITE_URL } from '$lib/config/site';
+	import { optimizedImage } from '$lib/utils/images';
 	import JsonLd from '$lib/components/seo/JsonLd.svelte';
-	import { buildFaqPage, buildEvent, buildGraph } from '$lib/utils/schema';
+	import { buildFaqPage, buildReviews, buildGraph } from '$lib/utils/schema';
+	import { buildKeynoteEvents } from '$lib/utils/keynote-schema';
 	import { safeColor, mixHex, softFromPrimary, isDarkColor } from '$lib/utils/color';
 	import { resolveFonts } from '$lib/config/fonts';
 
@@ -42,7 +44,7 @@
 		`--navline:${headerDark ? mixHex(cHeader, '#ffffff', 0.82) : mixHex(cSoft, cInk, 0.92)};` +
 		`--serif:${themeFonts.heading.family};--sans:${themeFonts.body.family};--hand:${themeFonts.hand.family};`;
 	// Die Palette der dunklen Bänder (--inv-*) kommt site-weit aus dem Root-Layout.
-	const heroImage = theme?.heroImage || '/fruits/hero.png';
+	const heroImage = optimizedImage(theme?.heroImage || '/fruits/hero.png');
 	// Form des Themes: 'edge' schaltet den Editorial-Look ein (eckig + Haarlinien-Raster).
 	const edge = theme?.shape === 'edge';
 	// Theme-Bild ist die Basis; ein im Pillar gesetztes Bild überschreibt es.
@@ -213,47 +215,16 @@
 	);
 
 	const faq: FaqContent = data.faq;
-	const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
 
-	// Relative Uploads/Links zu absoluten URLs machen (Structured Data verlangt absolut).
-	function absUrl(u: string | undefined): string | undefined {
-		if (!u) return undefined;
-		return /^https?:\/\//.test(u) ? u : SITE_URL + (u.startsWith('/') ? '' : '/') + u;
-	}
-	// Markdown zu Klartext für die JSON-LD-Beschreibung (keine Syntax/Tags in Structured Data).
-	function mdToPlain(md: string | undefined): string | undefined {
-		if (!md?.trim()) return undefined;
-		const text = renderMarkdownBlock(md)
-			.replace(/<li>/g, '• ')
-			.replace(/<\/(p|li|h[1-6])>/g, ' ')
-			.replace(/<[^>]+>/g, '')
-			.replace(/&amp;/g, '&')
-			.replace(/&lt;/g, '<')
-			.replace(/&gt;/g, '>')
-			.replace(/&quot;/g, '"')
-			.replace(/&#39;/g, "'")
-			.replace(/\s+/g, ' ')
-			.trim();
-		return text || undefined;
-	}
 	// Event-Structured-Data für jeden Auftritt mit gültigem Datum (E-E-A-T / Google-Events).
-	const keynoteEvents = keynotes.items
-		.filter((k) => k.date?.trim())
-		.map((k, i) =>
-			buildEvent({
-				siteUrl: SITE_URL,
-				id: `keynote-${i}`,
-				name: k.title,
-				startDate: k.date,
-				endDate: k.endDate?.trim() || undefined,
-				description: mdToPlain(k.desc),
-				image: absUrl(k.image),
-				url: absUrl(k.url),
-				location: k.location?.trim() || undefined,
-				organizer: k.event?.trim() || undefined
-			})
-		);
-	const jsonLdGraph = buildGraph([buildFaqPage(SITE_URL + '/', faq.items), ...keynoteEvents]);
+	const keynoteEvents = buildKeynoteEvents(SITE_URL, keynotes.items);
+	// Stimmen als Review-Knoten — beschreibt die Organisation für LLMs.
+	const reviews = buildReviews(SITE_URL, testimonials.items);
+	const jsonLdGraph = buildGraph([
+		buildFaqPage(SITE_URL + '/', faq.items),
+		...reviews,
+		...keynoteEvents
+	]);
 
 	// Scroll-aware nav: backdrop + active section
 	$effect(() => {
@@ -289,11 +260,6 @@
 		return () => observer.disconnect();
 	});
 </script>
-
-<svelte:head>
-	<title>Brigitte Hulliger — IT-Strategie, Verwaltungsrat & KI | Break the Box</title>
-	<meta name="description" content={m.hero_subline()} />
-</svelte:head>
 
 <div class="hbb" class:edge style={hbbStyle}>
 	<ScrollProgress />
@@ -605,7 +571,7 @@
 		<div class="wrap aboutgrid">
 			<div class="aboutcol reveal">
 				<div class="aboutpf">
-					<img src="/foto_brigitte_2025.jpg" alt="Brigitte Hulliger" loading="lazy" decoding="async" />
+					<img src="/foto_brigitte_2025.webp" alt="Brigitte Hulliger" loading="lazy" decoding="async" />
 				</div>
 				{#if aboutVideoEmbed}
 					<div class="about-video">

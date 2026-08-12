@@ -1,9 +1,7 @@
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/public';
 import { getPublishedBlogPosts } from '$lib/server/db/queries/blog';
 import { PUBLIC_LOCALES, DEFAULT_LOCALE, HREFLANG, localizedPath } from '$lib/config/locales';
-
-const SITE_URL = (env.PUBLIC_APP_URL || 'https://breakthebox.ch').replace(/\/$/, '');
+import { SITE_URL } from '$lib/config/site';
 
 const STATIC_ROUTES: Array<{ path: string; changefreq: string; priority: string }> = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },

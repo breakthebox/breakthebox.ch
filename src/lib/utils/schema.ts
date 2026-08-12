@@ -5,6 +5,15 @@
 // E-E-A-T-Signale für GEO (Generative Engine Optimization):
 // LLMs zitieren bevorzugt Quellen mit Person + Organization Schema.
 
+export interface EducationalOccupationalCredential {
+	'@type': 'EducationalOccupationalCredential';
+	name: string;
+	credentialCategory?: string;
+	educationalLevel?: string;
+	dateCreated?: string;
+	recognizedBy?: { '@id': string };
+}
+
 export interface Person {
 	'@type': 'Person';
 	'@id': string;
@@ -15,23 +24,37 @@ export interface Person {
 	description?: string;
 	knowsAbout?: string[];
 	sameAs?: string[];
-	worksFor?: { '@id': string };
+	worksFor?: Array<{ '@id': string }>;
+	memberOf?: Array<{ '@id': string }>;
+	alumniOf?: Array<{ '@id': string }>;
+	hasCredential?: EducationalOccupationalCredential[];
 }
 
 export interface Organization {
-	'@type': 'Organization';
+	// ProfessionalService ist eine Unterklasse von LocalBusiness und damit von
+	// Organization — sie erlaubt Geokoordinaten und lokale Signale.
+	'@type': 'Organization' | 'ProfessionalService';
 	'@id': string;
 	name: string;
 	url: string;
 	logo?: string;
+	image?: string;
 	founder?: { '@id': string };
 	sameAs?: string[];
+	telephone?: string;
+	email?: string;
 	address?: {
 		'@type': 'PostalAddress';
 		addressCountry: string;
 		addressLocality?: string;
 		postalCode?: string;
 		streetAddress?: string;
+		addressRegion?: string;
+	};
+	geo?: {
+		'@type': 'GeoCoordinates';
+		latitude: number;
+		longitude: number;
 	};
 	areaServed?: string | string[];
 	hasOfferCatalog?: OfferCatalog;
@@ -77,6 +100,26 @@ export interface Article {
 	inLanguage?: string;
 }
 
+export interface Review {
+	'@type': 'Review';
+	'@id': string;
+	itemReviewed: { '@id': string };
+	author: { '@type': 'Person'; name: string; jobTitle?: string };
+	reviewBody: string;
+}
+
+export interface ItemList {
+	'@type': 'ItemList';
+	'@id': string;
+	name: string;
+	numberOfItems: number;
+	itemListElement: Array<{
+		'@type': 'ListItem';
+		position: number;
+		item: SchemaNode;
+	}>;
+}
+
 export interface BreadcrumbList {
 	'@type': 'BreadcrumbList';
 	itemListElement: Array<{
@@ -120,7 +163,16 @@ export interface Event {
 	organizer?: { '@type': 'Organization'; name: string };
 }
 
-export type SchemaNode = Person | Organization | Article | BreadcrumbList | WebSite | FAQPage | Event;
+export type SchemaNode =
+	| Person
+	| Organization
+	| Article
+	| BreadcrumbList
+	| WebSite
+	| FAQPage
+	| Event
+	| Review
+	| ItemList;
 
 export interface SchemaGraph {
 	'@context': 'https://schema.org';
@@ -136,6 +188,33 @@ export function buildGraph(nodes: SchemaNode[]): SchemaGraph {
 
 // ─── Site-spezifische Builder ───
 
+/**
+ * Organisation, mit der die Person verbunden ist (Hochschule, Mandat, Firma).
+ * Wird als eigener Organization-Knoten in den Graph geschrieben, damit
+ * alumniOf/memberOf/worksFor per @id auf eine Entität zeigen statt auf einen String.
+ */
+export interface Affiliation {
+	/** Fragment für die @id, z.B. 'bfh' → https://.../#bfh */
+	id: string;
+	name: string;
+	url: string;
+	alumniOf?: boolean;
+	memberOf?: boolean;
+	worksFor?: boolean;
+}
+
+export interface CredentialInput {
+	name: string;
+	/** schema.org credentialCategory, z.B. 'degree' oder 'certification' */
+	credentialCategory?: string;
+	/** z.B. 'Master', 'Bachelor' */
+	educationalLevel?: string;
+	/** Abschlussjahr */
+	year?: string;
+	/** Fragment einer Affiliation, die den Abschluss verliehen hat */
+	issuerId?: string;
+}
+
 export interface SiteIdentity {
 	siteUrl: string; // ohne trailing slash
 	personName: string;
@@ -144,18 +223,44 @@ export interface SiteIdentity {
 	personImage?: string;
 	personSameAs: string[];
 	personKnowsAbout: string[];
+	personAffiliations?: Affiliation[];
+	personCredentials?: CredentialInput[];
 	orgName: string;
 	orgLogo: string;
 	orgSameAs: string[];
 	orgCountry: string;
 	orgLocality?: string;
+	orgRegion?: string;
 	orgPostalCode?: string;
 	orgStreetAddress?: string;
+	orgLatitude?: number;
+	orgLongitude?: number;
+	orgTelephone?: string;
+	orgEmail?: string;
 	orgAreaServed?: string | string[];
 	orgServices?: Array<{ name: string; description: string; serviceType?: string }>;
 }
 
 export function buildPerson(id: SiteIdentity): Person {
+	const affiliations = id.personAffiliations ?? [];
+	const ownOrg = { '@id': `${id.siteUrl}/#organization` };
+	const ref = (a: Affiliation) => ({ '@id': `${id.siteUrl}/#${a.id}` });
+	const refsWhere = (pick: (a: Affiliation) => boolean | undefined) =>
+		affiliations.filter(pick).map(ref);
+
+	const alumniOf = refsWhere((a) => a.alumniOf);
+	const memberOf = refsWhere((a) => a.memberOf);
+	const credentials = (id.personCredentials ?? []).map(
+		(c): EducationalOccupationalCredential => ({
+			'@type': 'EducationalOccupationalCredential',
+			name: c.name,
+			...(c.credentialCategory ? { credentialCategory: c.credentialCategory } : {}),
+			...(c.educationalLevel ? { educationalLevel: c.educationalLevel } : {}),
+			...(c.year ? { dateCreated: c.year } : {}),
+			...(c.issuerId ? { recognizedBy: { '@id': `${id.siteUrl}/#${c.issuerId}` } } : {})
+		})
+	);
+
 	return {
 		'@type': 'Person',
 		'@id': `${id.siteUrl}/#person`,
@@ -166,26 +271,56 @@ export function buildPerson(id: SiteIdentity): Person {
 		description: id.personDescription,
 		knowsAbout: id.personKnowsAbout,
 		sameAs: id.personSameAs,
-		worksFor: { '@id': `${id.siteUrl}/#organization` }
+		// Eigene Firma ist immer dabei; externe Mandate kommen aus den Affiliations.
+		worksFor: [ownOrg, ...refsWhere((a) => a.worksFor)],
+		...(memberOf.length ? { memberOf: [ownOrg, ...memberOf] } : {}),
+		...(alumniOf.length ? { alumniOf } : {}),
+		...(credentials.length ? { hasCredential: credentials } : {})
 	};
+}
+
+/**
+ * Organization-Knoten für alle Affiliations — Ziel der @id-Referenzen aus buildPerson.
+ */
+export function buildAffiliations(id: SiteIdentity): Organization[] {
+	return (id.personAffiliations ?? []).map((a) => ({
+		'@type': 'Organization',
+		'@id': `${id.siteUrl}/#${a.id}`,
+		name: a.name,
+		url: a.url,
+		sameAs: [a.url]
+	}));
 }
 
 export function buildOrganization(id: SiteIdentity): Organization {
 	return {
-		'@type': 'Organization',
+		'@type': 'ProfessionalService',
 		'@id': `${id.siteUrl}/#organization`,
 		name: id.orgName,
 		url: id.siteUrl,
 		logo: id.orgLogo,
+		image: id.orgLogo,
 		founder: { '@id': `${id.siteUrl}/#person` },
 		sameAs: id.orgSameAs,
+		...(id.orgTelephone ? { telephone: id.orgTelephone } : {}),
+		...(id.orgEmail ? { email: id.orgEmail } : {}),
 		address: {
 			'@type': 'PostalAddress',
 			addressCountry: id.orgCountry,
 			...(id.orgLocality ? { addressLocality: id.orgLocality } : {}),
+			...(id.orgRegion ? { addressRegion: id.orgRegion } : {}),
 			...(id.orgPostalCode ? { postalCode: id.orgPostalCode } : {}),
 			...(id.orgStreetAddress ? { streetAddress: id.orgStreetAddress } : {})
 		},
+		...(id.orgLatitude != null && id.orgLongitude != null
+			? {
+					geo: {
+						'@type': 'GeoCoordinates' as const,
+						latitude: id.orgLatitude,
+						longitude: id.orgLongitude
+					}
+				}
+			: {}),
 		...(id.orgAreaServed ? { areaServed: id.orgAreaServed } : {}),
 		...(id.orgServices && id.orgServices.length
 			? {
@@ -309,6 +444,61 @@ export function buildArticle(input: BlogArticleInput): Article {
 		keywords: input.tags,
 		inLanguage: input.inLanguage ?? 'de-CH'
 	};
+}
+
+export interface ReviewInput {
+	quote: string;
+	author: string;
+	role?: string;
+}
+
+/**
+ * Stimmen als Review-Knoten. Bewusst ohne `reviewRating` — es gibt keine
+ * Sternebewertungen, und erfundene wären falsch. Google zeigt Reviews auf der
+ * eigenen Website ohnehin nicht als Rich Result; der Wert liegt in der
+ * Entitätsbeschreibung für LLMs.
+ */
+export function buildReviews(siteUrl: string, items: ReviewInput[]): Review[] {
+	// Die Zitate sind im CMS mit **fett**/*kursiv* ausgezeichnet — in
+	// strukturierten Daten gehört Klartext.
+	const stripEmphasis = (text: string) => text.replace(/\*\*|__|(?<!\w)[*_](?!\w)/g, '').trim();
+
+	return items
+		.filter((item) => item.quote?.trim() && item.author?.trim())
+		.map((item, i) => ({
+			'@type': 'Review' as const,
+			'@id': `${siteUrl}/#review-${i}`,
+			itemReviewed: { '@id': `${siteUrl}/#organization` },
+			author: {
+				'@type': 'Person' as const,
+				name: item.author,
+				...(item.role?.trim() ? { jobTitle: item.role } : {})
+			},
+			reviewBody: stripEmphasis(item.quote)
+		}));
+}
+
+/** Geordnete Liste gleichartiger Knoten — z.B. alle Auftritte auf /keynotes. */
+export function buildItemList(id: string, name: string, items: SchemaNode[]): ItemList {
+	return {
+		'@type': 'ItemList',
+		'@id': id,
+		name,
+		numberOfItems: items.length,
+		itemListElement: items.map((item, i) => ({
+			'@type': 'ListItem' as const,
+			position: i + 1,
+			item
+		}))
+	};
+}
+
+/** Zweistufiger Breadcrumb Startseite → Unterseite. */
+export function buildPageBreadcrumb(siteUrl: string, name: string, path: string): BreadcrumbList {
+	return buildBreadcrumb([
+		{ name: 'Startseite', url: `${siteUrl}/` },
+		{ name, url: siteUrl + path }
+	]);
 }
 
 export function buildBreadcrumb(

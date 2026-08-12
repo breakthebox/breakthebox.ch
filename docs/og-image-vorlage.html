@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<!-- Vorlage für static/og-image.jpg (1200×630). Neu rendern:
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless \
+       --force-device-scale-factor=2 --window-size=1200,630 \
+       --screenshot=og@2x.png --virtual-time-budget=6000 file://$PWD/docs/og-image-vorlage.html
+     sips -z 630 1200 og@2x.png --out og.png
+     sips -s format jpeg -s formatOptions 88 og.png --out static/og-image.jpg
+     Danach ?v= in src/routes/+layout.svelte hochzählen. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#faf8f2;      /* Seitenhintergrund */
+    --ink:#14130f;        /* Text und Überschriften */
+    --primary:#0f7c82;    /* Primärfarbe */
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px}
+  body{
+    display:grid;
+    grid-template-columns:1fr 452px;
+    background:var(--cream);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .txt{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:76px 56px 64px 72px;
+  }
+  .kick{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:.17em;
+    text-transform:uppercase;
+    color:var(--primary);
+    margin-bottom:32px;
+  }
+  h1{
+    font-family:'Archivo',sans-serif;
+    font-weight:700;
+    font-size:63px;
+    line-height:.99;
+    letter-spacing:-.025em;
+    color:var(--ink);
+  }
+  h1 .em{color:var(--primary)}
+  .foot{
+    display:flex;
+    align-items:baseline;
+    gap:18px;
+  }
+  .brand{
+    font-family:'Archivo',sans-serif;
+    font-weight:700;
+    font-size:27px;
+    letter-spacing:-.02em;
+    color:var(--ink);
+  }
+  .sig{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--primary);
+  }
+  .head{}
+  .shot{position:relative;overflow:hidden}
+  .shot img{
+    width:100%;height:100%;
+    object-fit:cover;
+    object-position:52% 34%;
+    display:block;
+  }
+  /* Eingerückter Innenrahmen — dieselbe Bildkante wie im Editorial-Hero */
+  .frame{
+    position:absolute;inset:13px;
+    border:1px solid rgba(255,255,255,.32);
+    pointer-events:none;
+  }
+</style>
+</head>
+<body>
+  <div class="txt">
+    <div class="head">
+      <div class="kick">Digitale Urteilskraft · Verwaltungsrat &amp; Geschäftsleitung</div>
+      <h1>Eine Kombination,<br>die trägt.<br><span class="em">Gibt es nur selten.</span></h1>
+    </div>
+    <div class="foot">
+      <span class="brand">Brigitte Hulliger</span>
+      <span class="sig">Break the Box</span>
+    </div>
+  </div>
+  <div class="shot">
+    <img src="og-image-portrait.jpg" alt="">
+    <span class="frame"></span>
+  </div>
+</body>
+</html>

@@ -10,14 +10,6 @@
 	);
 </script>
 
-<svelte:head>
-	<title>Kontakt — Brigitte Hulliger | Break the Box</title>
-	<meta
-		name="description"
-		content="Kontakt zu Brigitte Hulliger, Break the Box GmbH — IT-Strategie, Verwaltungsrat und KI. Per E-Mail oder Telefon."
-	/>
-</svelte:head>
-
 <div class="sub">
 	<SiteNav theme={data.theme} links={navLinks} subtitle="Kontakt" />
 

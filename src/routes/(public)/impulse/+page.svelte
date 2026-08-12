@@ -9,6 +9,9 @@
 	import ScrollProgress from '$lib/components/ui/ScrollProgress.svelte';
 	import ContactBand from '$lib/components/ui/ContactBand.svelte';
 	import SiteFooter from '$lib/components/ui/SiteFooter.svelte';
+	import JsonLd from '$lib/components/seo/JsonLd.svelte';
+	import { SITE_URL } from '$lib/config/site';
+	import { buildPageBreadcrumb } from '$lib/utils/schema';
 
 	let { data } = $props();
 	const posts = data.posts as BlogPostRow[];
@@ -41,12 +44,11 @@
 		const d = new Date(date);
 		return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 	}
+
+	const breadcrumbJsonLd = buildPageBreadcrumb(SITE_URL, 'Impulse', '/impulse');
 </script>
 
-<svelte:head>
-	<title>Impulse — Brigitte Hulliger | Break the Box</title>
-	<meta name="description" content={m.blog_hero_lead()} />
-</svelte:head>
+<JsonLd data={breadcrumbJsonLd} />
 
 <div class="impulse">
 	<ScrollProgress />

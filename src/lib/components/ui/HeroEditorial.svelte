@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import { getMenuTarget } from '$lib/config/menu-targets';
+	import { optimizedImage } from '$lib/utils/images';
 	import type { HeroEditorial } from '$lib/types/content';
 
 	// Editorial-Hero: Split — Text links, vollflächiges Bild rechts, das bis an
@@ -15,7 +16,7 @@
 		return t.kind === 'section' ? (t.anchor ?? '') : localizeHref(t.path ?? '/');
 	}
 	const secondaryHref = $derived(targetHref(content.ctaSecondaryTarget));
-	const heroImage = $derived(content.image || image);
+	const heroImage = $derived(optimizedImage(content.image || image));
 </script>
 
 <header class="ehero">

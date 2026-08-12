@@ -9,6 +9,7 @@ import type { RequestHandler } from './$types';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { isConvertible, optimizeImage } from '$lib/server/images';
 const UPLOAD_DIR = process.env.UPLOAD_DIR ?? './uploads';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB (Bilder + PDF-Dokumente)
 const ALLOWED_TYPES = [
@@ -55,8 +56,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		throw error(400, 'Datei ist zu gross (max. 10 MB).');
 	}
 
+	// Rasterbilder werden nach WebP konvertiert und begrenzt — SVG/GIF/PDF bleiben,
+	// wie sie sind. Schlägt die Konvertierung fehl, wird das Original gespeichert.
+	const original = Buffer.from(await file.arrayBuffer());
+	let buffer: Buffer = original;
+	let ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+
+	if (isConvertible(file.type)) {
+		try {
+			const optimized = await optimizeImage(original);
+			buffer = optimized.buffer;
+			ext = optimized.ext;
+		} catch (err) {
+			console.error('Bildoptimierung fehlgeschlagen, Original wird gespeichert:', err);
+		}
+	}
+
 	// Generate unique, URL-sicheren Dateinamen (keine Leerzeichen/Sonderzeichen)
-	const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
 	const timestamp = Date.now();
 	const safeSection = section ? slugify(section) : '';
 	const prefix = safeSection ? `${safeSection}-` : '';
@@ -68,8 +84,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		await mkdir(uploadPath, { recursive: true });
 	}
 
-	// Write file
-	const buffer = Buffer.from(await file.arrayBuffer());
 	const filePath = path.join(uploadPath, filename);
 	await writeFile(filePath, buffer);
 

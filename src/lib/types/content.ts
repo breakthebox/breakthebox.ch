@@ -694,13 +694,15 @@ export interface BlogContentBlocks {
 
 // ─── AI Response Types ───
 export interface SeoSuggestion {
-	type: 'title' | 'content' | 'meta' | 'structure' | 'keywords';
+	type: 'title' | 'content' | 'meta' | 'structure' | 'keywords' | 'geo';
 	message: string;
 	priority: 'high' | 'medium' | 'low';
 }
 
 export interface SeoScoreResult {
 	score: number;
+	/** Zitierfähigkeit für generative Suchmaschinen (GEO). Optional — ältere Antworten haben ihn nicht. */
+	geoScore?: number;
 	suggestions: SeoSuggestion[];
 }
 
