@@ -32,7 +32,14 @@ services:
     environment:
       - DATABASE_URL=postgresql://${DB_USER:-breakthebox}:${DB_PASSWORD}@db:5432/${DB_NAME:-breakthebox}
       - NODE_ENV=production
-      - ORIGIN=${PUBLIC_APP_URL:-https://www.brigittehulliger.ch}
+      # Kein ORIGIN: die App wird unter zwei Hostnamen ausgeliefert. Mit festem
+      # ORIGIN würde `event.url` immer die kanonische Domain melden und der
+      # CSRF-Check in hooks.server.ts jeden POST auf der zweiten Domain mit 403
+      # abweisen. Stattdessen leitet adapter-node den Origin pro Request aus den
+      # Proxy-Headern ab, die Traefik selbst setzt (und dabei Client-Werte
+      # überschreibt — deshalb sind sie vertrauenswürdig).
+      - PROTOCOL_HEADER=x-forwarded-proto
+      - HOST_HEADER=x-forwarded-host
       # adapter-node begrenzt Request-Bodies auf 512 KB — hochgesetzt, damit
       # Bild-Uploads bis zur App-Grenze (5 MB, /api/upload) durchkommen.
       - BODY_SIZE_LIMIT=6M
@@ -71,6 +78,31 @@ services:
       - 'traefik.http.middlewares.btb-canonical.redirectregex.regex=^https?://[^/]+/(.*)'
       - 'traefik.http.middlewares.btb-canonical.redirectregex.replacement=https://www.brigittehulliger.ch/$${1}'
       - 'traefik.http.middlewares.btb-canonical.redirectregex.permanent=true'
+      # ─── Zweiter App-Router — www.breakthebox.ch liefert dieselbe App ───
+      # Gleicher Service, gleiche DB, gleiches Upload-Volume: nur ein weiterer
+      # Hostname auf denselben Container. Canonical, Sitemap und JSON-LD zeigen
+      # weiterhin auf www.brigittehulliger.ch, weil SITE_URL aus PUBLIC_APP_URL
+      # kommt und nicht aus dem Host — PUBLIC_APP_URL darf deshalb NICHT auf
+      # breakthebox.ch geändert werden.
+      - 'traefik.http.routers.btb-www.rule=Host(`www.breakthebox.ch`)'
+      - 'traefik.http.routers.btb-www.entrypoints=websecure'
+      - 'traefik.http.routers.btb-www.tls=true'
+      - 'traefik.http.routers.btb-www.tls.certresolver=myresolver'
+      - 'traefik.http.routers.btb-www.tls.domains[0].main=www.breakthebox.ch'
+      - 'traefik.http.routers.btb-www.service=breakthebox'
+      # ─── Apex breakthebox.ch → www.breakthebox.ch (301) ───
+      # Innerhalb der Marke auf www vereinheitlichen, analog zu
+      # brigittehulliger.ch → www.brigittehulliger.ch weiter oben.
+      - 'traefik.http.routers.btb-apex.rule=Host(`breakthebox.ch`)'
+      - 'traefik.http.routers.btb-apex.entrypoints=websecure'
+      - 'traefik.http.routers.btb-apex.tls=true'
+      - 'traefik.http.routers.btb-apex.tls.certresolver=myresolver'
+      - 'traefik.http.routers.btb-apex.tls.domains[0].main=breakthebox.ch'
+      - 'traefik.http.routers.btb-apex.service=breakthebox'
+      - 'traefik.http.routers.btb-apex.middlewares=btb-www-canonical'
+      - 'traefik.http.middlewares.btb-www-canonical.redirectregex.regex=^https?://[^/]+/(.*)'
+      - 'traefik.http.middlewares.btb-www-canonical.redirectregex.replacement=https://www.breakthebox.ch/$${1}'
+      - 'traefik.http.middlewares.btb-www-canonical.redirectregex.permanent=true'
 
 volumes:
   pgdata:
