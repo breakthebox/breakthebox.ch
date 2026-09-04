@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { AboutContent, AboutRole } from '$lib/types/content';
+	import ImageUpload from '$lib/components/ui/ImageUpload.svelte';
 
 	let { data, form } = $props();
 
@@ -102,6 +103,17 @@
 				placeholder="z.B. Strategin, Verwaltungsrätin, Dozentin — und Builderin"
 				bind:value={content.title}
 			/>
+		</section>
+
+		<!-- ═══════ Porträtfoto ═══════ -->
+		<section class="editor-section">
+			<div class="section-header">
+				<div>
+					<h2>Porträtfoto</h2>
+					<p class="section-desc">Das Foto in der «Über mich»-Sektion. Mit «Entfernen» wird kein Foto angezeigt.</p>
+				</div>
+			</div>
+			<ImageUpload bind:value={content.photo} section="about-portrait" label="Foto" />
 		</section>
 
 		<!-- ═══════ Texte ═══════ -->

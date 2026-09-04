@@ -112,6 +112,7 @@ export const defaultAbout: AboutContent = {
 		{ platform: 'linkedin', url: 'https://www.linkedin.com/in/bhulliger/' },
 		{ platform: 'instagram', url: 'https://www.instagram.com/brigitte.hulliger/' }
 	],
+	photo: '/foto_brigitte_2025.webp',
 	videoLabel: 'mein CV in 2 Minuten',
 	videoUrl: 'https://www.youtube.com/watch?v=uCzVUW3xY8I'
 };
