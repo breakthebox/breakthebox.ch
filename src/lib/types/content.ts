@@ -42,6 +42,7 @@ export interface AboutContent {
 	qualifications: string[];
 	roles: AboutRole[];
 	socials: SocialLink[];
+	photo?: string; // Porträtfoto; leer = kein Foto anzeigen
 	videoLabel: string;
 	videoUrl?: string; // YouTube-Link (watch/youtu.be/shorts/embed) — wird als Embed dargestellt
 }

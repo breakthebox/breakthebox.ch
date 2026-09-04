@@ -570,9 +570,11 @@
 	<section class="sec" id="about" class:inverted={cfg.about.inverted}>
 		<div class="wrap aboutgrid">
 			<div class="aboutcol reveal">
-				<div class="aboutpf">
-					<img src="/foto_brigitte_2025.webp" alt="Brigitte Hulliger" loading="lazy" decoding="async" />
-				</div>
+				{#if about.photo}
+					<div class="aboutpf">
+						<img src={about.photo} alt="Brigitte Hulliger" loading="lazy" decoding="async" />
+					</div>
+				{/if}
 				{#if aboutVideoEmbed}
 					<div class="about-video">
 						<span class="about-video-label">{about.videoLabel}</span>
